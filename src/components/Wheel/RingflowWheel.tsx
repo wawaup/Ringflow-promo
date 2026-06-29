@@ -22,6 +22,7 @@ type RingflowWheelProps = {
   showCursorReveal?: boolean;
   showGlowPulse?: boolean;
   showDragTrail?: boolean;
+  showSegmentLabels?: boolean;
   glowProgress?: number;
 };
 
@@ -45,6 +46,7 @@ export const RingflowWheel = ({
   showCursorReveal = false,
   showGlowPulse = true,
   showDragTrail = false,
+  showSegmentLabels,
   glowProgress,
 }: RingflowWheelProps) => {
   const rawId = useId();
@@ -79,8 +81,9 @@ export const RingflowWheel = ({
       })
     : 0;
   const dimension = Math.round(size * visualScale);
-  const labelFont = mini ? 32 : 34;
-  const centerFont = mini ? 30 : 34;
+  const shouldShowSegmentLabels = showSegmentLabels ?? !mini;
+  const labelFont = mini ? 15 : 22;
+  const centerFont = mini ? 20 : 26;
   const gradientId = `${idPrefix}-glass-${resolvedMode}-${mini ? "mini" : "full"}`;
   const glowId = `${idPrefix}-glow-${resolvedMode}-${mini ? "mini" : "full"}`;
   const shadowId = `${idPrefix}-soft-shadow`;
@@ -170,6 +173,7 @@ export const RingflowWheel = ({
             : reveal;
           const isActive = activeSegment === segment.id;
           const isRunning = runningSegment === segment.id;
+          const showLabel = shouldShowSegmentLabels && (isActive || isRunning);
           const label = labelPosition(index, wheelConfig.sectorCount, center, outer, wheelConfig.overlayInnerDeadZoneRatio);
 
           return (
@@ -197,19 +201,21 @@ export const RingflowWheel = ({
                   opacity={0.78}
                 />
               )}
-              <text
-                x={label.x}
-                y={label.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill={dark ? promoTheme.colors.darkInk : promoTheme.colors.ink}
-                fontFamily='-apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif'
-                fontSize={labelFont}
-                fontWeight={700}
-                letterSpacing={0}
-              >
-                {segment.label}
-              </text>
+              {showLabel ? (
+                <text
+                  x={label.x}
+                  y={label.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={dark ? promoTheme.colors.darkInk : promoTheme.colors.ink}
+                  fontFamily='-apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif'
+                  fontSize={labelFont}
+                  fontWeight={750}
+                  letterSpacing={0}
+                >
+                  {segment.label}
+                </text>
+              ) : null}
             </g>
           );
         })}
