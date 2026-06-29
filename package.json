@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check:timeline": "node scripts/check-timeline.mjs",
-    "build": "npm run typecheck && npm run test && npm run check:timeline",
+    "build": "pnpm run typecheck && pnpm run test && pnpm run check:timeline",
     "still": "remotion still src/index.ts RingflowPromo out/stills/frame-900.png --frame=900 --scale=0.5",
     "render": "remotion render src/index.ts RingflowPromo out/ringflow-promo-animatic.mp4"
   },
