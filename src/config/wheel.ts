@@ -11,6 +11,16 @@ export const wheelConfig = {
   fanDismissScale: 0.9,
 } as const;
 
+export const wheelDerivedConfig = {
+  overlayInnerRadius: wheelConfig.overlayOuterRadius * wheelConfig.overlayInnerDeadZoneRatio,
+  overlayDiameter: wheelConfig.overlayOuterRadius * 2,
+  folderRingInnerRadius: wheelConfig.overlayOuterRadius + wheelConfig.folderRingGap,
+  folderRingOuterRadius:
+    wheelConfig.overlayOuterRadius + wheelConfig.folderRingGap + wheelConfig.folderRingThickness,
+  folderRingMidRadius:
+    wheelConfig.overlayOuterRadius + wheelConfig.folderRingGap + wheelConfig.folderRingThickness / 2,
+} as const;
+
 export const wheelSegments = [
   { id: "quick-input", label: "润色改写" },
   { id: "quick-open", label: "快捷打开" },
