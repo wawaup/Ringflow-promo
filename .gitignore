@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+build/
+.remotion/
+.turbo/
+.DS_Store
+npm-debug.log*
+coverage/
+*.mp4
+*.mov
+*.webm
+*.wav
+*.aac
