@@ -1636,8 +1636,9 @@ export { OutroScene } from "./15_OutroScene";
 Create `/Users/admin/dev/Ringflow/Ringflow-promo/src/PromoFilm.tsx`:
 
 ```tsx
-import { Audio, staticFile } from "@remotion/media";
+import { Audio } from "@remotion/media";
 import { AbsoluteFill, Sequence } from "remotion";
+import { staticFile } from "remotion";
 import { assets } from "./config/assets";
 import { scenes } from "./config/timeline";
 import {
@@ -1982,4 +1983,3 @@ Two execution options:
 
 1. Subagent-Driven (recommended) - dispatch a fresh subagent per task, review between tasks, faster iteration and cleaner task boundaries.
 2. Inline Execution - execute tasks in this session using executing-plans, with checkpoints after each committed task.
-
