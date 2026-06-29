@@ -16,7 +16,7 @@ export const Toast = ({ text, mode = "dark" }: ToastProps) => {
         background: dark ? "rgba(17,24,39,0.80)" : "rgba(255,255,255,0.76)",
         border: dark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(255,255,255,0.78)",
         color: dark ? "#ffffff" : theme.colors.ink,
-        fontSize: theme.type.small,
+        fontSize: theme.type.label,
         lineHeight: 1.15,
         fontWeight: 680,
         letterSpacing: 0,

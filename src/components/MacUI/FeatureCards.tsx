@@ -46,7 +46,7 @@ export const FeatureCard = ({ label, emphasis = false, icon, mode = "light" }: F
         style={{
           minWidth: 0,
           overflowWrap: "anywhere",
-          fontSize: 28,
+          fontSize: 32,
           lineHeight: 1.12,
           fontWeight: 760,
           letterSpacing: 0,
@@ -74,7 +74,7 @@ export const MetricPill = ({ label, value, mode = "light" }: MetricPillProps) =>
         boxSizing: "border-box",
       }}
     >
-      <div style={{ fontSize: 22, lineHeight: 1.12, color: dark ? theme.colors.darkMuted : theme.colors.muted, letterSpacing: 0 }}>
+      <div style={{ fontSize: 32, lineHeight: 1.12, color: dark ? theme.colors.darkMuted : theme.colors.muted, letterSpacing: 0 }}>
         {label}
       </div>
       <div
