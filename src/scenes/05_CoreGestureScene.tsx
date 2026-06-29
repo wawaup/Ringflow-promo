@@ -11,6 +11,16 @@ export const CoreGestureScene = () => {
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
+  const folderProgress = interpolate(frame, [34, 58, 78], [0, 1, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  const folderRotation = interpolate(frame, [34, 74], [-28, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
   const cursorX = interpolate(frame, [8, 52, 84], [342, 430, 430], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -29,6 +39,8 @@ export const CoreGestureScene = () => {
           activeSegment="quick-input"
           centerLabel={releaseProgress > 0.72 ? "完成" : "按住"}
           showOuterRing
+          folderProgress={folderProgress}
+          folderRotation={folderRotation}
           showDragTrail
           glowProgress={0.82}
           releaseProgress={releaseProgress}

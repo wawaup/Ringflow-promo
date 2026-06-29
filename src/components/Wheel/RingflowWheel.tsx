@@ -35,6 +35,8 @@ type RingflowWheelProps = {
   glowProgress?: number;
   highlightIndex?: number | null;
   folderHighlightIndex?: number | null;
+  folderProgress?: number;
+  folderRotation?: number;
 };
 
 const clamp01 = (value: number): number => Math.min(Math.max(value, 0), 1);
@@ -261,6 +263,8 @@ export const RingflowWheel = ({
   glowProgress,
   highlightIndex,
   folderHighlightIndex,
+  folderProgress,
+  folderRotation = 0,
 }: RingflowWheelProps) => {
   const rawId = useId();
   const idPrefix = `ringflow-wheel-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -295,6 +299,7 @@ export const RingflowWheel = ({
         easing: Easing.bezier(0.16, 1, 0.3, 1),
       })
     : 0;
+  const outerRingProgress = clamp01(folderProgress ?? (withFolder ? reveal : 0));
   const activeMainIndex = highlightIndex ?? wheelSegmentToSiteIndex(activeSegment) ?? wheelSegmentToSiteIndex(runningSegment);
   const activeFolderIndex =
     folderHighlightIndex ??
@@ -365,13 +370,14 @@ export const RingflowWheel = ({
         <g filter={`url(#${shadowId})`}>
           {withFolder ? (
             <g
-              opacity={interpolate(frame, [revealFrame + 12, revealFrame + 32], [0, reveal], {
+              opacity={interpolate(outerRingProgress, [0, 1], [0, reveal], {
                 extrapolateLeft: "clamp",
                 extrapolateRight: "clamp",
                 easing: Easing.bezier(0.16, 1, 0.3, 1),
               })}
               style={{
-                scale: interpolate(frame, [revealFrame + 12, revealFrame + 32], [0.9, 1], {
+                rotate: `${folderRotation}deg`,
+                scale: interpolate(outerRingProgress, [0, 1], [0.88, 1], {
                   extrapolateLeft: "clamp",
                   extrapolateRight: "clamp",
                   easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -390,12 +396,12 @@ export const RingflowWheel = ({
               {FOLDER_SLOTS.map((slot, index) => {
                 if (!slot) return null;
                 const itemReveal = showSegmentStagger
-                  ? interpolate(frame, [revealFrame + 12 + index * stagger, revealFrame + 25 + index * stagger], [0, reveal], {
+                  ? interpolate(outerRingProgress, [0, Math.min(1, 0.48 + index * 0.065), 1], [0, 0.35, reveal], {
                       extrapolateLeft: "clamp",
                       extrapolateRight: "clamp",
                       easing: Easing.bezier(0.16, 1, 0.3, 1),
                     })
-                  : reveal;
+                  : outerRingProgress * reveal;
                 const highlighted = activeFolderIndex === index;
                 const path = annulusSectorPath(index, wheelConfig.sectorCount, center, folderOuter, folderInner);
                 return (
