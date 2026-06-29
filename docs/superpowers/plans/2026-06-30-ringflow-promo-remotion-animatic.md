@@ -6,7 +6,7 @@
 
 **Architecture:** Treat `Ringflow-promo` as a self-contained video project. Remotion owns timeline sequencing and export; React/SVG components own the wheel, cursor, mock macOS UI, text, cards, and toasts. The first milestone is an animatic that proves timing, scene composition, and wheel interaction, before high-fidelity polishing.
 
-**Tech Stack:** Remotion, React, TypeScript, SVG, CSS modules/plain CSS, Vitest for geometry/config tests, Node/npm scripts, existing storyboard Excel as source reference.
+**Tech Stack:** Remotion, React, TypeScript, SVG, CSS modules/plain CSS, Vitest for geometry/config tests, Node/pnpm scripts, existing storyboard Excel as source reference.
 
 ---
 
@@ -21,7 +21,7 @@ The parent repo currently ignores `Ringflow-promo`, so implementation commits sh
 Create or modify these files inside `Ringflow-promo`:
 
 - Create: `.gitignore` - ignore Remotion build outputs and dependencies inside the promo project.
-- Create: `package.json` - npm scripts and dependencies.
+- Create: `package.json` - pnpm scripts and dependencies.
 - Create: `tsconfig.json` - TypeScript config for Remotion.
 - Create: `remotion.config.ts` - Remotion output settings.
 - Create: `src/index.ts` - Remotion entry registration.
@@ -175,7 +175,7 @@ Create `/Users/admin/dev/Ringflow/Ringflow-promo/package.json`:
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check:timeline": "node scripts/check-timeline.mjs",
-    "build": "npm run typecheck && npm run test && npm run check:timeline",
+    "build": "pnpm run typecheck && pnpm run test && pnpm run check:timeline",
     "still": "remotion still src/index.ts RingflowPromo out/stills/frame-900.png --frame=900 --scale=0.5",
     "render": "remotion render src/index.ts RingflowPromo out/ringflow-promo-animatic.mp4"
   },
@@ -294,7 +294,7 @@ Run with network approval if needed:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm install
+pnpm install
 ```
 
 Expected:
@@ -309,7 +309,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run typecheck
+pnpm run typecheck
 ```
 
 Expected failure at this stage:
@@ -325,7 +325,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-git add package.json package-lock.json tsconfig.json remotion.config.ts src/index.ts src/Root.tsx src/styles/global.css .gitignore
+git add package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json remotion.config.ts src/index.ts src/Root.tsx src/styles/global.css .gitignore
 git commit -m "chore: 搭建 Remotion TypeScript 工程"
 ```
 
@@ -496,7 +496,7 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
   },
   "shell-script": {
     headline: ["脚本，也可以一划运行。"],
-    uiLabels: ["npm run build", "Done in 2.4s"],
+    uiLabels: ["pnpm run build", "Done in 2.4s"],
   },
   shortcuts: {
     headline: ["已有的自动化，也能更近一点。"],
@@ -620,7 +620,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run check:timeline
+pnpm run check:timeline
 ```
 
 Expected:
@@ -703,7 +703,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run test -- src/components/Wheel/wheelGeometry.test.ts
+pnpm run test -- src/components/Wheel/wheelGeometry.test.ts
 ```
 
 Expected:
@@ -836,7 +836,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run test -- src/components/Wheel/wheelGeometry.test.ts
+pnpm run test -- src/components/Wheel/wheelGeometry.test.ts
 ```
 
 Expected:
@@ -1207,7 +1207,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run typecheck
+pnpm run typecheck
 ```
 
 Expected still fails because `PromoFilm` and scenes are not created:
@@ -1503,7 +1503,7 @@ export const ShellScriptScene = () => (
     <div style={{ position: "relative" }}>
       <MacWindow title="Terminal" width={720} height={360}>
         <div style={{ fontFamily: "Menlo, monospace", fontSize: 26, color: "#0f172a", lineHeight: 1.7 }}>
-          <div>$ npm run build</div>
+          <div>$ pnpm run build</div>
           <div>✓ Done in 2.4s</div>
         </div>
       </MacWindow>
@@ -1700,7 +1700,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run typecheck
+pnpm run typecheck
 ```
 
 Expected:
@@ -1774,7 +1774,7 @@ Modify `/Users/admin/dev/Ringflow/Ringflow-promo/package.json` scripts:
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check:timeline": "node scripts/check-timeline.mjs",
-    "build": "npm run typecheck && npm run test && npm run check:timeline",
+    "build": "pnpm run typecheck && pnpm run test && pnpm run check:timeline",
     "still": "remotion still src/index.ts RingflowPromo out/stills/frame-900.png --frame=900 --scale=0.5",
     "stills": "node scripts/render-stills.mjs",
     "render": "remotion render src/index.ts RingflowPromo out/ringflow-promo-animatic.mp4"
@@ -1788,7 +1788,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run build
+pnpm run build
 ```
 
 Expected:
@@ -1810,7 +1810,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run stills
+pnpm run stills
 ```
 
 Expected:
@@ -1874,7 +1874,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run build
+pnpm run build
 ```
 
 Expected:
@@ -1896,7 +1896,7 @@ Run:
 
 ```bash
 cd /Users/admin/dev/Ringflow/Ringflow-promo
-npm run render
+pnpm run render
 ```
 
 Expected:
