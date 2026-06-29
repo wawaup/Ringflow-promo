@@ -10,6 +10,7 @@
     "check:timeline": "node scripts/check-timeline.mjs",
     "build": "pnpm run typecheck && pnpm run test && pnpm run check:timeline",
     "still": "remotion still src/index.ts RingflowPromo out/stills/frame-900.png --frame=900 --scale=0.5",
+    "stills": "node scripts/render-stills.mjs",
     "render": "remotion render src/index.ts RingflowPromo out/ringflow-promo-animatic.mp4"
   },
   "dependencies": {
