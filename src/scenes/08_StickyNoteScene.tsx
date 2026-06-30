@@ -2,23 +2,26 @@ import { Easing, interpolate, useCurrentFrame } from "remotion";
 import { MacWindow } from "../components/MacUI/MacWindow";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
+
+const scene = scenes.find((item) => item.id === "sticky-note")!;
 
 const noteItems = ["订阅状态刷新点", "设备解绑入口", "预设导入后的默认轮盘"];
 
 export const StickyNoteScene = () => {
   const frame = useCurrentFrame();
 
-  const windowReveal = interpolate(frame, [0, 20], [0, 1], {
+  const windowReveal = interpolate(frame, [scene.choreography.visualStartFrame, scene.choreography.visualStartFrame + 22], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
   return (
-    <SceneShell lines={sceneCopy["sticky-note"].headline}>
+    <SceneShell lines={sceneCopy["sticky-note"].headline} layout={scene.layout} choreography={scene.choreography}>
       <div style={{ display: "grid", gridTemplateColumns: "260px 440px", gap: 38, alignItems: "center" }}>
-        <RingflowWheel mini activeSegment="sticky-note" centerLabel="便签" revealFrame={4} />
+        <RingflowWheel mini activeSegment="sticky-note" centerLabel="便签" revealFrame={scene.choreography.visualStartFrame} />
         <div
           style={{
             opacity: windowReveal,
@@ -27,11 +30,11 @@ export const StickyNoteScene = () => {
         >
           <MacWindow title="会议要点" width={420} height={280}>
             <div style={{ display: "grid", gap: 16 }}>
-              <HeadlineReveal frame={frame} startFrame={8}>
+              <HeadlineReveal frame={frame} startFrame={scene.choreography.actionStartFrame}>
                 下次同步前确认三件事
               </HeadlineReveal>
               {noteItems.map((item, i) => (
-                <ItemReveal key={item} frame={frame} startFrame={18 + i * 10}>
+                <ItemReveal key={item} frame={frame} startFrame={scene.choreography.actionStartFrame + 14 + i * 12}>
                   <div
                     style={{ display: "flex", gap: 12, alignItems: "center", fontSize: 22, color: "#475569" }}
                   >

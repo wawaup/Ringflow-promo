@@ -2,7 +2,10 @@ import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "re
 import { Cursor } from "../components/Cursor/Cursor";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
+
+const scene = scenes.find((item) => item.id === "product-reveal")!;
 
 export const ProductRevealScene = () => {
   const frame = useCurrentFrame();
@@ -17,7 +20,7 @@ export const ProductRevealScene = () => {
   });
 
   // Cursor starts off-screen right, slides left toward wheel
-  const cursorT = interpolate(frame, [0, 22], [0, 1], {
+  const cursorT = interpolate(frame, [scene.choreography.actionStartFrame, scene.choreography.actionStartFrame + 32], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -28,15 +31,15 @@ export const ProductRevealScene = () => {
   const cursorX = interpolate(cursorT, [0, 1], [620, 446]);
   const cursorY = interpolate(cursorT, [0, 1], [60, 140]);
 
-  const cursorReveal = interpolate(frame, [0, 10], [0, 1], {
+  const cursorReveal = interpolate(frame, [scene.choreography.visualStartFrame, scene.choreography.visualStartFrame + 14], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
   return (
-    <SceneShell lines={sceneCopy["product-reveal"].headline} childrenDelay={2}>
-      <div style={{ position: "relative", width: 680, minHeight: 500, display: "grid", placeItems: "center" }}>
+    <SceneShell lines={sceneCopy["product-reveal"].headline} layout={scene.layout} choreography={scene.choreography}>
+      <div style={{ position: "relative", width: 760, minHeight: 520, display: "grid", placeItems: "center" }}>
         <div style={{ scale: 1.18, opacity: wheelReveal, transform: `scale(${0.88 + wheelReveal * 0.12})` }}>
           <RingflowWheel
             activeSegment="quick-input"

@@ -19,6 +19,382 @@ const panel = (mode: Mode = "light") => {
   } as const;
 };
 
+const reveal = (frame: number, start: number, duration = 22) =>
+  interpolate(frame, [start, start + duration], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+
+const sceneWindowVisibility = (frame: number, start: number, end: number, fade = 18) => {
+  const enter = reveal(frame, start, fade);
+  const exit = interpolate(frame, [end - fade, end], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.4, 0, 0.2, 1),
+  });
+  return Math.min(enter, exit);
+};
+
+const KeyCombo = ({
+  combo,
+  visible,
+  x,
+  y,
+}: {
+  combo: string[];
+  visible: number;
+  x: number;
+  y: number;
+}) => (
+  <div
+    style={{
+      position: "absolute",
+      left: x,
+      top: y,
+      display: "flex",
+      gap: 10,
+      alignItems: "center",
+      opacity: visible,
+      transform: `translateY(${(1 - visible) * 10}px)`,
+      filter: "drop-shadow(0 10px 24px rgba(30,45,70,0.16))",
+    }}
+  >
+    {combo.map((key, index) => (
+      <div
+        key={`${key}-${index}`}
+        style={{
+          minWidth: key.length > 1 ? 92 : 54,
+          height: 48,
+          padding: "0 16px",
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.88)",
+          border: "1px solid rgba(148,163,184,0.30)",
+          display: "grid",
+          placeItems: "center",
+          color: "#243044",
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif',
+          fontSize: 23,
+          fontWeight: 780,
+          letterSpacing: 0,
+        }}
+      >
+        {key}
+      </div>
+    ))}
+  </div>
+);
+
+const DockIcon = ({
+  label,
+  active,
+  x,
+  y,
+}: {
+  label: string;
+  active: number;
+  x: number;
+  y: number;
+}) => (
+  <div
+    style={{
+      position: "absolute",
+      left: x,
+      top: y,
+      width: 78,
+      display: "grid",
+      justifyItems: "center",
+      gap: 8,
+      opacity: 0.92,
+      transform: `translateY(${-active * 9}px) scale(${1 + active * 0.08})`,
+    }}
+  >
+    <div
+      style={{
+        width: 58,
+        height: 58,
+        borderRadius: 16,
+        background:
+          label === "便签"
+            ? "linear-gradient(180deg, #fff6bf, #f7d865)"
+            : "linear-gradient(180deg, #f8fbff, #dce9f7)",
+        border: "1px solid rgba(255,255,255,0.75)",
+        boxShadow: active > 0.1 ? "0 18px 36px rgba(47,127,211,0.24)" : "0 10px 28px rgba(30,45,70,0.13)",
+        display: "grid",
+        placeItems: "center",
+        color: "#344155",
+        fontSize: 26,
+        fontWeight: 860,
+      }}
+    >
+      {label === "便签" ? "纪" : "提"}
+    </div>
+    <div style={{ fontSize: 15, fontWeight: 700, color: "#64748b" }}>{label}</div>
+  </div>
+);
+
+export const InterruptedWorkflowWorkspace = ({
+  choreography,
+}: {
+  choreography: {
+    pageStartFrame?: number;
+    pageReadyFrame?: number;
+    codexInputStartFrame?: number;
+    codexMainStartFrame?: number;
+    noteStartFrame?: number;
+    stickyOpenFrame?: number;
+    noteCopyFrame?: number;
+    notePasteFrame?: number;
+    promptOpenFrame?: number;
+    promptCopyFrame?: number;
+    promptPasteFrame?: number;
+    holdStartFrame?: number;
+  };
+}) => {
+  const frame = useCurrentFrame();
+  const page = reveal(frame, choreography.pageStartFrame ?? 0, 58);
+  const pageSweep = interpolate(frame, [choreography.pageStartFrame ?? 0, choreography.pageReadyFrame ?? 56], [-18, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+  const codexInput = reveal(frame, choreography.codexInputStartFrame ?? 0, 22);
+  const stickyOpen = reveal(frame, choreography.stickyOpenFrame ?? 0, 18);
+  const noteCopy = reveal(frame, choreography.noteCopyFrame ?? 0, 10);
+  const notePaste = reveal(frame, choreography.notePasteFrame ?? 0, 14);
+  const promptCopy = reveal(frame, choreography.promptCopyFrame ?? 0, 10);
+  const promptPaste = reveal(frame, choreography.promptPasteFrame ?? 0, 14);
+  const codeWindow = sceneWindowVisibility(
+    frame,
+    choreography.codexMainStartFrame ?? 0,
+    (choreography.noteStartFrame ?? 0) - 2,
+    20,
+  );
+  const noteWindow = sceneWindowVisibility(
+    frame,
+    choreography.noteStartFrame ?? 0,
+    (choreography.promptOpenFrame ?? 0) - 10,
+    18,
+  );
+  const promptOpen = sceneWindowVisibility(
+    frame,
+    choreography.promptOpenFrame ?? 0,
+    (choreography.holdStartFrame ?? 626) + 44,
+    18,
+  );
+  const noteSelection = interpolate(frame, [
+    (choreography.noteCopyFrame ?? 0) - 18,
+    choreography.noteCopyFrame ?? 0,
+    (choreography.notePasteFrame ?? 0) + 8,
+  ], [0, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const promptSelection = interpolate(frame, [
+    (choreography.promptCopyFrame ?? 0) - 18,
+    choreography.promptCopyFrame ?? 0,
+    (choreography.promptPasteFrame ?? 0) + 8,
+  ], [0, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const copyKeys = Math.max(
+    interpolate(frame, [choreography.noteCopyFrame ?? 0, (choreography.noteCopyFrame ?? 0) + 18, (choreography.notePasteFrame ?? 0) - 6], [0, 1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+    interpolate(frame, [choreography.promptCopyFrame ?? 0, (choreography.promptCopyFrame ?? 0) + 18, (choreography.promptPasteFrame ?? 0) - 6], [0, 1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+  );
+  const pasteKeys = Math.max(
+    interpolate(frame, [choreography.notePasteFrame ?? 0, (choreography.notePasteFrame ?? 0) + 18, (choreography.notePasteFrame ?? 0) + 40], [0, 1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+    interpolate(frame, [choreography.promptPasteFrame ?? 0, (choreography.promptPasteFrame ?? 0) + 18, (choreography.promptPasteFrame ?? 0) + 46], [0, 1, 0], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+  );
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width: 940,
+        height: 640,
+        opacity: page,
+        transform: `translateY(${(1 - page) * 34}px) scale(${0.92 + page * 0.08})`,
+        filter: `blur(${(1 - page) * 10}px)`,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: -60,
+          right: -40,
+          top: 28,
+          height: 560,
+          borderRadius: 36,
+          background: "linear-gradient(115deg, rgba(255,255,255,0.04), rgba(255,255,255,0.42), rgba(214,235,255,0.10))",
+          opacity: page * 0.62,
+          transform: `translateX(${pageSweep * 20}px)`,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: "22px 26px",
+          borderRadius: 30,
+          background: "rgba(255,255,255,0.38)",
+          border: "1px solid rgba(255,255,255,0.46)",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.55)",
+        }}
+      />
+
+      {/* Top stage: code, notes, and prompt windows take turns instead of coexisting. */}
+      <div style={{ position: "absolute", left: 170, top: 46, opacity: codeWindow, transform: `translateY(${(1 - codeWindow) * 18}px) scale(${0.97 + codeWindow * 0.03})` }}>
+        <div style={{ ...panel("light"), width: 600, height: 268, borderRadius: 22, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          {/* Title bar */}
+          <div style={{ height: 42, padding: "0 16px", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(148,163,184,0.13)", background: "rgba(248,250,253,0.92)", flexShrink: 0 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 999, background: "#ff5f57" }} />
+            <span style={{ width: 10, height: 10, borderRadius: 999, background: "#ffbd2e" }} />
+            <span style={{ width: 10, height: 10, borderRadius: 999, background: "#28c840" }} />
+            <span style={{ marginLeft: 8, fontSize: 14, fontWeight: 700, color: "#64748b" }}>useSubscription.ts</span>
+          </div>
+          <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+            {/* File tree sidebar */}
+            <div style={{ width: 148, borderRight: "1px solid rgba(148,163,184,0.13)", padding: "14px 0", background: "rgba(245,248,252,0.88)" }}>
+              {[
+                { name: "src", indent: 0, isFolder: true },
+                { name: "hooks", indent: 1, isFolder: true },
+                { name: "useSubscription.ts", indent: 2, active: true },
+                { name: "useDevice.ts", indent: 2 },
+                { name: "components", indent: 1, isFolder: true },
+                { name: "PresetImport.tsx", indent: 2 },
+              ].map((item) => (
+                <div
+                  key={item.name}
+                  style={{
+                    padding: `5px 12px 5px ${12 + item.indent * 14}px`,
+                    fontSize: 12,
+                    fontWeight: item.active ? 760 : 560,
+                    color: item.active ? "#2563a9" : item.isFolder ? "#334155" : "#64748b",
+                    background: item.active ? "rgba(47,127,211,0.10)" : "transparent",
+                    borderRadius: item.active ? "0 8px 8px 0" : 0,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                    fontFamily: "Menlo, Monaco, Consolas, monospace",
+                  }}
+                >
+                  {item.isFolder ? "▸ " : ""}{item.name}
+                </div>
+              ))}
+            </div>
+            {/* Code area */}
+            <div style={{ flex: 1, padding: "16px 18px", fontFamily: "Menlo, Monaco, Consolas, monospace", fontSize: 13, lineHeight: 1.7, color: "#334155", overflow: "hidden" }}>
+              <div style={{ color: "#94a3b8" }}>{"// 订阅状态刷新 + 预设导入验证"}</div>
+              <div><span style={{ color: "#7c3aed" }}>export function</span> <span style={{ color: "#1d4ed8" }}>useSubscription</span>{"() {"}</div>
+              <div style={{ paddingLeft: 18 }}><span style={{ color: "#7c3aed" }}>const</span> [status, setStatus] = <span style={{ color: "#1d4ed8" }}>useState</span>{"<"}<span style={{ color: "#0891b2" }}>Status</span>{">(null)"}</div>
+              <div style={{ paddingLeft: 18 }}></div>
+              <div style={{ paddingLeft: 18 }}><span style={{ color: "#7c3aed" }}>useEffect</span>{"(() => {"}</div>
+              <div style={{ paddingLeft: 36, color: "#64748b" }}>{"// TODO: 对照会议纪要补充边界"}</div>
+              <div style={{ paddingLeft: 36 }}><span style={{ color: "#1d4ed8" }}>fetchStatus</span>{"().then(setStatus)"}</div>
+              <div style={{ paddingLeft: 18 }}>{"}, [deps])"}</div>
+              <div>{"}"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* AI Chat is the steady destination for pasted context. */}
+      <div style={{ position: "absolute", left: 210, top: 354, opacity: codexInput, transform: `translateY(${(1 - codexInput) * 18}px) scale(${0.96 + codexInput * 0.04})` }}>
+        <div style={{ ...panel("light"), width: 520, height: 238, borderRadius: 24, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          <div style={{ height: 48, padding: "0 18px", display: "flex", alignItems: "center", gap: 9, borderBottom: "1px solid rgba(148,163,184,0.13)", background: "rgba(248,250,253,0.94)", flexShrink: 0 }}>
+            <span style={{ width: 28, height: 28, borderRadius: 9, background: "linear-gradient(135deg,#7c3aed,#2563ab)", display: "grid", placeItems: "center" }}>
+              <span style={{ color: "white", fontSize: 13, fontWeight: 860 }}>AI</span>
+            </span>
+            <span style={{ fontSize: 16, fontWeight: 780, color: "#334155" }}>AI Chat</span>
+          </div>
+          <div style={{ flex: 1, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, overflow: "hidden" }}>
+            {/* User bubble */}
+            <div style={{ alignSelf: "start", justifySelf: "end", maxWidth: "94%", background: "rgba(47,127,211,0.12)", border: "1px solid rgba(47,127,211,0.18)", borderRadius: "15px 15px 5px 15px", padding: "10px 12px", fontSize: 13, color: "#1e3a5f", lineHeight: 1.48, fontWeight: 640 }}>
+              帮我补充 useSubscription 的边界处理
+            </div>
+            {/* AI bubble */}
+            <div style={{ alignSelf: "start", justifySelf: "start", maxWidth: "96%", background: "rgba(248,250,253,0.96)", border: "1px solid rgba(148,163,184,0.18)", borderRadius: "15px 15px 15px 5px", padding: "10px 12px", fontSize: 13, color: "#334155", lineHeight: 1.48, fontWeight: 580 }}>
+              好的，你需要处理三种情况：loading、error 和 expired…
+            </div>
+            {/* Input area */}
+            <div style={{ gridColumn: "1 / span 2", alignSelf: "end", height: 66, borderRadius: 14, background: "rgba(241,245,249,0.92)", border: "1.5px solid rgba(47,127,211,0.20)", padding: "12px 14px", boxSizing: "border-box" }}>
+              <div style={{ fontSize: 14, color: "#233044", fontWeight: 620, lineHeight: 1.42 }}>
+                {notePaste > 0.1 ? "会议纪要：确认订阅刷新…" : ""}
+                {promptPaste > 0.1 ? " 总结提炼步骤" : ""}
+                <span style={{ display: "inline-block", width: 8, height: 16, marginLeft: 2, background: "#2f7fd3", opacity: Math.floor(frame / 18) % 2 ? 0.22 : 0.78, verticalAlign: -3 }} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", left: 256, top: 66, opacity: noteWindow, transform: `translateY(${(1 - noteWindow) * 18}px) scale(${0.97 + noteWindow * 0.03})` }}>
+        <div style={{ ...panel("light"), width: 428, height: 218, borderRadius: 22, overflow: "hidden" }}>
+          <div style={{ height: 38, padding: "0 14px", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(148,163,184,0.14)", color: "#7a6b21", fontSize: 13, fontWeight: 760, background: "rgba(255,247,199,0.82)" }}>
+            <span style={{ fontSize: 15 }}>🗒</span> 会议纪要
+          </div>
+          <div style={{ padding: "18px 20px", fontSize: 17, lineHeight: 1.58, fontWeight: 620, color: "#3e4858", position: "relative" }}>
+            {noteSelection > 0.1 ? <div style={{ position: "absolute", inset: "10px 10px 12px", borderRadius: 10, background: `rgba(47,127,211,${0.11 * noteSelection})` }} /> : null}
+            <div style={{ position: "relative" }}>
+              下次同步前确认三件事：<br />
+              订阅状态刷新点、设备解绑入口、预设导入后的默认轮盘。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", left: 316, top: 66, opacity: promptOpen, transform: `translateY(${(1 - promptOpen) * 18}px) scale(${0.97 + promptOpen * 0.03})` }}>
+        <div style={{ ...panel("light"), width: 308, height: 218, borderRadius: 22, overflow: "hidden" }}>
+          <div style={{ height: 38, display: "flex", alignItems: "center", padding: "0 14px", borderBottom: "1px solid rgba(148,163,184,0.14)", background: "rgba(248,251,255,0.82)", color: "#64748b", fontSize: 13, fontWeight: 780 }}>
+            常用 Prompt
+          </div>
+          <div style={{ padding: "14px 16px" }}>
+            {["总结提炼", "润色改写", "分步说明", "对比分析"].map((item) => {
+              const selected = item === "总结提炼";
+              return (
+                <div
+                  key={item}
+                  style={{
+                    height: 36,
+                    borderRadius: 9,
+                    padding: "0 12px",
+                    marginBottom: 8,
+                    display: "flex",
+                    alignItems: "center",
+                    background: selected ? `rgba(223,239,255,${0.7 + promptSelection * 0.25})` : "rgba(248,250,252,0.80)",
+                    border: selected ? "1px solid rgba(47,127,211,0.22)" : "1px solid rgba(226,232,240,0.65)",
+                    color: selected ? "#1f5f9f" : "#566477",
+                    fontSize: 15,
+                    fontWeight: selected ? 760 : 580,
+                    transform: selected ? `scale(${1 + promptSelection * 0.016})` : "none",
+                  }}
+                >
+                  {item}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <KeyCombo combo={["Control", "C"]} visible={copyKeys} x={642} y={278} />
+      <KeyCombo combo={["Control", "V"]} visible={pasteKeys} x={642} y={278} />
+    </div>
+  );
+};
+
 /** Eased fade-in for staggered list items */
 const useItemReveal = (index: number, staggerFrames = 8, durationFrames = 18) => {
   const frame = useCurrentFrame();
@@ -192,29 +568,26 @@ const AnimatedItem = ({
   );
 };
 
-// ─── QuickInputWorkspace (distinct from WritingWorkspace) ─────────────────────
+// ─── QuickInputWorkspace (Cursor-style: code editor + AI chat) ───────────────
 export const QuickInputWorkspace = () => {
   const frame = useCurrentFrame();
 
-  // Typing cursor blink at ~1Hz
   const cursorBlink = Math.floor(frame / 18) % 2 === 0;
 
-  // Characters typed progressively
-  const totalChars = 24;
+  const totalChars = 15;
   const typedCount = Math.min(
     totalChars,
     Math.floor(
-      interpolate(frame, [10, 50], [0, totalChars], {
+      interpolate(frame, [10, 48], [0, totalChars], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
         easing: Easing.bezier(0.4, 0, 0.2, 1),
       }),
     ),
   );
-  const fullText = "请帮我总结以上内容的关键决策点";
+  const fullText = "总结提炼，分步说明";
   const typedText = fullText.slice(0, typedCount);
 
-  // Prompt card flash in
   const promptFlash = interpolate(frame, [52, 66], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -228,154 +601,93 @@ export const QuickInputWorkspace = () => {
   });
 
   return (
-    <div
-      style={{
-        position: "relative",
-        width: 850,
-        opacity: windowReveal,
-        transform: `translateY(${(1 - windowReveal) * 20}px)`,
-      }}
-    >
-      <div
-        style={{
-          ...panel("light"),
-          width: 780,
-          minHeight: 480,
-          borderRadius: 26,
-          overflow: "hidden",
-        }}
-      >
+    <div style={{ position: "relative", width: 850, opacity: windowReveal, transform: `translateY(${(1 - windowReveal) * 20}px)` }}>
+      <div style={{ ...panel("light"), width: 780, height: 480, borderRadius: 26, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {/* Title bar */}
-        <div
-          style={{
-            height: 54,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "0 24px",
-            borderBottom: "1px solid rgba(148,163,184,0.16)",
-            color: "#64748b",
-            fontSize: 17,
-            fontWeight: 650,
-          }}
-        >
+        <div style={{ height: 50, display: "flex", alignItems: "center", gap: 10, padding: "0 22px", borderBottom: "1px solid rgba(148,163,184,0.15)", background: "rgba(248,250,253,0.94)", flexShrink: 0 }}>
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ff5f57" }} />
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ffbd2e" }} />
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#28c840" }} />
-          <span style={{ marginLeft: 14 }}>项目复盘文档.md</span>
+          {/* Tab bar */}
+          <div style={{ marginLeft: 16, display: "flex", gap: 4 }}>
+            {["ProductReview.md", "api.ts", "config.json"].map((tab, i) => (
+              <div key={tab} style={{ padding: "4px 14px", borderRadius: "8px 8px 0 0", background: i === 0 ? "rgba(255,255,255,0.92)" : "transparent", border: i === 0 ? "1px solid rgba(148,163,184,0.18)" : "none", borderBottom: i === 0 ? "1px solid rgba(255,255,255,0.92)" : "none", fontSize: 13, fontWeight: i === 0 ? 720 : 520, color: i === 0 ? "#334155" : "#94a3b8" }}>
+                {tab}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 230px", height: 426 }}>
-          {/* Text area */}
-          <div style={{ padding: "30px 36px", display: "flex", flexDirection: "column", gap: 18 }}>
-            <div style={{ fontSize: 26, lineHeight: 1.52, fontWeight: 680, color: "#334155", flex: 1 }}>
-              本次迭代覆盖了三个核心模块，包括用户鉴权、数据同步和离线缓存策略……
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          {/* Code / markdown area */}
+          <div style={{ flex: 1, padding: "22px 28px", display: "flex", flexDirection: "column", gap: 14, overflow: "hidden" }}>
+            <div style={{ fontSize: 22, fontWeight: 740, color: "#1e293b" }}># 本次迭代复盘</div>
+            <div style={{ fontSize: 16, lineHeight: 1.62, color: "#475569" }}>
+              覆盖三个核心模块：用户鉴权、数据同步与离线缓存策略。
+              各模块验收标准需在发布前对齐……
             </div>
+            <div style={{ height: 1, background: "rgba(148,163,184,0.14)" }} />
 
-            {/* Live typing input bar */}
-            <div
-              style={{
-                height: 60,
-                borderRadius: 14,
-                background: "rgba(241,245,249,0.9)",
-                border: "1.5px solid rgba(47,127,211,0.22)",
-                display: "flex",
-                alignItems: "center",
-                padding: "0 18px",
-                fontSize: 22,
-                color: "#1e3a5f",
-                fontWeight: 600,
-                gap: 4,
-              }}
-            >
-              <span>{typedText}</span>
-              {typedCount < totalChars && cursorBlink && (
-                <span
+            {/* AI input bar — Ringflow inserts here */}
+            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ height: 52, borderRadius: 14, background: "rgba(241,245,249,0.92)", border: "1.5px solid rgba(47,127,211,0.22)", display: "flex", alignItems: "center", padding: "0 16px", fontSize: 20, color: "#1e3a5f", fontWeight: 600, gap: 6 }}>
+                <span style={{ width: 20, height: 20, borderRadius: 6, background: "linear-gradient(135deg,#7c3aed,#2563ab)", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                  <span style={{ color: "white", fontSize: 10, fontWeight: 860 }}>AI</span>
+                </span>
+                <span>{typedText}</span>
+                {typedCount < totalChars && cursorBlink && (
+                  <span style={{ width: 2, height: 24, background: "#2f7fd3", borderRadius: 1, display: "inline-block" }} />
+                )}
+              </div>
+
+                {/* Ringflow inserted prompt card */}
+              {promptFlash > 0.05 && (
+                <div
                   style={{
-                    width: 2,
-                    height: 26,
-                    background: "#2f7fd3",
-                    borderRadius: 1,
-                    display: "inline-block",
+                    opacity: promptFlash,
+                    transform: `translateY(${(1 - promptFlash) * 10}px)`,
+                    height: 52,
+                    borderRadius: 14,
+                    background: "linear-gradient(135deg, rgba(218,238,255,0.98), rgba(248,251,255,0.96))",
+                    border: "1px solid rgba(47,127,211,0.20)",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 16px",
+                    gap: 10,
                   }}
-                />
+                >
+                  <span style={{ width: 7, height: 7, borderRadius: 999, background: "#2f7fd3", flexShrink: 0 }} />
+                  <span style={{ fontSize: 16, fontWeight: 720, color: "#1e4d8c" }}>
+                    Ringflow 已输入：总结提炼 Prompt · 剪贴板已恢复
+                  </span>
+                </div>
               )}
             </div>
-
-            {/* Ringflow inserted prompt card */}
-            {promptFlash > 0.05 && (
-              <div
-                style={{
-                  opacity: promptFlash,
-                  transform: `translateY(${(1 - promptFlash) * 12}px)`,
-                  height: 62,
-                  borderRadius: 14,
-                  background: "linear-gradient(135deg, rgba(218,238,255,0.98), rgba(248,251,255,0.96))",
-                  border: "1px solid rgba(47,127,211,0.20)",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 18px",
-                  gap: 12,
-                }}
-              >
-                <span
-                  style={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: 999,
-                    background: "#2f7fd3",
-                    flexShrink: 0,
-                  }}
-                />
-                <span style={{ fontSize: 19, fontWeight: 720, color: "#1e4d8c" }}>
-                  Ringflow 已输入：总结提炼 Prompt · 剪贴板已恢复
-                </span>
-              </div>
-            )}
           </div>
 
-          {/* Prompt sidebar */}
-          <div
-            style={{
-              borderLeft: "1px solid rgba(148,163,184,0.14)",
-              padding: "24px 20px",
-              background: "rgba(248, 251, 255, 0.72)",
-            }}
-          >
-            <div style={{ fontSize: 16, fontWeight: 760, color: "#64748b", marginBottom: 14 }}>快捷输入</div>
+          {/* Prompt snippet sidebar */}
+          <div style={{ width: 200, borderLeft: "1px solid rgba(148,163,184,0.13)", padding: "18px 16px", background: "rgba(248,251,255,0.80)", flexShrink: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 760, color: "#64748b", marginBottom: 12 }}>快捷 Prompt</div>
             {["总结提炼", "润色改写", "分步说明", "对比分析"].map((item, index) => (
               <AnimatedItem key={item} index={index} stagger={6}>
                 <div
                   style={{
-                    height: 50,
-                    borderRadius: 12,
-                    marginBottom: 10,
-                    padding: "0 14px",
+                    height: 44,
+                    borderRadius: 10,
+                    marginBottom: 8,
+                    padding: "0 12px",
                     display: "flex",
                     alignItems: "center",
-                    background: index === 0 ? "rgba(223, 239, 255, 0.96)" : "rgba(255,255,255,0.78)",
+                    background: index === 0 ? "rgba(223,239,255,0.96)" : "rgba(255,255,255,0.78)",
                     color: index === 0 ? "#1f5f9f" : "#475569",
-                    fontSize: 18,
-                    fontWeight: index === 0 ? 760 : 600,
+                    fontSize: 15,
+                    fontWeight: index === 0 ? 760 : 580,
                     border: index === 0 ? "1.5px solid rgba(47,127,211,0.22)" : "1px solid rgba(226,232,240,0.78)",
-                    boxShadow: index === 0 ? "0 2px 12px rgba(47,127,211,0.10)" : "none",
                   }}
                 >
                   {item}
                   {index === 0 && (
-                    <span
-                      style={{
-                        marginLeft: "auto",
-                        fontSize: 13,
-                        color: "#2f7fd3",
-                        fontWeight: 700,
-                        background: "rgba(47,127,211,0.10)",
-                        borderRadius: 6,
-                        padding: "2px 8px",
-                      }}
-                    >
-                      已选
-                    </span>
+                    <span style={{ marginLeft: "auto", fontSize: 11, color: "#2f7fd3", fontWeight: 700, background: "rgba(47,127,211,0.10)", borderRadius: 5, padding: "2px 6px" }}>已选</span>
                   )}
                 </div>
               </AnimatedItem>
@@ -656,9 +968,36 @@ export const MonitorDashboard = () => {
 };
 
 // ─── AppConfigurationScreenshot ───────────────────────────────────────────────
+const PROFILES = [
+  {
+    role: "写作者",
+    app: "Notion",
+    color: "#1a1a1a",
+    bg: "rgba(255,255,255,0.92)",
+    actions: ["润色改写", "总结提炼", "翻译", "查词", "发布草稿"],
+    accent: "#64748b",
+  },
+  {
+    role: "开发者",
+    app: "Cursor",
+    color: "#7c3aed",
+    bg: "rgba(245,242,255,0.92)",
+    actions: ["运行测试", "Git Push", "新分支", "格式化", "Terminal"],
+    accent: "#7c3aed",
+  },
+  {
+    role: "会议中",
+    app: "Zoom",
+    color: "#2563ab",
+    bg: "rgba(240,246,255,0.92)",
+    actions: ["截图", "新便签", "发 Slack", "静音", "分享屏幕"],
+    accent: "#2563ab",
+  },
+];
+
 export const AppConfigurationScreenshot = () => {
   const frame = useCurrentFrame();
-  const t = interpolate(frame, [0, 22], [0, 1], {
+  const panelReveal = interpolate(frame, [0, 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -667,16 +1006,108 @@ export const AppConfigurationScreenshot = () => {
   return (
     <div
       style={{
-        width: 900,
-        borderRadius: 26,
-        overflow: "hidden",
-        boxShadow: "0 30px 90px rgba(25, 47, 80, 0.20), 0 2px 16px rgba(25, 47, 80, 0.12)",
-        border: "1px solid rgba(255,255,255,0.74)",
-        opacity: t,
-        transform: `scale(${0.96 + t * 0.04}) translateY(${(1 - t) * 20}px)`,
+        width: 860,
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 18,
+        opacity: panelReveal,
+        transform: `translateY(${(1 - panelReveal) * 22}px)`,
       }}
     >
-      <Img src={staticFile(assets.brand.appScreenshot)} style={{ width: "100%", display: "block" }} />
+      {PROFILES.map((profile, pi) => {
+        const cardReveal = interpolate(frame, [pi * 10, pi * 10 + 22], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
+        });
+        return (
+          <div
+            key={profile.role}
+            style={{
+              ...panel("light"),
+              borderRadius: 22,
+              overflow: "hidden",
+              opacity: cardReveal,
+              transform: `translateY(${(1 - cardReveal) * 16}px)`,
+              outline: pi === 1 ? "2px solid rgba(124,58,237,0.28)" : "none",
+              boxShadow: pi === 1 ? "0 0 0 5px rgba(124,58,237,0.07), 0 24px 64px rgba(30,45,70,0.14)" : theme.shadow.panel,
+            }}
+          >
+            {/* Profile header */}
+            <div
+              style={{
+                padding: "16px 18px 14px",
+                borderBottom: "1px solid rgba(148,163,184,0.13)",
+                background: profile.bg,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    background: profile.color,
+                    display: "grid",
+                    placeItems: "center",
+                    boxShadow: `0 2px 8px ${profile.color}44`,
+                  }}
+                >
+                  <span style={{ color: "white", fontSize: 13, fontWeight: 860 }}>
+                    {profile.app[0]}
+                  </span>
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>{profile.role}</div>
+                  <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 580 }}>{profile.app}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action list */}
+            <div style={{ padding: "12px 14px", display: "grid", gap: 7 }}>
+              {profile.actions.map((action, ai) => {
+                const itemReveal = interpolate(frame, [pi * 10 + ai * 5 + 14, pi * 10 + ai * 5 + 28], [0, 1], {
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                  easing: Easing.bezier(0.16, 1, 0.3, 1),
+                });
+                return (
+                  <div
+                    key={action}
+                    style={{
+                      height: 34,
+                      borderRadius: 10,
+                      padding: "0 12px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      background: ai === 0 ? `${profile.accent}14` : "rgba(248,250,252,0.88)",
+                      border: ai === 0 ? `1px solid ${profile.accent}28` : "1px solid rgba(226,232,240,0.70)",
+                      color: ai === 0 ? profile.accent : "#475569",
+                      fontSize: 13,
+                      fontWeight: ai === 0 ? 760 : 560,
+                      opacity: itemReveal,
+                      transform: `translateX(${(1 - itemReveal) * -8}px)`,
+                    }}
+                  >
+                    <span>{action}</span>
+                    <span
+                      style={{
+                        width: 14,
+                        height: 14,
+                        borderRadius: 4,
+                        background: ai === 0 ? profile.accent : "rgba(148,163,184,0.30)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

@@ -28,6 +28,8 @@ type MiddleClickCursorProps = {
   /** 0 = no swipe indicator, 1 = full arrow */
   swipeProgress?: number;
   trail?: TrailPoint[];
+  /** Scale the teaching cursor (1.0 = default size) */
+  scale?: number;
 };
 
 /** Standard macOS arrow cursor */
@@ -107,6 +109,7 @@ export const MiddleClickCursor = ({
   swipeAngle = 0,
   swipeProgress = 0,
   trail = [],
+  scale = 1,
 }: MiddleClickCursorProps) => {
   const rawId = useId();
   const shadowId = `mc-cursor-shadow-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -144,14 +147,14 @@ export const MiddleClickCursor = ({
       ))}
 
       <svg
-        width={56}
-        height={80}
+        width={56 * scale}
+        height={80 * scale}
         viewBox="0 0 56 80"
         aria-hidden="true"
         style={{
           position: "absolute",
-          left: x - 28,
-          top: y - 20,
+          left: x - 28 * scale,
+          top: y - 20 * scale,
           opacity: revealProgress,
           transform: `scaleY(${bodyScaleY})`,
           transformOrigin: "28px 30px",

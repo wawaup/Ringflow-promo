@@ -22,7 +22,7 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
     headline: ["Ringflow", "出现在光标旁边。"],
   },
   "core-gesture": {
-    headline: ["按住。", "划动。", "完成。"],
+    headline: ["按住中键，", "向右一划。"],
   },
   "quick-input": {
     headline: ["常用文字，一划输入。"],

@@ -1,9 +1,12 @@
 import { PresetLibraryShowcase } from "../components/ProductUI/ProductSurfaces";
 import { sceneCopy } from "../config/copy";
+import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 
+const scene = scenes.find((item) => item.id === "preset-library")!;
+
 export const PresetLibraryScene = () => (
-  <SceneShell lines={sceneCopy["preset-library"].headline}>
+  <SceneShell lines={sceneCopy["preset-library"].headline} layout={scene.layout} choreography={scene.choreography}>
     <PresetLibraryShowcase />
   </SceneShell>
 );

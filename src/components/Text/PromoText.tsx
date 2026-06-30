@@ -13,6 +13,8 @@ type PromoTextProps = {
   startFrame?: number;
   /** Frames between each line's reveal (default: 6) */
   lineStagger?: number;
+  /** Reduce headline scale for top stage scenes (default: 1) */
+  scale?: number;
 };
 
 export const PromoText = ({
@@ -25,6 +27,7 @@ export const PromoText = ({
   maxWidth = 1120,
   startFrame = 0,
   lineStagger = 6,
+  scale = 1,
 }: PromoTextProps) => {
   const frame = useCurrentFrame();
   const dark = mode === "dark";
@@ -71,7 +74,7 @@ export const PromoText = ({
           >
             <div
               style={{
-                fontSize: size,
+                fontSize: size * scale,
                 lineHeight: 1.08,
                 fontWeight: 820,
                 letterSpacing: 0,
