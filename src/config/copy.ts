@@ -18,19 +18,16 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
   "nearer-concept": {
     headline: ["常用的，", "应该更近一点。"],
   },
-  "product-reveal": {
-    headline: ["Ringflow", "出现在光标旁边。"],
-  },
   "core-gesture": {
     headline: ["按住中键，", "向右一划。"],
   },
   "quick-input": {
     headline: ["常用文字，一划输入。"],
-    uiLabels: ["润色改写", "总结提炼", "Prompt inserted · Clipboard restored"],
+    uiLabels: ["润色改写", "总结提炼", "Prompt inserted · 剪贴板已恢复"],
   },
   "quick-open": {
     headline: ["常用应用、文件、文件夹，一划打开。"],
-    uiLabels: ["Terminal", "README.md", "Project Folder"],
+    uiLabels: ["新应用", "新文件", "新文件夹"],
   },
   "sticky-note": {
     headline: ["灵感，不必打断。"],
@@ -50,15 +47,15 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
   },
   monitor: {
     headline: ["状态，一眼看到。"],
-    uiLabels: ["CPU", "内存", "网络", "电池"],
+    uiLabels: ["CPU", "内存", "网速", "电池"],
   },
   "app-profiles": {
     headline: ["不同 App，", "不同轮盘。"],
-    uiLabels: ["Writing", "Coding", "Meeting"],
+    uiLabels: ["写作", "开发", "会议"],
   },
   "preset-library": {
     headline: ["下载。导入。开始使用。"],
-    uiLabels: ["AI 写作", "开发者", "会议记录"],
+    uiLabels: ["AI 写作助手", "开发者工作流", "会议记录整理"],
   },
   outro: {
     headline: ["让 Mac 操作，", "更接近直觉。", "Ringflow"],

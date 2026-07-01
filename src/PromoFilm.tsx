@@ -1,7 +1,7 @@
 import { Audio } from "@remotion/media";
 import { AbsoluteFill, Sequence, staticFile } from "remotion";
 import { assets } from "./config/assets";
-import { scenes } from "./config/timeline";
+import { scenes, type SceneId } from "./config/timeline";
 import {
   AppProfilesScene,
   CoreGestureScene,
@@ -12,7 +12,6 @@ import {
   NearerConceptScene,
   OutroScene,
   PresetLibraryScene,
-  ProductRevealScene,
   QuickInputScene,
   QuickOpenScene,
   ShellScriptScene,
@@ -20,29 +19,32 @@ import {
   StickyNoteScene,
 } from "./scenes";
 
-const sceneComponents = [
-  IntroFocusScene,
-  FrictionScene,
-  NearerConceptScene,
-  ProductRevealScene,
-  CoreGestureScene,
-  QuickInputScene,
-  QuickOpenScene,
-  StickyNoteScene,
-  MacroSequenceScene,
-  ShellScriptScene,
-  ShortcutsScene,
-  MonitorScene,
-  AppProfilesScene,
-  PresetLibraryScene,
-  OutroScene,
-] as const;
+const SCENE_MAP: Record<SceneId, React.ComponentType> = {
+  "intro-focus": IntroFocusScene,
+  friction: FrictionScene,
+  "nearer-concept": NearerConceptScene,
+  "core-gesture": CoreGestureScene,
+  "quick-input": QuickInputScene,
+  "quick-open": QuickOpenScene,
+  "sticky-note": StickyNoteScene,
+  "macro-sequence": MacroSequenceScene,
+  "shell-script": ShellScriptScene,
+  shortcuts: ShortcutsScene,
+  monitor: MonitorScene,
+  "app-profiles": AppProfilesScene,
+  "preset-library": PresetLibraryScene,
+  outro: OutroScene,
+};
 
 export const PromoFilm = () => {
   return (
     <AbsoluteFill>
-      {scenes.map((scene, index) => {
-        const Scene = sceneComponents[index];
+      {scenes.map((scene) => {
+        const Scene = SCENE_MAP[scene.id];
+        if (!Scene) {
+          // Safety: should never happen once timeline and map are aligned
+          return null;
+        }
         return (
           <Sequence key={scene.id} from={scene.startFrame} durationInFrames={scene.durationInFrames}>
             <Scene />
