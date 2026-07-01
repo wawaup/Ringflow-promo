@@ -67,7 +67,7 @@ const rawScenes = [
     shot: 1,
     id: "intro-focus",
     name: "开场：保持连贯",
-    durationSeconds: 5.5,
+    durationSeconds: 4.8,
     layout: "left-stage",
     choreography: {
       pageStartFrame: 0,
@@ -84,7 +84,7 @@ const rawScenes = [
       promptOpenFrame: 175,
       promptCopyFrame: 185,
       promptPasteFrame: 197,
-      holdStartFrame: 260,
+      holdStartFrame: 220,
     },
   },
   {

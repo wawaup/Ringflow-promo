@@ -33,7 +33,7 @@ Prefer:
 Before finishing any scene or the full film:
 
 - Check text readability (real Chinese & English).
-- Check scene timing, uniform pacing, zero-gap chaining, and sufficient breathing (see "Animation Choreography Principles" below).
+- Check scene timing, uniform pacing, zero-gap chaining, and concise connection pauses (see "Animation Choreography Principles" below). For this <60s video, keep breathing short (0.2-0.5s range) rather than long holds.
 - Check dark theme contrast (and light theme).
 - Check wheel animation smoothness and fidelity to real app.
 - Check native macOS UI details (no placeholder squares + text).
@@ -132,8 +132,8 @@ When the same type of micro-interaction (select + Copy + Paste) appears multiple
 - After the last key visual or major motion completes, avoid long periods where the whole screen is visually static while the viewer is forced to wait for the scene to end.
 - Preferred solutions (in order):
   1. Extend the **earlier** actions in the chain to their proper full duration (so the sequence itself fills time).
-  2. Move `holdStartFrame` and/or reduce `durationSeconds` so the scene ends ~1–2 s after the final meaningful state.
-- Final result state (pasted prompt visible in input, operation complete) should receive 1–2 seconds of calm breathing time, but not excessive idle.
+  2. Move `holdStartFrame` earlier and/or reduce `durationSeconds` so the scene ends after only a short reasonable connection pause once the final result is clear (typically 15-35 frames).
+- Final result state (pasted prompt visible in input, operation complete) should receive only a short, reasonable connection pause (typically 10-30 frames / ~0.17-0.5s) so the result registers clearly, then advance. In a video under 60 seconds, avoid longer pauses as they feel excessive.
 
 ### 4. Uniform Perceived Pacing
 
@@ -185,7 +185,7 @@ When the same type of micro-interaction (select + Copy + Paste) appears multiple
 3. Adjust reveal, selection, copyKeys, pasteKeys, and `sceneWindowVisibility` end calculations in the UI component.
 4. Run `npm run typecheck`.
 5. Produce stills at the critical moments of the changed elements.
-6. Visually judge using the principles above (uniformity, zero gap, breathing, density).
+6. Visually judge using the principles above (uniformity, zero gap, concise connections, density).
 7. Fix and repeat until clean.
 8. Only then commit with the proper Chinese conventional message.
 9. Update this document if a new general rule emerges.
@@ -197,7 +197,7 @@ Before considering any scene or the whole film finished, verify:
 - Text readability (Chinese + English, all sizes, contrast).
 - Scene timing & pacing uniformity (use the principles in this document).
 - Zero-gap chaining between text, windows, selections, and key actions.
-- Sufficient 1–2 s breathing on final states; no excessive static dead air.
+- Sufficient but concise connection pauses on final states (typically 0.2-0.5s max; avoid long idle where the screen has nothing moving); no excessive static dead air. Keep overall pace tight for a <60s film.
 - Dark theme contrast (and light theme).
 - Wheel animation smoothness + fidelity to real app.
 - Real app data used (prompts, wheel slots, labels, copy).

@@ -34,8 +34,8 @@ After the last key press visual or major motion of a chain:
 - Do not leave a large stretch of completely static screen while the viewer waits for the scene (or film) to advance.
 - Solutions (preferred order):
   1. Give the earlier actions in the same chain their proper full lifetime (the sequence itself fills the time).
-  2. Move `holdStartFrame` earlier and/or reduce the scene's `durationSeconds` so the scene ends only 1–2 s after the final result state.
-- The final visible result (e.g. the pasted prompt text in the AI input) deserves 1–2 s of calm breathing, but not several seconds of pure idleness.
+  2. Move `holdStartFrame` earlier and/or reduce the scene's `durationSeconds` so the scene ends after only a short, reasonable connection pause (e.g. 15-35 frames) once the final result state is clear.
+- The final visible result (e.g. the pasted prompt text in the AI input) should be clearly visible for a short moment using reasonable connection intervals (typically 10-30 frames / 0.17-0.5s), but avoid long static pauses. In a <60s video, tight pacing is essential.
 
 ## 4. Uniform Perceived Pacing
 
@@ -93,8 +93,8 @@ Before committing to numbers:
 2. Compute full lifetime of the reference (usually the last) action.
 3. Give every earlier analogous action the same lifetime by adjusting its start and the following trigger.
 4. Ensure window visibility covers its own keys and selection.
-5. Add 1–2 s breathing after the very last action of the chain.
-6. Trim or extend scene duration according to density so there is no long static tail.
+5. Add only a short reasonable connection pause (typically 10-30 frames / 0.17-0.5s) after the very last action of the chain so the result registers clearly, then advance. Long pauses feel slow in a sub-60s video.
+6. Trim or extend scene duration according to density so final connection pauses are short (no long static tail).
 7. Verify all interpolate ranges are monotonic.
 8. Generate stills and judge with the viewer eye.
 
