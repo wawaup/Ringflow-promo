@@ -7,6 +7,6 @@ const scene = scenes.find((item) => item.id === "preset-library")!;
 
 export const PresetLibraryScene = () => (
   <SceneShell lines={sceneCopy["preset-library"].headline} layout={scene.layout} choreography={scene.choreography}>
-    <PresetLibraryShowcase />
+    <PresetLibraryShowcase choreography={scene.choreography} />
   </SceneShell>
 );

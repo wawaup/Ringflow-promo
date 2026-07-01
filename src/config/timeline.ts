@@ -154,7 +154,15 @@ const rawScenes = [
     name: "快捷打开",
     durationSeconds: 3.2,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 46, actionStartFrame: 84, holdStartFrame: 110 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 46, 
+      actionStartFrame: 84, 
+      wheelStartFrame: 60, 
+      wheelHighlightStartFrame: 70, 
+      wheelHighlightEndFrame: 95, 
+      holdStartFrame: 110 
+    },
   },
   {
     shot: 8,
@@ -178,7 +186,15 @@ const rawScenes = [
     name: "快捷键 / 宏序列",
     durationSeconds: 3.3,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 48, actionStartFrame: 88, holdStartFrame: 110 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 48, 
+      actionStartFrame: 88, 
+      wheelStartFrame: 70, 
+      wheelHighlightStartFrame: 85, 
+      wheelHighlightEndFrame: 140, 
+      holdStartFrame: 110 
+    },
   },
   {
     shot: 10,
@@ -186,7 +202,15 @@ const rawScenes = [
     name: "Shell 脚本",
     durationSeconds: 3.0,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 46, actionStartFrame: 88, holdStartFrame: 100 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 46, 
+      actionStartFrame: 88, 
+      wheelStartFrame: 65, 
+      wheelHighlightStartFrame: 80, 
+      wheelHighlightEndFrame: 105, 
+      holdStartFrame: 100 
+    },
   },
   {
     shot: 11,
@@ -194,7 +218,15 @@ const rawScenes = [
     name: "macOS 快捷指令",
     durationSeconds: 2.8,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 44, actionStartFrame: 82, holdStartFrame: 90 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 44, 
+      actionStartFrame: 82, 
+      wheelStartFrame: 60, 
+      wheelHighlightStartFrame: 70, 
+      wheelHighlightEndFrame: 95, 
+      holdStartFrame: 90 
+    },
   },
   {
     shot: 12,
@@ -202,7 +234,15 @@ const rawScenes = [
     name: "系统监视器",
     durationSeconds: 2.7,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 44, actionStartFrame: 82, holdStartFrame: 90 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 44, 
+      actionStartFrame: 82, 
+      wheelStartFrame: 60, 
+      wheelHighlightStartFrame: 70, 
+      wheelHighlightEndFrame: 95, 
+      holdStartFrame: 90 
+    },
   },
   {
     shot: 13,
@@ -210,7 +250,15 @@ const rawScenes = [
     name: "应用独立配置",
     durationSeconds: 3.0,
     layout: "left-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 48, actionStartFrame: 88, holdStartFrame: 170 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 48, 
+      actionStartFrame: 88, 
+      wheelStartFrame: 70, 
+      wheelHighlightStartFrame: 85, 
+      wheelHighlightEndFrame: 130, 
+      holdStartFrame: 170 
+    },
   },
   {
     shot: 14,
@@ -218,7 +266,15 @@ const rawScenes = [
     name: "预设库",
     durationSeconds: 3.6,
     layout: "left-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 54, actionStartFrame: 102, holdStartFrame: 214 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 54, 
+      actionStartFrame: 102, 
+      wheelStartFrame: 70, 
+      wheelHighlightStartFrame: 90, 
+      wheelHighlightEndFrame: 140, 
+      holdStartFrame: 214 
+    },
   },
   {
     shot: 15,
@@ -226,7 +282,15 @@ const rawScenes = [
     name: "品牌收尾",
     durationSeconds: 2.8,
     layout: "center-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 66, actionStartFrame: 94, holdStartFrame: 154 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 66, 
+      actionStartFrame: 94, 
+      wheelStartFrame: 80, 
+      wheelHighlightStartFrame: 100, 
+      wheelHighlightEndFrame: 130, 
+      holdStartFrame: 154 
+    },
   },
 ] as const;
 

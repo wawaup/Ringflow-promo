@@ -145,7 +145,7 @@
 - Final full render if needed.
 **Success Criteria**: Viewer immediately understands Ringflow is the wheel that controls everything using real app actions. Layout is disciplined. All principles followed.
 **Block Owner**: Current session
-**Status**: Completed 2026-07-02 (synced to real app defaults from ActionItem.swift etc.)
+**Status**: Completed 2026-07-02 (all scenes updated with conductor pattern and layout; dead code cleaned; full typecheck/timeline/stills validation; principles updated; committed)
 
 ---
 
@@ -156,7 +156,7 @@
 - **Real data priority**: Always prefer exact strings/behavior from mac app over promo inventions.
 - After all blocks: final review against full list in plan.
 
-**Current Block**: Block 1
+**Current Block**: Block 5
 
 **Progress Log**:
 - 2026-07-02: Created this prioritized blocks doc. Identified real app data sources. Starting Block 1.

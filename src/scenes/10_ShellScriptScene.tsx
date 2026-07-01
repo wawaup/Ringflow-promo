@@ -72,8 +72,20 @@ const TerminalLine = ({
 
 export const ShellScriptScene = () => {
   const frame = useCurrentFrame();
-  const vf = scene.choreography.visualStartFrame;
-  const af = scene.choreography.actionStartFrame;
+  const c = scene.choreography;
+  const vf = c.visualStartFrame;
+  const af = c.actionStartFrame;
+
+  const wheelReveal = interpolate(frame, [c.wheelStartFrame ?? 65, (c.wheelStartFrame ?? 65) + 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 80, c.wheelHighlightEndFrame ?? 105], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
 
   const windowReveal = interpolate(frame, [vf, vf + 20], [0, 1], {
     extrapolateLeft: "clamp",
@@ -115,7 +127,15 @@ export const ShellScriptScene = () => {
             </div>
           </MacWindow>
         </div>
-        <RingflowWheel mini mode="dark" runningSegment="shell" centerLabel="Shell" revealFrame={vf} />
+        {/* Wheel first, highlight leads shell result */}
+        <RingflowWheel 
+          mini 
+          mode="dark" 
+          runningSegment="shell" 
+          centerLabel="Shell" 
+          revealProgress={wheelReveal} 
+          glowProgress={highlight} 
+        />
       </div>
     </SceneShell>
   );

@@ -7,6 +7,6 @@ const scene = scenes.find((item) => item.id === "app-profiles")!;
 
 export const AppProfilesScene = () => (
   <SceneShell lines={sceneCopy["app-profiles"].headline} layout={scene.layout} choreography={scene.choreography}>
-    <AppConfigurationScreenshot />
+    <AppConfigurationScreenshot choreography={scene.choreography} />
   </SceneShell>
 );

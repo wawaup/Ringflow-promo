@@ -17,7 +17,7 @@ const frames = [
   frameFor("intro-focus", 230),
   frameFor("intro-focus", 402),
   frameFor("intro-focus", 594),
-  frameFor("product-reveal", 116),
+  frameFor("nearer-concept", 100),
   frameFor("core-gesture", 58),
   frameFor("core-gesture", 124),
   frameFor("core-gesture", 152),
