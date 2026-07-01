@@ -59,8 +59,8 @@ test("intro focus stages the interrupted workflow before text and clipboard acti
   assert.ok(intro);
   const pageStartFrame = assertNumber(intro.choreography.pageStartFrame);
   const pageReadyFrame = assertNumber(intro.choreography.pageReadyFrame);
-  const codexInputStartFrame = assertNumber(intro.choreography.codexInputStartFrame);
-  const codexMainStartFrame = assertNumber(intro.choreography.codexMainStartFrame);
+  const destinationInputStartFrame = assertNumber(intro.choreography.destinationInputStartFrame);
+  const documentStartFrame = assertNumber(intro.choreography.documentStartFrame);
   const noteStartFrame = assertNumber(intro.choreography.noteStartFrame);
   const stickyOpenFrame = assertNumber(intro.choreography.stickyOpenFrame);
   const noteCopyFrame = assertNumber(intro.choreography.noteCopyFrame);
@@ -73,9 +73,9 @@ test("intro focus stages the interrupted workflow before text and clipboard acti
   assert.ok(pageReadyFrame < intro.choreography.textStartFrame);
   assert.ok(intro.durationInFrames >= 600);
   assert.ok(intro.choreography.textStartFrame < intro.choreography.visualStartFrame);
-  assert.ok(intro.choreography.visualStartFrame <= codexInputStartFrame);
-  assert.ok(codexInputStartFrame < codexMainStartFrame);
-  assert.ok(codexMainStartFrame < noteStartFrame);
+  assert.ok(intro.choreography.visualStartFrame <= destinationInputStartFrame);
+  assert.ok(destinationInputStartFrame < documentStartFrame);
+  assert.ok(documentStartFrame < noteStartFrame);
   assert.ok(noteStartFrame < stickyOpenFrame);
   assert.ok(stickyOpenFrame < noteCopyFrame);
   assert.ok(noteCopyFrame < notePasteFrame);

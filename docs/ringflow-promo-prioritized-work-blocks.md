@@ -83,7 +83,7 @@
 - Update principles doc with new "Wheel Conductor Rules".
 **Success Criteria**: In every feature scene, viewer sees wheel → highlight → result. Wheel never feels like an afterthought.
 **Block Owner**: Current session
-**Status**: Completed 2026-07-02 (synced to real app defaults from ActionItem.swift etc.)
+**Status**: Completed 2026-07-02
 
 ### Block 3: Layout Discipline, Sizing & Positioning (P1)
 **Goal**: Predictable, professional, non-arbitrary layouts. No more random shifts/overlaps.

@@ -11,8 +11,8 @@ export type SceneChoreography = {
   holdStartFrame: number;
   pageStartFrame?: number;
   pageReadyFrame?: number;
-  codexInputStartFrame?: number;
-  codexMainStartFrame?: number;
+  destinationInputStartFrame?: number;
+  documentStartFrame?: number;
   noteStartFrame?: number;
   stickyOpenFrame?: number;
   noteCopyFrame?: number;
@@ -23,6 +23,8 @@ export type SceneChoreography = {
   mouseStartFrame?: number;
   swipeStartFrame?: number;
   wheelStartFrame?: number;
+  wheelHighlightStartFrame?: number;  // when the relevant sector starts highlighting (leads result)
+  wheelHighlightEndFrame?: number;    // when highlight peaks, result can appear
 };
 
 const baseComposition = {
@@ -74,8 +76,8 @@ const rawScenes = [
       pageReadyFrame: 12,
       textStartFrame: 18,
       visualStartFrame: 26,
-      codexInputStartFrame: 35,
-      codexMainStartFrame: 45,
+      destinationInputStartFrame: 35,
+      documentStartFrame: 45,
       noteStartFrame: 95,
       actionStartFrame: 98,
       stickyOpenFrame: 98,
@@ -106,7 +108,9 @@ const rawScenes = [
       visualStartFrame: 60,
       actionStartFrame: 90,
       mouseStartFrame: 100,
-      wheelStartFrame: 120,
+      wheelStartFrame: 80,
+      wheelHighlightStartFrame: 100,
+      wheelHighlightEndFrame: 140,
       holdStartFrame: 300,
     },
   },
@@ -122,7 +126,9 @@ const rawScenes = [
       mouseStartFrame: 44,
       actionStartFrame: 60,
       swipeStartFrame: 100,
-      wheelStartFrame: 120,
+      wheelStartFrame: 70,
+      wheelHighlightStartFrame: 90,
+      wheelHighlightEndFrame: 130,
       holdStartFrame: 180,
     },
   },
@@ -132,7 +138,15 @@ const rawScenes = [
     name: "快捷输入",
     durationSeconds: 3.2,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 44, actionStartFrame: 78, holdStartFrame: 110 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 44, 
+      actionStartFrame: 78, 
+      wheelStartFrame: 60, 
+      wheelHighlightStartFrame: 70, 
+      wheelHighlightEndFrame: 95, 
+      holdStartFrame: 110 
+    },
   },
   {
     shot: 7,
@@ -148,7 +162,15 @@ const rawScenes = [
     name: "便签",
     durationSeconds: 3.2,
     layout: "top-stage",
-    choreography: { textStartFrame: 0, visualStartFrame: 46, actionStartFrame: 86, holdStartFrame: 110 },
+    choreography: { 
+      textStartFrame: 0, 
+      visualStartFrame: 46, 
+      actionStartFrame: 86, 
+      wheelStartFrame: 60, 
+      wheelHighlightStartFrame: 75, 
+      wheelHighlightEndFrame: 100, 
+      holdStartFrame: 110 
+    },
   },
   {
     shot: 9,

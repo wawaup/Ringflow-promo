@@ -7,6 +7,6 @@ const scene = scenes.find((item) => item.id === "quick-open")!;
 
 export const QuickOpenScene = () => (
   <SceneShell lines={sceneCopy["quick-open"].headline} layout={scene.layout} choreography={scene.choreography}>
-    <QuickOpenTargets />
+    <QuickOpenTargets choreography={scene.choreography} />
   </SceneShell>
 );

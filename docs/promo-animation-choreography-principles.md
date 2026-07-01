@@ -98,6 +98,14 @@ Before committing to numbers:
 7. Verify all interpolate ranges are monotonic.
 8. Generate stills and judge with the viewer eye.
 
+## Wheel Conductor Rules (Added for Block 2)
+- Wheel always appears first in the visual sequence for feature demos.
+- Configure wheel sectors to match the current scene's real app actions (from synced productSemantics).
+- For each result/component: relevant real sector on wheel **highlights/glows first** (use glowProgress or highlightIndex driven by choreography).
+- In sequences: smoothly slide the highlight across sectors (interpolate index) in sync with result order.
+- Result UI only fully reveals after the highlight peak.
+- This makes the wheel the protagonist that "conducts" every action. Use real labels/sectors only. Verify with stills at wheel-enter, highlight-ramp, result-after.
+
 ## References
 
 - Main project instructions: `AGENTS.md`

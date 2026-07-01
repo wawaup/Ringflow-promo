@@ -1,6 +1,7 @@
 import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { PromoBackground } from "../components/Background/PromoBackground";
 import { Cursor } from "../components/Cursor/Cursor";
+import { MacWindow } from "../components/MacUI/MacWindow";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
 import { scenes } from "../config/timeline";
@@ -27,6 +28,15 @@ export const NearerConceptScene = () => {
     config: { damping: 20, stiffness: 200, mass: 0.85 },
     durationInFrames: 26,
   });
+
+  // Highlight on relevant real sector (e.g. quick-input / 润色改写) leads any follow-on
+  const highlight = interpolate(frame, [
+    c.wheelHighlightStartFrame ?? (c.wheelStartFrame ?? 80) + 20,
+    c.wheelHighlightEndFrame ?? (c.wheelStartFrame ?? 80) + 60
+  ], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
   const cursorReveal = reveal(frame, c.mouseStartFrame ?? c.actionStartFrame, 18);
 
   const cursorT = interpolate(frame, [
@@ -42,19 +52,21 @@ export const NearerConceptScene = () => {
   const cy = height / 2;
 
   // Center the gesture area (wheel + cursor movement) in the middle of screen
-  const wheelCenterX = cx - 80; // slightly left for balance with text
-  const wheelCenterY = cy + 80; // lower part below text
+  const wheelCenterX = cx - 80;
+  const wheelCenterY = cy + 80;
 
-  const cursorStartX = cx + 180;
-  const cursorStartY = cy + 150;
-  const cursorEndX = wheelCenterX + 60;
-  const cursorEndY = wheelCenterY - 40;
+  // Cursor starts inside the document window area, ends near where wheel is summoned
+  const cursorStartX = cx - 60;
+  const cursorStartY = cy + 50;
+  const cursorEndX = cx + 110;   // near the summoned wheel (inside/edge of document)
+  const cursorEndY = cy + 20;
 
   const cursorX = interpolate(cursorT, [0, 1], [cursorStartX, cursorEndX]);
   const cursorY = interpolate(cursorT, [0, 1], [cursorStartY, cursorEndY]);
 
   const wheelOpacity = interpolate(wheelReveal, [0, 1], [0, 1]);
-  const wheelScale = interpolate(wheelReveal, [0, 1], [0.82, 1]);
+  // Summon feel: starts smaller, pops a bit larger, settles (product UI reveal moment)
+  const wheelScale = interpolate(wheelReveal, [0, 0.6, 1], [0.55, 1.08, 1]);
 
   const trailAlpha = interpolate(frame, [
     c.mouseStartFrame ?? c.actionStartFrame,
@@ -116,11 +128,11 @@ export const NearerConceptScene = () => {
             </div>
           </div>
 
-          {/* 第四屏内容放在下方：Ringflow 出现在光标旁 + 轮盘动画 */}
+          {/* Reveal text - sourced */}
           <div
             style={{
               position: "absolute",
-              top: 220,
+              top: 200,
               left: 0,
               width: "100%",
               textAlign: "center",
@@ -137,31 +149,39 @@ export const NearerConceptScene = () => {
                 color: "#334155",
               }}
             >
-              Ringflow
-              <br />
-              出现在光标旁边。
+              {sceneCopy["nearer-concept"].caption || "Ringflow 出现在光标旁边。"}
             </div>
           </div>
 
-          {/* 居中的轮盘 + 光标执行区域 */}
+          {/* 桌面上下文 + 真实使用场景中的召唤：文档窗口内光标，Ringflow 在光标旁弹出 (hero identity moment) */}
           <div
             style={{
               position: "absolute",
-              left: wheelCenterX - 200,
-              top: wheelCenterY - 160,
-              width: 520,
-              height: 420,
+              left: wheelCenterX - 280,
+              top: wheelCenterY - 210,
+              width: 660,
+              height: 500,
               pointerEvents: "none",
             }}
           >
-            {/* Wheel - stays visible after reveal */}
+            {/* Active document window — shows real usage context */}
+            <div style={{ position: "absolute", left: 20, top: 50 }}>
+              <MacWindow title="项目计划.md" width={440} height={300}>
+                <div style={{ fontSize: 16, lineHeight: 1.65, color: "#334155" }}>
+                  订阅状态刷新需要处理 loading、error、过期三种情况。<br />
+                  <span style={{ background: "rgba(47,127,211,0.18)", padding: "1px 5px", borderRadius: 3 }}>下次同步前确认三件事</span> 已记录在会议纪要中。
+                </div>
+              </MacWindow>
+            </div>
+
+            {/* Wheel summoned right next to cursor position — the product itself, hero size */}
             <div
               style={{
                 position: "absolute",
-                left: 100,
-                top: 80,
+                left: 300,
+                top: 70,
                 opacity: wheelOpacity * finalHold,
-                transform: `scale(${wheelScale})`,
+                transform: `scale(${wheelScale * 1.15})`,
                 transformOrigin: "center",
               }}
             >
@@ -170,15 +190,16 @@ export const NearerConceptScene = () => {
                 centerLabel="Ringflow"
                 showCursorReveal={false}
                 revealProgress={wheelReveal}
+                glowProgress={highlight}
               />
             </div>
 
-            {/* Cursor approaching the wheel - centered gesture */}
+            {/* Cursor inside the document, approaching summon position */}
             <div style={{ opacity: cursorReveal * finalHold }}>
-              <Cursor x={cursorX} y={cursorY} scale={1.0} trail={trail.map((point) => ({
+              <Cursor x={cursorX} y={cursorY} scale={0.95} trail={trail.map((point) => ({
                 ...point,
-                x: point.x - (wheelCenterX - 200),
-                y: point.y - (wheelCenterY - 160),
+                x: point.x - (wheelCenterX - 280),
+                y: point.y - (wheelCenterY - 210),
               }))} />
             </div>
           </div>

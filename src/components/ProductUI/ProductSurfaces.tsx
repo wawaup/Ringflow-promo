@@ -602,7 +602,14 @@ const AnimatedItem = ({
 export const QuickInputWorkspace = ({
   choreography,
 }: {
-  choreography?: { visualStartFrame?: number; actionStartFrame?: number; holdStartFrame?: number };
+  choreography?: { 
+    visualStartFrame?: number; 
+    actionStartFrame?: number; 
+    holdStartFrame?: number;
+    wheelStartFrame?: number;
+    wheelHighlightStartFrame?: number;
+    wheelHighlightEndFrame?: number;
+  };
 } = {}) => {
   const frame = useCurrentFrame();
 
@@ -610,6 +617,9 @@ export const QuickInputWorkspace = ({
   const visualStart = c.visualStartFrame ?? 0;
   const actionStart = c.actionStartFrame ?? 78;
   const holdStart = c.holdStartFrame ?? 136;
+  const wheelStart = c.wheelStartFrame ?? 60;
+  const hlStart = c.wheelHighlightStartFrame ?? 70;
+  const hlEnd = c.wheelHighlightEndFrame ?? 95;
 
   const windowReveal = interpolate(frame, [visualStart, visualStart + 18], [0, 1], {
     extrapolateLeft: "clamp",
@@ -617,22 +627,22 @@ export const QuickInputWorkspace = ({
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  // Wheel appears FIRST as the protagonist, configured for this scenario (润色改写 sector)
-  const wheelReveal = interpolate(frame, [actionStart - 20, actionStart + 4], [0, 1], {
+  // Wheel appears FIRST as the protagonist (real sector: 润色改写 from synced data)
+  const wheelReveal = interpolate(frame, [wheelStart, wheelStart + 18], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   // Sector highlight on wheel LEADS the result UI (core conductor pattern)
-  // Highlight the relevant sector (quick-input / 润色改写) BEFORE the insertion
-  const sectorHighlight = interpolate(frame, [actionStart - 12, actionStart + 6], [0, 1], {
+  // Highlight the real "润色改写" sector BEFORE insertion
+  const sectorHighlight = interpolate(frame, [hlStart, hlEnd], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  // Simulate the "润色改写" action result (timed text insertion) - AFTER highlight leads
-  const actionComplete = interpolate(frame, [actionStart + 14, actionStart + 40], [0, 1], {
+  // Result AFTER highlight peaks
+  const actionComplete = interpolate(frame, [hlEnd + 5, hlEnd + 30], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -856,8 +866,9 @@ const appGlyph: Record<string, { color: string; glyph: string }> = {
   Shortcuts: { color: "#8b5cf6", glyph: "S" },
 };
 
-export const QuickOpenTargets = () => {
+export const QuickOpenTargets = ({ choreography }: { choreography?: { wheelStartFrame?: number; wheelHighlightStartFrame?: number; wheelHighlightEndFrame?: number } } = {}) => {
   const frame = useCurrentFrame();
+  const c = choreography || {};
 
   // Simple targets with realistic result feedback
   const targets = [
@@ -866,7 +877,18 @@ export const QuickOpenTargets = () => {
     { name: "README", icon: "📄", color: "#147ef5", desc: "项目说明" },
   ];
 
-  const actionComplete = interpolate(frame, [80, 110], [0, 1], {
+  const wheelReveal = interpolate(frame, [c.wheelStartFrame ?? 55, (c.wheelStartFrame ?? 55) + 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Highlight leads open result (real "快捷打开" sector)
+  const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 65, c.wheelHighlightEndFrame ?? 95], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const actionComplete = interpolate(frame, [c.wheelHighlightEndFrame ?? 95, (c.wheelHighlightEndFrame ?? 95) + 25], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -933,9 +955,14 @@ export const QuickOpenTargets = () => {
         })}
       </div>
 
-      {/* Ringflow wheel as the trigger (more prominent) */}
-      <div style={{ position: "absolute", right: -10, bottom: -18, opacity: interpolate(frame, [60, 85], [0, 1], { extrapolateLeft: "clamp" }) }}>
-        <RingflowWheel activeSegment="quick-open" centerLabel="打开" revealProgress={interpolate(frame, [55, 80], [0, 1], { extrapolateLeft: "clamp" })} />
+      {/* Wheel first with highlight leading the open result */}
+      <div style={{ position: "absolute", right: -10, bottom: -18, opacity: wheelReveal }}>
+        <RingflowWheel 
+          activeSegment="quick-open" 
+          centerLabel="打开" 
+          revealProgress={wheelReveal} 
+          glowProgress={highlight}
+        />
       </div>
     </div>
   );
@@ -945,17 +972,39 @@ export const QuickOpenTargets = () => {
 export const MacroExecution = ({
   choreography,
 }: {
-  choreography?: { visualStartFrame?: number; actionStartFrame?: number };
+  choreography?: { visualStartFrame?: number; actionStartFrame?: number; wheelStartFrame?: number; wheelHighlightStartFrame?: number; wheelHighlightEndFrame?: number };
 } = {}) => {
   const frame = useCurrentFrame();
   const c = choreography || {};
   const visual = c.visualStartFrame ?? 48;
   const action = c.actionStartFrame ?? 88;
+  const wheelStart = c.wheelStartFrame ?? 70;
+  const hlStart = c.wheelHighlightStartFrame ?? 85;
+  const hlEnd = c.wheelHighlightEndFrame ?? 140;
+
+  const wheelReveal = interpolate(frame, [wheelStart, wheelStart + 15], [0, 1], { extrapolateLeft: "clamp" });
+
+  // Smooth slide highlight across 4 real macro steps (conductor)
+  const stepCount = 4;
+  const slide = interpolate(frame, [hlStart, hlEnd], [0, stepCount - 0.1], { extrapolateLeft: "clamp" });
+  const currentHighlightStep = Math.floor(slide);
 
   const steps = ["复制", "切换应用", "粘贴", "保存"];
 
   return (
     <div style={{ width: 640, display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
+      {/* Wheel first with sliding highlight across real macro steps */}
+      <div style={{ opacity: wheelReveal, marginBottom: 8 }}>
+        <RingflowWheel 
+          mini 
+          mode="dark" 
+          activeSegment="macro" 
+          centerLabel="宏序列" 
+          revealProgress={wheelReveal}
+          glowProgress={Math.min(1, (slide % 1) + 0.2)} 
+        />
+      </div>
+
       {steps.map((step, index) => {
         const start = visual + index * 18;
         const t = interpolate(frame, [start, start + 20], [0, 1], {
@@ -963,7 +1012,7 @@ export const MacroExecution = ({
           extrapolateRight: "clamp",
           easing: Easing.bezier(0.16, 1, 0.3, 1),
         });
-        const isDone = index < 3 || (index === 3 && frame > action + 50);
+        const isDone = index <= currentHighlightStep;
 
         return (
           <div
@@ -1004,18 +1053,14 @@ export const MacroExecution = ({
           </div>
         );
       })}
-
-      {/* Running wheel indicator */}
-      <div style={{ marginTop: 6, opacity: interpolate(frame, [action - 4, action + 12], [0, 1], { extrapolateLeft: "clamp" }) }}>
-        <RingflowWheel mini mode="dark" runningSegment="shell" centerLabel="运行中" revealFrame={action - 10} />
-      </div>
     </div>
   );
 };
 
 // ─── MonitorDashboard ─────────────────────────────────────────────────────────
-export const MonitorDashboard = () => {
+export const MonitorDashboard = ({ choreography }: { choreography?: { wheelStartFrame?: number; wheelHighlightStartFrame?: number; wheelHighlightEndFrame?: number } } = {}) => {
   const frame = useCurrentFrame();
+  const c = choreography || {};
 
   const metrics = [
     { label: "CPU", value: "18%", raw: 0.18, color: "#4aa3ff" },
@@ -1024,7 +1069,8 @@ export const MonitorDashboard = () => {
     { label: "电池", value: "86%", raw: 0.86, color: "#fbbf24" },
   ];
 
-  const wheelReveal = interpolate(frame, [40, 70], [0, 1], { extrapolateLeft: "clamp" });
+  const wheelReveal = interpolate(frame, [c.wheelStartFrame ?? 40, (c.wheelStartFrame ?? 40) + 25], [0, 1], { extrapolateLeft: "clamp" });
+  const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 55, c.wheelHighlightEndFrame ?? 85], [0, 1], { extrapolateLeft: "clamp" });
 
   return (
     <div style={{ position: "relative", width: 620 }}>
@@ -1080,9 +1126,9 @@ export const MonitorDashboard = () => {
         </div>
       </div>
 
-      {/* Ringflow wheel as the quick access for status (prominent) */}
+      {/* Wheel first, highlight on monitor sector leads metrics */}
       <div style={{ position: "absolute", right: -5, bottom: -25, opacity: wheelReveal, transform: "scale(1.15)" }}>
-        <RingflowWheel mini mode="dark" activeSegment="monitor" centerLabel="状态" revealProgress={wheelReveal} />
+        <RingflowWheel mini mode="dark" activeSegment="monitor" centerLabel="状态" revealProgress={wheelReveal} glowProgress={highlight} />
       </div>
     </div>
   );

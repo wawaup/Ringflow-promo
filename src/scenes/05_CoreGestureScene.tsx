@@ -50,12 +50,20 @@ export const CoreGestureScene = () => {
     { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.32, 0.02, 0.2, 1) }
   );
 
-  // Wheel + outer ring reveal (only on swipe)
+  // Wheel first as protagonist, highlight during swipe (real gesture sector)
   const wheelReveal = spring({
     frame: Math.max(0, frame - (c.wheelStartFrame ?? c.actionStartFrame + 8)),
     fps,
     config: { damping: 18, stiffness: 215, mass: 0.8 },
     durationInFrames: 22,
+  });
+
+  const sectorHighlight = interpolate(frame, [
+    c.wheelHighlightStartFrame ?? (c.swipeStartFrame ?? 100),
+    c.wheelHighlightEndFrame ?? (c.holdStartFrame ?? 180) - 20
+  ], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
 
   // Release / completion
@@ -145,7 +153,7 @@ export const CoreGestureScene = () => {
             folderProgress={folderProgress}
             folderRotation={folderRotation}
             showDragTrail={swipeT > 0.12}
-            glowProgress={sectorGlow}
+            glowProgress={Math.max(sectorGlow, sectorHighlight)}
             revealProgress={wheelReveal}
             releaseProgress={0} // no dismiss, stay visible
             showCursorReveal={false}
