@@ -188,7 +188,7 @@ export const InterruptedWorkflowWorkspace = ({
   const codeWindow = sceneWindowVisibility(
     frame,
     choreography.codexMainStartFrame ?? 0,
-    (choreography.codexMainStartFrame ?? 0) + 35,  // ~0.58s, consistent short appearance for no-action window
+    (choreography.codexMainStartFrame ?? 0) + 14,  // shortened by cp cost ~0.23s
     20,
   );
   const noteWindow = sceneWindowVisibility(
@@ -219,12 +219,17 @@ export const InterruptedWorkflowWorkspace = ({
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const noteCopyVal = choreography.noteCopyFrame ?? 0;
+  const notePasteVal = choreography.notePasteFrame ?? 0;
+  const promptCopyVal = choreography.promptCopyFrame ?? 0;
+  const promptPasteVal = choreography.promptPasteFrame ?? 0;
+
   const copyKeys = Math.max(
-    interpolate(frame, [choreography.noteCopyFrame ?? 0, (choreography.noteCopyFrame ?? 0) + 18, (choreography.notePasteFrame ?? 0) - 6], [0, 1, 0], {
+    interpolate(frame, [noteCopyVal, noteCopyVal + 10, Math.max(noteCopyVal + 11, notePasteVal - 2)], [0, 1, 0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     }),
-    interpolate(frame, [choreography.promptCopyFrame ?? 0, (choreography.promptCopyFrame ?? 0) + 18, (choreography.promptPasteFrame ?? 0) - 6], [0, 1, 0], {
+    interpolate(frame, [promptCopyVal, promptCopyVal + 10, Math.max(promptCopyVal + 11, promptPasteVal - 2)], [0, 1, 0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     }),
