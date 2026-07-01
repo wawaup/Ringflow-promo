@@ -8,9 +8,8 @@ import { SceneShell } from "./SceneShell";
 const scene = scenes.find((item) => item.id === "shell-script")!;
 
 const COMMANDS = [
-  { cmd: "$ git push origin main", output: "Branch 'main' pushed to origin", outputColor: "#8bd69a", tag: "开发者" },
   { cmd: "$ pnpm run build", output: "✓ Compiled in 2.4s", outputColor: "#8bd69a", tag: "构建" },
-  { cmd: "$ python analyze.py", output: "✓ Report saved to output/", outputColor: "#fbbf24", tag: "数据" },
+  { cmd: "$ git push", output: "✓ Pushed to origin", outputColor: "#8bd69a", tag: "Git" },
 ];
 
 const TerminalLine = ({
