@@ -188,7 +188,7 @@ export const InterruptedWorkflowWorkspace = ({
   const codeWindow = sceneWindowVisibility(
     frame,
     choreography.codexMainStartFrame ?? 0,
-    (choreography.codexMainStartFrame ?? 0) + 14,  // shortened by cp cost ~0.23s
+    (choreography.noteStartFrame ?? 0) - 5,  // continuous: code window stays until note appears
     20,
   );
   const noteWindow = sceneWindowVisibility(
