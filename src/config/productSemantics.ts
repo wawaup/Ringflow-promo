@@ -13,10 +13,10 @@ export type WheelAction = {
 };
 
 export const MAIN_WHEEL_ACTIONS: readonly WheelAction[] = [
-  { id: "prompt-folder", label: "常用提示词", semantic: "Folder for text prompts" },
   { id: "copy", label: "复制", semantic: "Copy selection (cmd+c)" },
   { id: "paste", label: "粘贴", semantic: "Paste (cmd+v)" },
   { id: "undo", label: "撤销", semantic: "Undo (cmd+z)" },
+  { id: "save", label: "保存", semantic: "Save (cmd+s)" },
   { id: "select-all", label: "全选", semantic: "Select all (cmd+a)" },
   { id: "shell", label: "新脚本", semantic: "Shell script action" },
   { id: "monitor", label: "监视器", semantic: "System monitor (CPU, memory, battery...)" },
@@ -42,6 +42,15 @@ export const TEXT_ACTION_PROMPTS: Record<string, string> = {
   "对比分析": "请从多个角度对比分析这些选项的优劣，说明各自适用场景，并给出你的建议和理由。",
   "补充完善": "请在现有内容基础上适当补充细节和例子，把说明写得更完整、更容易理解。",
 };
+
+// Exact real default actions from mac app (ActionItem.defaultLibrary)
+export const REAL_DEFAULT_MAIN_ACTIONS = [
+  "复制", "粘贴", "撤销", "保存", "全选", "新脚本", "监视器", "新便签"
+] as const;
+
+export const REAL_TEXT_PROMPTS = [
+  "总结提炼", "润色改写", "分步说明", "对比分析", "补充完善"
+] as const;
 
 export const REAL_MONITOR_LABELS = [
   { label: "CPU", metric: "cpuUsage" },

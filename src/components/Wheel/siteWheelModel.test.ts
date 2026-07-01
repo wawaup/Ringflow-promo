@@ -23,8 +23,7 @@ describe("siteWheelModel", () => {
   });
 
   it("maps legacy promo segment ids onto the closest real website sectors", () => {
-    assert.equal(wheelSegmentToSiteIndex("profiles"), 0);
-    assert.equal(wheelSegmentToSiteIndex("quick-input"), 0);
+    assert.equal(wheelSegmentToSiteIndex("quick-input"), 1);
     assert.equal(wheelSegmentToSiteIndex("macro"), 5);
     assert.equal(wheelSegmentToSiteIndex("monitor"), 6);
     assert.equal(wheelSegmentToSiteIndex("sticky-note"), 7);

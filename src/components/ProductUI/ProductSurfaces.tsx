@@ -2,7 +2,9 @@ import { Easing, interpolate, useCurrentFrame } from "remotion";
 import { Img, staticFile } from "remotion";
 import { assets } from "../../config/assets";
 import { theme } from "../../config/theme";
+import { MacWindow } from "../MacUI/MacWindow";
 import { RingflowWheel } from "../Wheel/RingflowWheel";
+import { REAL_TEXT_PROMPTS } from "../../config/productSemantics";
 
 type Mode = "light" | "dark";
 
@@ -139,8 +141,8 @@ export const InterruptedWorkflowWorkspace = ({
   choreography: {
     pageStartFrame?: number;
     pageReadyFrame?: number;
-    codexInputStartFrame?: number;
-    codexMainStartFrame?: number;
+    destinationInputStartFrame?: number;
+    documentStartFrame?: number;
     noteStartFrame?: number;
     stickyOpenFrame?: number;
     noteCopyFrame?: number;
@@ -179,7 +181,7 @@ export const InterruptedWorkflowWorkspace = ({
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
-  const codexInput = reveal(frame, choreography.codexInputStartFrame ?? 0, 22);
+  const destinationInput = reveal(frame, choreography.destinationInputStartFrame ?? 0, 22);
   const stickyOpen = reveal(frame, choreography.stickyOpenFrame ?? 0, 18);
   const noteCopy = reveal(frame, choreography.noteCopyFrame ?? 0, 10);
   const notePaste = reveal(frame, choreography.notePasteFrame ?? 0, 14);
@@ -187,7 +189,7 @@ export const InterruptedWorkflowWorkspace = ({
   const promptPaste = reveal(frame, choreography.promptPasteFrame ?? 0, 14);
   const codeWindow = sceneWindowVisibility(
     frame,
-    choreography.codexMainStartFrame ?? 0,
+    choreography.documentStartFrame ?? 0,
     (choreography.noteStartFrame ?? 0) - 5,  // continuous: code window stays until note appears
     20,
   );
@@ -288,7 +290,7 @@ export const InterruptedWorkflowWorkspace = ({
             <span style={{ width: 10, height: 10, borderRadius: 999, background: "#ff5f57" }} />
             <span style={{ width: 10, height: 10, borderRadius: 999, background: "#ffbd2e" }} />
             <span style={{ width: 10, height: 10, borderRadius: 999, background: "#28c840" }} />
-            <span style={{ marginLeft: 8, fontSize: 14, fontWeight: 700, color: "#64748b" }}>useSubscription.ts</span>
+            <span style={{ marginLeft: 8, fontSize: 14, fontWeight: 700, color: "#64748b" }}>SubscriptionStatus.tsx</span>
           </div>
           <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
             {/* File tree sidebar */}
@@ -296,7 +298,7 @@ export const InterruptedWorkflowWorkspace = ({
               {[
                 { name: "src", indent: 0, isFolder: true },
                 { name: "hooks", indent: 1, isFolder: true },
-                { name: "useSubscription.ts", indent: 2, active: true },
+                { name: "SubscriptionStatus.tsx", indent: 2, active: true },
                 { name: "useDevice.ts", indent: 2 },
                 { name: "components", indent: 1, isFolder: true },
                 { name: "PresetImport.tsx", indent: 2 },
@@ -336,19 +338,19 @@ export const InterruptedWorkflowWorkspace = ({
         </div>
       </div>
 
-      {/* AI Chat is the steady destination for pasted context. */}
-      <div style={{ position: "absolute", left: 210, top: 354, opacity: codexInput, transform: `translateY(${(1 - codexInput) * 18}px) scale(${0.96 + codexInput * 0.04})` }}>
+      {/* The destination input that receives Ringflow actions (paste / prompt insert). */}
+      <div style={{ position: "absolute", left: 210, top: 354, opacity: destinationInput, transform: `translateY(${(1 - destinationInput) * 18}px) scale(${0.96 + destinationInput * 0.04})` }}>
         <div style={{ ...panel("light"), width: 520, height: 238, borderRadius: 24, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           <div style={{ height: 48, padding: "0 18px", display: "flex", alignItems: "center", gap: 9, borderBottom: "1px solid rgba(148,163,184,0.13)", background: "rgba(248,250,253,0.94)", flexShrink: 0 }}>
             <span style={{ width: 28, height: 28, borderRadius: 9, background: "linear-gradient(135deg,#7c3aed,#2563ab)", display: "grid", placeItems: "center" }}>
               <span style={{ color: "white", fontSize: 13, fontWeight: 860 }}>AI</span>
             </span>
-            <span style={{ fontSize: 16, fontWeight: 780, color: "#334155" }}>AI Chat</span>
+            <span style={{ fontSize: 16, fontWeight: 780, color: "#334155" }}>提示助手</span>
           </div>
           <div style={{ flex: 1, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, overflow: "hidden" }}>
             {/* User bubble first */}
             <div style={{ alignSelf: "flex-end", maxWidth: "85%", background: "rgba(47,127,211,0.12)", border: "1px solid rgba(47,127,211,0.18)", borderRadius: "15px 15px 5px 15px", padding: "8px 10px", fontSize: 12, color: "#1e3a5f", lineHeight: 1.4, fontWeight: 640 }}>
-              帮我补充 useSubscription 的边界处理
+              帮我补充订阅状态的边界处理逻辑
             </div>
             {/* AI bubble below */}
             <div style={{ alignSelf: "flex-start", maxWidth: "85%", background: "rgba(248,250,253,0.96)", border: "1px solid rgba(148,163,184,0.18)", borderRadius: "15px 15px 15px 5px", padding: "8px 10px", fontSize: 12, color: "#334155", lineHeight: 1.4, fontWeight: 580 }}>
@@ -478,7 +480,7 @@ export const WritingWorkspace = () => {
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ff5f57" }} />
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ffbd2e" }} />
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#28c840" }} />
-          <span style={{ marginLeft: 14 }}>会议纪要.md</span>
+          <span style={{ marginLeft: 14 }}>会议记录.md</span>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 250px", height: 442 }}>
@@ -615,14 +617,22 @@ export const QuickInputWorkspace = ({
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  // Wheel appears after the workspace
-  const wheelReveal = interpolate(frame, [actionStart - 12, actionStart + 6], [0, 1], {
+  // Wheel appears FIRST as the protagonist, configured for this scenario (润色改写 sector)
+  const wheelReveal = interpolate(frame, [actionStart - 20, actionStart + 4], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Simulate the "润色改写" action result (timed text insertion)
-  const actionComplete = interpolate(frame, [actionStart + 26, actionStart + 48], [0, 1], {
+  // Sector highlight on wheel LEADS the result UI (core conductor pattern)
+  // Highlight the relevant sector (quick-input / 润色改写) BEFORE the insertion
+  const sectorHighlight = interpolate(frame, [actionStart - 12, actionStart + 6], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+
+  // Simulate the "润色改写" action result (timed text insertion) - AFTER highlight leads
+  const actionComplete = interpolate(frame, [actionStart + 14, actionStart + 40], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -635,9 +645,9 @@ export const QuickInputWorkspace = ({
 
   return (
     <div style={{ position: "relative", width: 920, opacity: windowReveal, transform: `translateY(${(1 - windowReveal) * 22}px)` }}>
-      {/* Header to clarify it's an AI app context */}
+      {/* Header to show realistic editor context */}
       <div style={{ textAlign: "center", marginBottom: 6, fontSize: 13, color: "#64748b", fontWeight: 620, letterSpacing: 0.3 }}>
-        Codex · AI 应用
+        编辑器 · 当前文档
       </div>
       <div style={{ ...panel("light"), width: 920, height: 510, borderRadius: 26, overflow: "hidden", display: "flex", flexDirection: "column" }}>
         {/* Title bar */}
@@ -645,7 +655,7 @@ export const QuickInputWorkspace = ({
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ff5f57" }} />
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ffbd2e" }} />
           <span style={{ width: 12, height: 12, borderRadius: 999, background: "#28c840" }} />
-          <div style={{ marginLeft: 16, fontSize: 15, fontWeight: 680, color: "#64748b" }}>迭代复盘.md</div>
+          <div style={{ marginLeft: 16, fontSize: 15, fontWeight: 680, color: "#64748b" }}>项目复盘.md</div>
         </div>
 
         <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
@@ -656,7 +666,7 @@ export const QuickInputWorkspace = ({
               覆盖用户鉴权、数据同步与离线缓存。验收标准需在发布前对齐。
             </div>
 
-            {/* Prominent large AI input area - like desktop AI Agent (Cursor / Codex style) */}
+            {/* Prominent input area where Ringflow inserts prompts directly */}
             <div style={{ marginTop: "auto", flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 650, color: "#64748b", marginBottom: 8 }}>向 AI 提问</div>
               <div
@@ -713,8 +723,8 @@ export const QuickInputWorkspace = ({
           {/* Prompt list sidebar + mini wheel */}
           <div style={{ width: 208, borderLeft: "1px solid rgba(148,163,184,0.13)", padding: "18px 14px", background: "rgba(248,251,255,0.78)", flexShrink: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 720, color: "#64748b", marginBottom: 10 }}>快捷 Prompt</div>
-            {["总结提炼", "润色改写", "分步说明", "对比分析"].map((item, index) => {
-              const isActive = item === "润色改写" && showResult;
+            {REAL_TEXT_PROMPTS.slice(0,4).map((item, index) => {
+              const isActive = item === "润色改写" && (sectorHighlight > 0.4 || showResult);
               return (
                 <div
                   key={item}
@@ -741,17 +751,22 @@ export const QuickInputWorkspace = ({
         </div>
       </div>
 
-      {/* Ringflow wheel positioned as the action trigger */}
+      {/* Ringflow wheel - protagonist first, highlight leads result, larger for presence */}
       <div
         style={{
           position: "absolute",
-          right: 8,
-          bottom: -28,
+          right: 12,
+          bottom: -22,
           opacity: wheelReveal,
-          transform: `scale(${0.86 + wheelReveal * 0.14})`,
+          transform: `scale(${1.05 + wheelReveal * 0.1})`,
         }}
       >
-        <RingflowWheel mini activeSegment="quick-input" centerLabel="文本" revealProgress={wheelReveal} />
+        <RingflowWheel
+          activeSegment="quick-input"
+          centerLabel="文本"
+          revealProgress={wheelReveal}
+          glowProgress={sectorHighlight}
+        />
       </div>
     </div>
   );
@@ -774,57 +789,59 @@ export const FrictionWorkflow = ({
   const switchStage = interpolate(frame, [action + 38, action + 62], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
-    <div style={{ position: "relative", width: 720, height: 440 }}>
-      {/* Context: the thing the user actually wants to do */}
+    <div style={{ position: "relative", width: 780, height: 460 }}>
+      {/* Main document window — real usage context */}
+      <div style={{ position: "absolute", left: 60, top: 30 }}>
+        <MacWindow title="迭代计划.md" width={520} height={200}>
+          <div style={{ fontSize: 15, color: "#334155", lineHeight: 1.65 }}>
+            需要把会议纪要里的三件事同步到代码注释里…<br />
+            <span style={{ opacity: 0.7 }}>添加订阅状态刷新逻辑</span>
+          </div>
+        </MacWindow>
+      </div>
+
+      {/* Real menu bar friction (appears as overlay from the window top) */}
       <div
         style={{
-          ...panel("light"),
           position: "absolute",
-          left: 80,
-          top: 60,
-          width: 520,
-          height: 160,
-          borderRadius: 20,
-          padding: "18px 24px",
-          opacity: 0.95,
+          left: 140,
+          top: 82,
+          opacity: menuStage,
+          transform: `translateY(${(1 - menuStage) * 10}px)`,
         }}
       >
-        <div style={{ fontSize: 15, color: "#64748b", marginBottom: 8 }}>当前文档 · 迭代计划</div>
-        <div style={{ fontSize: 20, fontWeight: 680, color: "#263244" }}>添加订阅状态刷新逻辑</div>
-        <div style={{ marginTop: 12, fontSize: 15, color: "#475569" }}>需要把会议纪要里的三件事同步到代码注释里…</div>
-      </div>
-
-      {/* Stage 1: Menu bar friction */}
-      <div style={{ position: "absolute", left: 110, top: 240, opacity: menuStage, transform: `translateY(${(1 - menuStage) * 12}px)` }}>
-        <div style={{ ...panel("light"), width: 240, borderRadius: 16, padding: "10px 8px", fontSize: 16 }}>
-          <div style={{ padding: "4px 12px", color: "#334155", fontWeight: 650 }}>编辑</div>
-          <div style={{ padding: "4px 12px", color: "#334155", fontWeight: 650 }}>服务</div>
-          <div style={{ padding: "4px 12px", background: "rgba(232,244,255,0.8)", borderRadius: 8, color: "#1f5f9f" }}>替换…</div>
+        <div style={{ ...panel("light"), width: 210, borderRadius: 10, padding: "6px 4px", fontSize: 14, boxShadow: "0 8px 24px rgba(0,0,0,0.18)" }}>
+          <div style={{ padding: "2px 10px" }}>编辑</div>
+          <div style={{ padding: "2px 10px" }}>服务</div>
+          <div style={{ padding: "2px 10px", background: "rgba(232,244,255,0.85)", borderRadius: 6, color: "#1f5f9f" }}>替换…</div>
         </div>
-        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6, textAlign: "center" }}>菜单栏</div>
       </div>
 
-      {/* Stage 2: Submenu — deeper navigation */}
-      <div style={{ position: "absolute", left: 260, top: 290, opacity: subStage, transform: `translateY(${(1 - subStage) * 14}px)` }}>
-        <div style={{ ...panel("light"), width: 210, borderRadius: 16, padding: "10px 8px", fontSize: 16 }}>
-          <div style={{ padding: "4px 12px", color: "#475569" }}>转换文本</div>
-          <div style={{ padding: "4px 12px", color: "#475569" }}>朗读</div>
-          <div style={{ padding: "4px 12px", background: "rgba(232,244,255,0.8)", borderRadius: 8 }}>打开方式</div>
+      {/* Submenu deeper path */}
+      <div
+        style={{
+          position: "absolute",
+          left: 280,
+          top: 130,
+          opacity: subStage,
+          transform: `translateY(${(1 - subStage) * 8}px)`,
+        }}
+      >
+        <div style={{ ...panel("light"), width: 170, borderRadius: 10, padding: "6px 4px", fontSize: 13, boxShadow: "0 8px 24px rgba(0,0,0,0.18)" }}>
+          <div style={{ padding: "2px 10px" }}>转换文本</div>
+          <div style={{ padding: "2px 10px" }}>朗读</div>
+          <div style={{ padding: "2px 10px", background: "rgba(232,244,255,0.85)", borderRadius: 6 }}>打开方式</div>
         </div>
-        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6, textAlign: "center" }}>二级菜单</div>
       </div>
 
-      {/* Stage 3: Window / app switching cost */}
-      <div style={{ position: "absolute", left: 410, top: 200, opacity: switchStage }}>
-        <div style={{ ...panel("light"), width: 220, borderRadius: 16, padding: "12px 14px", fontSize: 15 }}>
-          <div style={{ marginBottom: 6, fontWeight: 640 }}>窗口切换</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {["Notes", "Finder", "Terminal"].map((w, i) => (
-              <div key={i} style={{ background: i === 1 ? "rgba(223,239,255,0.9)" : "rgba(248,250,252,0.8)", padding: "3px 10px", borderRadius: 8, fontSize: 14 }}>{w}</div>
-            ))}
+      {/* App/window switching cost — another real window appears */}
+      <div style={{ position: "absolute", left: 420, top: 160, opacity: switchStage, transform: `translateY(${(1 - switchStage) * 12}px)` }}>
+        <MacWindow title="备忘录" width={210} height={130} mode="light">
+          <div style={{ fontSize: 13, color: "#475569" }}>
+            Notes · Finder · Terminal<br />
+            <span style={{ color: "#1f5f9f" }}>来回切换…</span>
           </div>
-        </div>
-        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6, textAlign: "center" }}>来回切换</div>
+        </MacWindow>
       </div>
     </div>
   );
@@ -842,63 +859,83 @@ const appGlyph: Record<string, { color: string; glyph: string }> = {
 export const QuickOpenTargets = () => {
   const frame = useCurrentFrame();
 
+  // Simple targets with realistic result feedback
   const targets = [
-    { name: "Terminal", icon: ">_ ", color: "#111827" },
-    { name: "Finder", icon: "📁", color: "#4aa3ff" },
-    { name: "Project", icon: "📄", color: "#147ef5" },
+    { name: "Terminal", icon: ">_ ", color: "#111827", desc: "命令行环境" },
+    { name: "Finder", icon: "📁", color: "#4aa3ff", desc: "项目目录" },
+    { name: "README", icon: "📄", color: "#147ef5", desc: "项目说明" },
   ];
 
+  const actionComplete = interpolate(frame, [80, 110], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 160px)", gap: 18, justifyContent: "center" }}>
-      {targets.map((t, index) => {
-        const tt = interpolate(frame, [index * 7, index * 7 + 20], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
-        const highlighted = index === 0;
-        return (
-          <div
-            key={index}
-            style={{
-              ...panel("light"),
-              width: 160,
-              height: 160,
-              borderRadius: 24,
-              display: "grid",
-              placeItems: "center",
-              gap: 8,
-              padding: 18,
-              outline: highlighted ? "3px solid rgba(47,127,211,0.28)" : "none",
-              boxShadow: highlighted
-                ? "0 0 0 6px rgba(47,127,211,0.08), 0 24px 80px rgba(30,45,70,0.16)"
-                : theme.shadow.panel,
-              opacity: tt,
-              transform: `translateY(${(1 - tt) * 20}px) scale(${0.94 + tt * 0.06})`,
-            }}
-          >
+    <div style={{ position: "relative", width: 620 }}>
+      {/* Realistic editor context */}
+      <div style={{ ...panel("light"), marginBottom: 18, padding: 18, borderRadius: 18 }}>
+        <div style={{ fontSize: 13, color: "#64748b", marginBottom: 6 }}>当前文档 · 迭代计划.md</div>
+        <div style={{ fontSize: 15, color: "#334155" }}>
+          需要快速打开 Terminal 来运行构建，并查看项目结构。
+        </div>
+      </div>
+
+      {/* Opened targets as result of the wheel action */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 170px)", gap: 14, justifyContent: "center" }}>
+        {targets.map((t, index) => {
+          const tt = interpolate(frame, [index * 8, index * 8 + 18], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+            easing: Easing.bezier(0.16, 1, 0.3, 1),
+          });
+          const isOpened = index === 0 && actionComplete > 0.3;
+          return (
             <div
+              key={index}
               style={{
-                width: 58,
-                height: 58,
-                borderRadius: 14,
-                background: t.color,
-                color: "white",
-                display: "grid",
-                placeItems: "center",
-                fontSize: 22,
-                fontWeight: 820,
-                boxShadow: `0 4px 14px ${t.color}55`,
+                ...panel("light"),
+                width: 170,
+                height: 128,
+                borderRadius: 18,
+                padding: 14,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                opacity: tt,
+                transform: `translateY(${(1 - tt) * 14}px)`,
+                border: isOpened ? "2px solid rgba(47,127,211,0.35)" : "1px solid rgba(255,255,255,0.7)",
               }}
             >
-              {t.icon}
+              <div
+                style={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: 12,
+                  background: t.color,
+                  color: "white",
+                  display: "grid",
+                  placeItems: "center",
+                  fontSize: 20,
+                  fontWeight: 820,
+                }}
+              >
+                {t.icon}
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 680, color: "#334155" }}>{t.name}</div>
+              <div style={{ fontSize: 12, color: isOpened ? "#2f7fd3" : "#64748b" }}>
+                {isOpened ? "已通过 Ringflow 打开" : t.desc}
+              </div>
             </div>
-            <div style={{ fontSize: 17, fontWeight: 680, color: "#334155" }}>{t.name}</div>
-          </div>
-        );
-      })}
-      <div style={{ gridColumn: "1 / -1", justifySelf: "center", marginTop: 4 }}>
-        <RingflowWheel mini activeSegment="quick-open" centerLabel="快捷打开" revealFrame={14} />
+          );
+        })}
+      </div>
+
+      {/* Ringflow wheel as the trigger (more prominent) */}
+      <div style={{ position: "absolute", right: -10, bottom: -18, opacity: interpolate(frame, [60, 85], [0, 1], { extrapolateLeft: "clamp" }) }}>
+        <RingflowWheel activeSegment="quick-open" centerLabel="打开" revealProgress={interpolate(frame, [55, 80], [0, 1], { extrapolateLeft: "clamp" })} />
       </div>
     </div>
   );
@@ -987,63 +1024,65 @@ export const MonitorDashboard = () => {
     { label: "电池", value: "86%", raw: 0.86, color: "#fbbf24" },
   ];
 
-  return (
-    <div style={{ width: 560, display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 18 }}>
-      {metrics.map(({ label, value, raw, color }, index) => {
-        const tCard = interpolate(frame, [index * 8, index * 8 + 22], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
-        // Bar fills after card appears
-        const barStart = index * 8 + 16;
-        const barFill = interpolate(frame, [barStart, barStart + 26], [0, raw], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.4, 0, 0.2, 1),
-        });
+  const wheelReveal = interpolate(frame, [40, 70], [0, 1], { extrapolateLeft: "clamp" });
 
-        return (
-          <div
-            key={label}
-            style={{
-              ...panel("dark"),
-              borderRadius: 20,
-              padding: 20,
-              minHeight: 142,
-              opacity: tCard,
-              transform: `translateY(${(1 - tCard) * 16}px)`,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", color: theme.colors.darkMuted, fontSize: 20 }}>
-              <span>{label}</span>
-              <span style={{ color: theme.colors.darkInk, fontWeight: 720 }}>{value}</span>
-            </div>
-            <div
-              style={{
-                height: 10,
-                borderRadius: 999,
-                background: "rgba(255,255,255,0.10)",
-                marginTop: 28,
-                overflow: "hidden",
-              }}
-            >
+  return (
+    <div style={{ position: "relative", width: 620 }}>
+      {/* Realistic system monitor context window */}
+      <div style={{ ...panel("dark"), padding: 18, borderRadius: 18, marginBottom: 12 }}>
+        <div style={{ fontSize: 14, color: "#9aa7bd", marginBottom: 10, display: "flex", justifyContent: "space-between" }}>
+          <span>活动监视器</span>
+          <span style={{ color: "#2f7fd3", fontSize: 12 }}>Ringflow 状态</span>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+          {metrics.map(({ label, value, raw, color }, index) => {
+            const tCard = interpolate(frame, [index * 7, index * 7 + 20], [0, 1], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+              easing: Easing.bezier(0.16, 1, 0.3, 1),
+            });
+            const barStart = index * 7 + 14;
+            const barFill = interpolate(frame, [barStart, barStart + 24], [0, raw], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+              easing: Easing.bezier(0.4, 0, 0.2, 1),
+            });
+
+            return (
               <div
+                key={label}
                 style={{
-                  width: `${barFill * 100}%`,
-                  height: "100%",
-                  borderRadius: 999,
-                  background: `linear-gradient(90deg, ${color}cc, ${color})`,
-                  boxShadow: `0 0 8px ${color}66`,
-                  transition: "none",
+                  background: "rgba(15,23,42,0.6)",
+                  borderRadius: 14,
+                  padding: 14,
+                  opacity: tCard,
+                  transform: `translateY(${(1 - tCard) * 10}px)`,
                 }}
-              />
-            </div>
-          </div>
-        );
-      })}
-      <div style={{ gridColumn: "1 / -1", justifySelf: "center", marginTop: 10 }}>
-        <RingflowWheel mini mode="dark" activeSegment="monitor" centerLabel="监视器" revealFrame={16} />
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", color: "#cbd5e1", fontSize: 15 }}>
+                  <span>{label}</span>
+                  <span style={{ color: "#f1f5f9", fontWeight: 720 }}>{value}</span>
+                </div>
+                <div style={{ height: 8, background: "rgba(255,255,255,0.08)", borderRadius: 999, marginTop: 10, overflow: "hidden" }}>
+                  <div
+                    style={{
+                      width: `${barFill * 100}%`,
+                      height: "100%",
+                      background: `linear-gradient(90deg, ${color}cc, ${color})`,
+                      borderRadius: 999,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Ringflow wheel as the quick access for status (prominent) */}
+      <div style={{ position: "absolute", right: -5, bottom: -25, opacity: wheelReveal, transform: "scale(1.15)" }}>
+        <RingflowWheel mini mode="dark" activeSegment="monitor" centerLabel="状态" revealProgress={wheelReveal} />
       </div>
     </div>
   );

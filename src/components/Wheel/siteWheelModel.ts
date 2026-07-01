@@ -12,6 +12,7 @@ export type SiteWheelIconName =
   | "doc.on.doc"
   | "doc.on.clipboard"
   | "arrow.uturn.backward"
+  | "square.and.arrow.down"
   | "selection.pin.in.out"
   | "terminal.fill"
   | "thermometer.medium"
@@ -25,10 +26,10 @@ export type SiteWheelIconName =
   | "gauge.with.dots.needle.67percent";
 
 export const MAIN_SLOTS = [
-  { label: "常用提示词", icon: "folder.fill", isFolder: true },
   { label: "复制", icon: "doc.on.doc" },
   { label: "粘贴", icon: "doc.on.clipboard" },
   { label: "撤销", icon: "arrow.uturn.backward" },
+  { label: "保存", icon: "square.and.arrow.down" },
   { label: "全选", icon: "selection.pin.in.out" },
   { label: "新脚本", icon: "terminal.fill" },
   { label: "监视器", icon: "gauge.with.dots.needle.67percent" },
@@ -55,6 +56,8 @@ export const SITE_WHEEL_ICON_PATHS: Record<SiteWheelIconName, string> = {
     '<path d="M8.2 5.8h1.5a2.4 2.4 0 0 1 4.6 0h1.5c.9 0 1.6.7 1.6 1.6v10.1c0 .9-.7 1.6-1.6 1.6H8.2c-.9 0-1.6-.7-1.6-1.6V7.4c0-.9.7-1.6 1.6-1.6z" fill="none" stroke="currentColor" stroke-width="1.55"/><path d="M9.4 8h5.2" stroke="currentColor" stroke-width="1.55" stroke-linecap="round"/><path d="M9.2 12h5.6M9.2 15.4h4.2" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>',
   "arrow.uturn.backward":
     '<path d="M9.2 6.2 5.4 10l3.8 3.8M5.7 10h8.1a4.8 4.8 0 1 1 0 9.6h-1.2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>',
+  "square.and.arrow.down":
+    '<path d="M12 4v10M7 10l5 5 5-5M5 19h14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
   "selection.pin.in.out":
     '<rect x="6" y="6" width="12" height="12" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-dasharray="2.2 2.2"/><path d="M8.3 3.8v4.5M3.8 8.3h4.5M15.7 20.2v-4.5M20.2 15.7h-4.5" stroke="currentColor" stroke-width="1.45" stroke-linecap="round"/>',
   "terminal.fill":
@@ -80,19 +83,19 @@ export const SITE_WHEEL_ICON_PATHS: Record<SiteWheelIconName, string> = {
 };
 
 const LEGACY_SEGMENT_TO_SITE_INDEX: Record<WheelSegmentId, number> = {
-  "prompt-folder": 0,
-  "quick-input": 0,
-  "copy": 1,
-  "paste": 2,
-  "undo": 3,
+  "copy": 0,
+  "paste": 1,
+  "undo": 2,
+  "save": 3,
   "select-all": 4,
   "shell": 5,
   "monitor": 6,
   "sticky-note": 7,
+  "prompt-folder": 0,
+  "quick-input": 1,
   "quick-open": 5,
   "macro": 5,
-  shortcuts: 3,
-  profiles: 0,
+  shortcuts: 2,
 };
 
 const LEGACY_SEGMENT_TO_FOLDER_INDEX: Partial<Record<WheelSegmentId, number>> = {
@@ -100,7 +103,6 @@ const LEGACY_SEGMENT_TO_FOLDER_INDEX: Partial<Record<WheelSegmentId, number>> = 
   "quick-input": 1,
   "quick-open": 2,
   shortcuts: 5,
-  profiles: 0,
 };
 
 export const wheelSegmentToSiteIndex = (segment?: WheelSegmentId): number | null => {

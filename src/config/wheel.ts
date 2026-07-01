@@ -22,20 +22,20 @@ export const wheelDerivedConfig = {
 } as const;
 
 export const wheelSegments = [
-  { id: "prompt-folder", label: "常用提示词" },
   { id: "copy", label: "复制" },
   { id: "paste", label: "粘贴" },
   { id: "undo", label: "撤销" },
+  { id: "save", label: "保存" },
   { id: "select-all", label: "全选" },
   { id: "shell", label: "新脚本" },
   { id: "monitor", label: "监视器" },
   { id: "sticky-note", label: "新便签" },
-  // Feature names used by scenes (map to appropriate visual slots)
+  // Feature / folder mappings used by scenes (map to real app labels)
+  { id: "prompt-folder", label: "常用提示词" },
   { id: "quick-input", label: "润色改写" },
   { id: "quick-open", label: "快捷打开" },
   { id: "macro", label: "宏序列" },
   { id: "shortcuts", label: "快捷指令" },
-  { id: "profiles", label: "配置" },
 ] as const;
 
 export type WheelSegmentId = (typeof wheelSegments)[number]["id"];
