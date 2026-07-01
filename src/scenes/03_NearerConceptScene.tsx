@@ -4,6 +4,7 @@ import { Cursor } from "../components/Cursor/Cursor";
 import { MacWindow } from "../components/MacUI/MacWindow";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { LAYOUT } from "../config/layout";
 import { scenes } from "../config/timeline";
 
 const scene = scenes.find((item) => item.id === "nearer-concept")!;
@@ -153,20 +154,20 @@ export const NearerConceptScene = () => {
             </div>
           </div>
 
-          {/* 桌面上下文 + 真实使用场景中的召唤：文档窗口内光标，Ringflow 在光标旁弹出 (hero identity moment) */}
+          {/* 桌面上下文 + 真实使用场景中的召唤：使用固定布局常量 (hero) */}
           <div
             style={{
               position: "absolute",
-              left: wheelCenterX - 280,
-              top: wheelCenterY - 210,
-              width: 660,
-              height: 500,
+              left: LAYOUT.width / 2 - 200,
+              top: LAYOUT.height / 2 - 100,
+              width: LAYOUT.stage.center.width * 0.6,
+              height: LAYOUT.stage.center.height * 0.7,
               pointerEvents: "none",
             }}
           >
-            {/* Active document window — shows real usage context */}
-            <div style={{ position: "absolute", left: 20, top: 50 }}>
-              <MacWindow title="项目计划.md" width={440} height={300}>
+            {/* Active document window — fixed size, consistent with layout rules */}
+            <div style={{ position: "absolute", left: 0, top: 0 }}>
+              <MacWindow title="项目计划.md" width={420} height={280}>
                 <div style={{ fontSize: 16, lineHeight: 1.65, color: "#334155" }}>
                   订阅状态刷新需要处理 loading、error、过期三种情况。<br />
                   <span style={{ background: "rgba(47,127,211,0.18)", padding: "1px 5px", borderRadius: 3 }}>下次同步前确认三件事</span> 已记录在会议纪要中。
@@ -174,14 +175,14 @@ export const NearerConceptScene = () => {
               </MacWindow>
             </div>
 
-            {/* Wheel summoned right next to cursor position — the product itself, hero size */}
+            {/* Wheel — hero size, fixed placement relative to context (right of window) */}
             <div
               style={{
                 position: "absolute",
-                left: 300,
-                top: 70,
+                left: 340,
+                top: 40,
                 opacity: wheelOpacity * finalHold,
-                transform: `scale(${wheelScale * 1.15})`,
+                transform: `scale(${wheelScale})`,
                 transformOrigin: "center",
               }}
             >
@@ -194,13 +195,9 @@ export const NearerConceptScene = () => {
               />
             </div>
 
-            {/* Cursor inside the document, approaching summon position */}
-            <div style={{ opacity: cursorReveal * finalHold }}>
-              <Cursor x={cursorX} y={cursorY} scale={0.95} trail={trail.map((point) => ({
-                ...point,
-                x: point.x - (wheelCenterX - 280),
-                y: point.y - (wheelCenterY - 210),
-              }))} />
+            {/* Cursor inside the document */}
+            <div style={{ position: "absolute", left: 150, top: 120, opacity: cursorReveal * finalHold }}>
+              <Cursor x={cursorX - 100} y={cursorY - 80} scale={0.95} trail={trail} />
             </div>
           </div>
         </div>

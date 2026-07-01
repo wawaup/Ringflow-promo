@@ -5,6 +5,7 @@ import { theme } from "../../config/theme";
 import { MacWindow } from "../MacUI/MacWindow";
 import { RingflowWheel } from "../Wheel/RingflowWheel";
 import { REAL_TEXT_PROMPTS } from "../../config/productSemantics";
+import { LAYOUT } from "../../config/layout";
 
 type Mode = "light" | "dark";
 
@@ -776,6 +777,7 @@ export const QuickInputWorkspace = ({
           centerLabel="文本"
           revealProgress={wheelReveal}
           glowProgress={sectorHighlight}
+          // Standard size per layout rules
         />
       </div>
     </div>

@@ -3,6 +3,7 @@ import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoCon
 import { PromoBackground } from "../components/Background/PromoBackground";
 import { PromoText } from "../components/Text/PromoText";
 import { theme } from "../config/theme";
+import { LAYOUT } from "../config/layout";
 import type { SceneChoreography, SceneLayout } from "../config/timeline";
 
 type SceneShellProps = {
@@ -56,8 +57,14 @@ export const SceneShell = ({
   });
 
   const childrenLift = interpolate(childrenReveal, [0, 1], [36, 0]);
-  const visualStageWidth = stageWidth ?? (resolvedLayout === "left-stage" ? 760 : 1040);
-  const visualStageHeight = stageHeight ?? (resolvedLayout === "left-stage" ? 600 : 610);
+
+  // Use fixed layout constants for consistency (no arbitrary sizes)
+  const visualStageWidth = stageWidth ?? (resolvedLayout === "left-stage" 
+    ? LAYOUT.stage.left.width 
+    : LAYOUT.stage.top.width);
+  const visualStageHeight = stageHeight ?? (resolvedLayout === "left-stage" 
+    ? LAYOUT.stage.left.height 
+    : LAYOUT.stage.top.height);
 
   return (
     <AbsoluteFill>
@@ -101,10 +108,13 @@ export const SceneShell = ({
               caption={caption}
               mode={mode}
               align={textAlign}
-              maxWidth={resolvedLayout === "left-stage" ? 700 : 1320}
+              // Enforce fixed text sizes and max widths from layout constants
+              size={resolvedLayout === "top-stage" ? LAYOUT.text.headlineTop : LAYOUT.text.headline}
+              captionSize={resolvedLayout === "top-stage" ? LAYOUT.text.captionTop : LAYOUT.text.caption}
+              maxWidth={resolvedLayout === "left-stage" ? LAYOUT.textMaxWidth.left : LAYOUT.textMaxWidth.topCenter}
               startFrame={textStartFrame}
               lineStagger={textLineStagger}
-              scale={resolvedLayout === "top-stage" ? 0.74 : 1}
+              scale={1} // Scale controlled centrally now
             />
           </div>
 

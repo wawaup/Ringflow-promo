@@ -2,6 +2,7 @@ import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "re
 import { MiddleClickCursor } from "../components/Cursor/Cursor";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { LAYOUT } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 
@@ -143,9 +144,9 @@ export const CoreGestureScene = () => {
       stageWidth={1180}
       stageHeight={620}
     >
-      <div style={{ position: "relative", width: 1180, height: 620, display: "grid", placeItems: "center" }}>
-        {/* The gesture wheel - centered, stays after animation completes */}
-        <div style={{ position: "absolute", left: cx - 180, top: cy - 180 }}>
+      <div style={{ position: "relative", width: LAYOUT.stage.center.width * 0.9, height: LAYOUT.stage.center.height * 0.9, display: "grid", placeItems: "center" }}>
+        {/* The gesture wheel - fixed hero size, consistent center placement */}
+        <div style={{ position: "absolute", left: -80, top: -60 }}>
           <RingflowWheel
             activeSegment="quick-input"
             centerLabel={centerLabel}
@@ -172,12 +173,12 @@ export const CoreGestureScene = () => {
           scale={3.0 - swipeT * 0.8}
         />
 
-        {/* Clear completion feedback */}
+        {/* Clear completion feedback - fixed position */}
         <div
           style={{
             position: "absolute",
-            left: 760,
-            top: 525,
+            left: 200,
+            top: 280,
             width: 340,
             textAlign: "center",
             opacity: resultOpacity,

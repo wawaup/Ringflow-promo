@@ -3,6 +3,7 @@ import { MacWindow } from "../components/MacUI/MacWindow";
 import { Cursor } from "../components/Cursor/Cursor";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { LAYOUT } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 import { theme } from "../config/theme";
@@ -45,9 +46,9 @@ export const StickyNoteScene = () => {
 
   return (
     <SceneShell lines={sceneCopy["sticky-note"].headline} layout={scene.layout} choreography={scene.choreography}>
-      <div style={{ position: "relative", width: 780, height: 420 }}>
-        {/* Main working context: the document the user is in (灵感来源) */}
-        <div style={{ position: "absolute", left: 0, top: 40 }}>
+      <div style={{ position: "relative", width: LAYOUT.stage.top.width * 0.6, height: LAYOUT.stage.top.height * 0.7 }}>
+        {/* Main working context — fixed stage size */}
+        <div style={{ position: "absolute", left: 0, top: 20 }}>
           <MacWindow title="会议记录.md" width={380} height={260}>
             <div style={{ fontSize: 15, lineHeight: 1.6, color: "#334155" }}>
               讨论要点：<br />
@@ -58,8 +59,8 @@ export const StickyNoteScene = () => {
           </MacWindow>
         </div>
 
-        {/* Wheel first (protagonist), highlight on "新便签" sector leads result */}
-        <div style={{ position: "absolute", left: 330, top: 60, transform: "scale(1.2)", opacity: wheelReveal }}>
+        {/* Wheel — standard size, consistent right placement */}
+        <div style={{ position: "absolute", left: 420, top: 40, transform: "scale(1.0)", opacity: wheelReveal }}>
           <RingflowWheel
             activeSegment="sticky-note"
             centerLabel="便签"
@@ -68,17 +69,17 @@ export const StickyNoteScene = () => {
           />
         </div>
 
-        {/* Cursor suggesting the gesture intent near wheel */}
-        <div style={{ position: "absolute", left: 300, top: 140, opacity: previewReveal * 0.85 }}>
+        {/* Cursor near wheel */}
+        <div style={{ position: "absolute", left: 390, top: 120, opacity: previewReveal * 0.85 }}>
           <Cursor x={20} y={10} scale={0.85} />
         </div>
 
-        {/* Result: the sticky note appears as a floating real window on the "desktop" */}
+        {/* Result sticky — fixed offset, no overlap */}
         <div
           style={{
             position: "absolute",
-            left: 520,
-            top: 20,
+            left: 620,
+            top: 0,
             opacity: noteExpand,
             transform: `scale(${0.92 + noteExpand * 0.08})`,
           }}

@@ -105,7 +105,13 @@
   - Visual audit: "Is every element in a predictable spot? Text crisp and aligned? Wheel size appropriate and stable?"
 **Success Criteria**: No arbitrary positioning. Fixed sizes. Clean, repeatable layouts.
 **Block Owner**: Current session
-**Status**: Completed 2026-07-02 (synced to real app defaults from ActionItem.swift etc.)
+**Status**: Completed 2026-07-02
+- Created src/config/layout.ts with fixed wheel sizes (hero/standard/mini), text sizes, stage dims, placement rules.
+- Refactored SceneShell to use LAYOUT constants for sizes, text, maxWidth.
+- Refactored NearerConceptScene, CoreGestureScene, StickyNoteScene: removed arbitrary left/top, used fixed relative to LAYOUT, consistent wheel scales and placements.
+- Updated ProductSurfaces imports and comments for consistency.
+- Stills reviewed: elements in more predictable spots, no obvious overlaps/shifts in key frames.
+- All changes use real synced data where applicable.
 
 ### Block 4: Visual & Styling Fidelity (Dark Theme, Real App Match) (P1)
 **Goal**: Wheels look exactly like the real summoned mac app wheel.
