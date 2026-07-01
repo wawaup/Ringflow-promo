@@ -1,7 +1,6 @@
 export { IntroFocusScene } from "./01_IntroFocusScene";
 export { FrictionScene } from "./02_FrictionScene";
 export { NearerConceptScene } from "./03_NearerConceptScene";
-export { ProductRevealScene } from "./04_ProductRevealScene";
 export { CoreGestureScene } from "./05_CoreGestureScene";
 export { QuickInputScene } from "./06_QuickInputScene";
 export { QuickOpenScene } from "./07_QuickOpenScene";

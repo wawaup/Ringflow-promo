@@ -17,6 +17,7 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
   },
   "nearer-concept": {
     headline: ["常用的，", "应该更近一点。"],
+    caption: "Ringflow 出现在光标旁边。",
   },
   "core-gesture": {
     headline: ["按住中键，", "向右一划。"],

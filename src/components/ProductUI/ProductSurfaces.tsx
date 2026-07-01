@@ -1164,9 +1164,21 @@ const PROFILES = [
   },
 ];
 
-export const AppConfigurationScreenshot = () => {
+export const AppConfigurationScreenshot = ({ choreography }: { choreography?: { wheelStartFrame?: number; wheelHighlightStartFrame?: number; wheelHighlightEndFrame?: number } } = {}) => {
   const frame = useCurrentFrame();
+  const c = choreography || {};
   const panelReveal = interpolate(frame, [0, 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+
+  const wheelReveal = interpolate(frame, [c.wheelStartFrame ?? 70, (c.wheelStartFrame ?? 70) + 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 90, c.wheelHighlightEndFrame ?? 130], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -1282,10 +1294,22 @@ export const AppConfigurationScreenshot = () => {
 };
 
 // ─── PresetLibraryShowcase ────────────────────────────────────────────────────
-export const PresetLibraryShowcase = () => {
+export const PresetLibraryShowcase = ({ choreography }: { choreography?: { wheelStartFrame?: number; wheelHighlightStartFrame?: number; wheelHighlightEndFrame?: number } } = {}) => {
   const frame = useCurrentFrame();
+  const c = choreography || {};
 
   const panelReveal = interpolate(frame, [0, 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.16, 1, 0.3, 1),
+  });
+
+  const wheelReveal = interpolate(frame, [c.wheelStartFrame ?? 70, (c.wheelStartFrame ?? 70) + 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 90, c.wheelHighlightEndFrame ?? 140], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -1345,8 +1369,8 @@ export const PresetLibraryShowcase = () => {
           );
         })}
       </div>
-      <div style={{ position: "absolute", right: 0, bottom: 4, width: 260 }}>
-        <RingflowWheel mini activeSegment="prompt-folder" centerLabel="默认" revealFrame={20} />
+      <div style={{ position: "absolute", right: 0, bottom: 4, width: 260, opacity: wheelReveal }}>
+        <RingflowWheel mini activeSegment="prompt-folder" centerLabel="默认" revealProgress={wheelReveal} glowProgress={highlight} />
       </div>
     </div>
   );

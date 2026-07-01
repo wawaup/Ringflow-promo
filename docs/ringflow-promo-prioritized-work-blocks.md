@@ -156,7 +156,7 @@
 - **Real data priority**: Always prefer exact strings/behavior from mac app over promo inventions.
 - After all blocks: final review against full list in plan.
 
-**Current Block**: Block 5
+**Current Block**: All Completed
 
 **Progress Log**:
 - 2026-07-02: Created this prioritized blocks doc. Identified real app data sources. Starting Block 1.
