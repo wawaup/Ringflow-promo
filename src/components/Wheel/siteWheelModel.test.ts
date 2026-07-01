@@ -11,7 +11,7 @@ describe("siteWheelModel", () => {
   it("uses the official website wheel slot labels and ordering", () => {
     assert.deepEqual(
       MAIN_SLOTS.map((slot) => slot.label),
-      ["常用提示词", "复制", "粘贴", "撤销", "全选", "新脚本", "44°", "新便签"],
+      ["常用提示词", "复制", "粘贴", "撤销", "全选", "新脚本", "监视器", "新便签"],
     );
   });
 
@@ -24,7 +24,7 @@ describe("siteWheelModel", () => {
 
   it("maps legacy promo segment ids onto the closest real website sectors", () => {
     assert.equal(wheelSegmentToSiteIndex("profiles"), 0);
-    assert.equal(wheelSegmentToSiteIndex("quick-input"), 2);
+    assert.equal(wheelSegmentToSiteIndex("quick-input"), 0);
     assert.equal(wheelSegmentToSiteIndex("macro"), 5);
     assert.equal(wheelSegmentToSiteIndex("monitor"), 6);
     assert.equal(wheelSegmentToSiteIndex("sticky-note"), 7);

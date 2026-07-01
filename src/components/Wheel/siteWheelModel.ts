@@ -21,7 +21,8 @@ export type SiteWheelIconName =
   | "list.number"
   | "arrow.left.arrow.right"
   | "text.append"
-  | "text.bubble.fill";
+  | "text.bubble.fill"
+  | "gauge.with.dots.needle.67percent";
 
 export const MAIN_SLOTS = [
   { label: "常用提示词", icon: "folder.fill", isFolder: true },
@@ -30,7 +31,7 @@ export const MAIN_SLOTS = [
   { label: "撤销", icon: "arrow.uturn.backward" },
   { label: "全选", icon: "selection.pin.in.out" },
   { label: "新脚本", icon: "terminal.fill" },
-  { label: "44°", icon: "thermometer.medium", isMonitor: true },
+  { label: "监视器", icon: "gauge.with.dots.needle.67percent" },
   { label: "新便签", icon: "note.text" },
 ] as const satisfies readonly SiteWheelSlot[];
 
@@ -74,20 +75,28 @@ export const SITE_WHEEL_ICON_PATHS: Record<SiteWheelIconName, string> = {
     '<path d="M5 6.6h10.2M5 10.2h14M5 13.8h8.2M5 17.4h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M17 15.2v5M14.5 17.7h5" stroke="currentColor" stroke-width="1.55" stroke-linecap="round"/>',
   "text.bubble.fill":
     '<path d="M5 6.6a2.6 2.6 0 0 1 2.6-2.6h8.8A2.6 2.6 0 0 1 19 6.6v5.2a2.6 2.6 0 0 1-2.6 2.6h-4.7L8 17.6v-3.2h-.4A2.6 2.6 0 0 1 5 11.8z" fill="currentColor"/><path d="M8.2 8h7.6M8.2 10.8h4.8" stroke="white" stroke-width="1.25" stroke-linecap="round" opacity="0.85"/>',
+  "gauge.with.dots.needle.67percent":
+    '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 5.5v6.5l4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
 };
 
 const LEGACY_SEGMENT_TO_SITE_INDEX: Record<WheelSegmentId, number> = {
-  "quick-input": 2,
-  "quick-open": 1,
+  "prompt-folder": 0,
+  "quick-input": 0,
+  "copy": 1,
+  "paste": 2,
+  "undo": 3,
+  "select-all": 4,
+  "shell": 5,
+  "monitor": 6,
   "sticky-note": 7,
-  macro: 5,
-  shell: 5,
+  "quick-open": 5,
+  "macro": 5,
   shortcuts: 3,
-  monitor: 6,
   profiles: 0,
 };
 
 const LEGACY_SEGMENT_TO_FOLDER_INDEX: Partial<Record<WheelSegmentId, number>> = {
+  "prompt-folder": 0,
   "quick-input": 1,
   "quick-open": 2,
   shortcuts: 5,
