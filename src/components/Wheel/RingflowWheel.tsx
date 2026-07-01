@@ -114,22 +114,23 @@ type SitePalette = {
 const paletteForMode = (dark: boolean): SitePalette =>
   dark
     ? {
+        // Matched to real Ringflow mac app dark live overlay summoned style (WheelStyle.swift)
         primaryText: "rgb(230, 238, 248)",
-        secondaryText: "rgba(190, 204, 224, 0.78)",
-        accent: "rgb(118, 178, 245)",
-        selectedFill: "rgba(83, 151, 231, 0.34)",
+        secondaryText: "rgba(163, 172, 189, 0.78)",
+        accent: "rgb(115, 173, 242)",
+        selectedFill: "rgba(71, 122, 194, 0.34)",
         runningFill: "rgba(245, 158, 11, 0.34)",
-        hoverFill: "rgba(255, 255, 255, 0.075)",
-        divider: "rgba(255, 255, 255, 0.16)",
-        ringOutline: "rgba(255, 255, 255, 0.18)",
-        glassRingFill: "rgba(15, 23, 42, 0.78)",
-        glassRingStroke: "rgba(255, 255, 255, 0.12)",
-        folderGlassOpacity: 0.92,
-        centerBase: "rgba(15, 23, 42, 0.88)",
-        centerStroke: "rgba(255, 255, 255, 0.16)",
-        centerShadow: "rgba(2, 6, 23, 0.22)",
-        textMuted: "rgba(230, 238, 248, 0.72)",
-        trail: "rgba(118,178,245,0.34)",
+        hoverFill: "rgba(61, 66, 77, 0.24)",
+        divider: "rgba(255, 255, 255, 0.12)",
+        ringOutline: "rgba(255, 255, 255, 0.16)",
+        glassRingFill: "rgba(26, 30, 38, 0.58)",
+        glassRingStroke: "rgba(255, 255, 255, 0.10)",
+        folderGlassOpacity: 0.82,
+        centerBase: "rgba(26, 30, 38, 0.72)",
+        centerStroke: "rgba(255, 255, 255, 0.14)",
+        centerShadow: "rgba(2, 6, 23, 0.28)",
+        textMuted: "rgba(163, 172, 189, 0.72)",
+        trail: "rgba(115,173,242,0.34)",
         cursorFill: "rgba(255,255,255,0.96)",
         cursorStroke: "rgba(10,18,32,0.72)",
       }
@@ -148,8 +149,8 @@ const paletteForMode = (dark: boolean): SitePalette =>
         centerBase: "rgba(255, 255, 255, 0.88)",
         centerStroke: "rgba(255, 255, 255, 0.64)",
         centerShadow: "rgba(51, 122, 209, 0.05)",
-        textMuted: "rgba(28, 38, 51, 0.78)",
-        trail: "rgba(47,127,211,0.30)",
+        textMuted: "rgba(102, 112, 133, 0.82)",
+        trail: "rgba(51,122,209,0.30)",
         cursorFill: "rgba(255,255,255,0.98)",
         cursorStroke: "rgba(15,23,42,0.70)",
       };
@@ -342,6 +343,14 @@ export const RingflowWheel = ({
             <stop offset="0%" stopColor={dark ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.96)"} />
             <stop offset="100%" stopColor={palette.centerBase} />
           </radialGradient>
+          {/* Dark live glass wash gradient to better match real summoned style */}
+          {dark && (
+            <linearGradient id={`${idPrefix}-darkWash`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(26,30,38,0.42)" />
+              <stop offset="40%" stopColor="rgba(32,38,48,0.22)" />
+              <stop offset="100%" stopColor="rgba(10,12,16,0.35)" />
+            </linearGradient>
+          )}
           <filter id={shadowId} x="-30%" y="-30%" width="160%" height="160%">
             <feDropShadow dx="0" dy="2" stdDeviation="5" floodColor="rgba(10,11,13,0.045)" />
             <feDropShadow dx="0" dy="0" stdDeviation="7.5" floodColor="rgba(51,122,209,0.055)" />
@@ -388,10 +397,10 @@ export const RingflowWheel = ({
               <path
                 d={ringPath(center, folderInner, folderOuter)}
                 fillRule="evenodd"
-                fill={palette.glassRingFill}
+                fill={dark ? `url(#${idPrefix}-darkWash)` : palette.glassRingFill}
                 stroke={palette.glassRingStroke}
                 strokeWidth={0.8}
-                opacity={palette.folderGlassOpacity}
+                opacity={dark ? 0.75 : palette.folderGlassOpacity}
               />
               {FOLDER_SLOTS.map((slot, index) => {
                 if (!slot) return null;
@@ -443,9 +452,10 @@ export const RingflowWheel = ({
             <path
               d={ringPath(center, inner, outer)}
               fillRule="evenodd"
-              fill={palette.glassRingFill}
+              fill={dark ? `url(#${idPrefix}-darkWash)` : palette.glassRingFill}
               stroke={palette.glassRingStroke}
               strokeWidth={0.8}
+              opacity={dark ? 0.85 : 1}
             />
           </g>
 
@@ -523,9 +533,10 @@ export const RingflowWheel = ({
               cx={center.x}
               cy={center.y}
               r={centerGlassDiameter(outer) / 2}
-              fill={`url(#${centerGlowId})`}
+              fill={dark ? `url(#${idPrefix}-darkWash)` : `url(#${centerGlowId})`}
               stroke={palette.centerStroke}
               strokeWidth={1.15}
+              opacity={dark ? 0.85 : 1}
               style={{
                 filter: `drop-shadow(0 1px ${activeMainIndex == null ? 12 : 7}px ${palette.centerShadow}) drop-shadow(0 2px 7px rgba(10, 11, 13, 0.07))`,
               }}

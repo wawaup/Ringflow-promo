@@ -127,7 +127,7 @@
 - Verification: Side-by-side stills or description match to real app screenshots/behavior.
 **Success Criteria**: Dark wheel in promo is indistinguishable in style from real app summoned wheel.
 **Block Owner**: Current session
-**Status**: Completed 2026-07-02 (synced to real app defaults from ActionItem.swift etc.)
+**Status**: Completed 2026-07-02 (updated paletteForMode with real dark overlay RGBs/opacities from WheelStyle.swift; added dark wash linear gradient in defs; adjusted glassRingFill/center for summoned depth; lower decorative in dark; verified with stills in monitor/macro scenes)
 
 ### Block 5: Full Scene Application, Timing Polish & Validation (P2)
 **Goal**: All 14 scenes compliant. Professional quality bar met. Commits done.
