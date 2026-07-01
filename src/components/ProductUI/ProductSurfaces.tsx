@@ -173,7 +173,7 @@ export const InterruptedWorkflowWorkspace = ({
   ];
 
   const selectedPrompt = realPrompts.find((p) => p.title === "总结提炼")!;
-  const page = reveal(frame, choreography.pageStartFrame ?? 0, 58);
+  const page = reveal(frame, choreography.pageStartFrame ?? 0, 25);
   const pageSweep = interpolate(frame, [choreography.pageStartFrame ?? 0, choreography.pageReadyFrame ?? 56], [-18, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -188,7 +188,7 @@ export const InterruptedWorkflowWorkspace = ({
   const codeWindow = sceneWindowVisibility(
     frame,
     choreography.codexMainStartFrame ?? 0,
-    (choreography.noteStartFrame ?? 0) - 2,
+    (choreography.codexMainStartFrame ?? 0) + 35,  // ~0.58s, consistent short appearance for no-action window
     20,
   );
   const noteWindow = sceneWindowVisibility(

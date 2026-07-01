@@ -51,7 +51,7 @@ export const PromoFilm = () => {
           </Sequence>
         );
       })}
-      <Audio src={staticFile(assets.audio.music)} volume={0.32} />
+      <Audio src={staticFile(assets.audio.music)} trimBefore={120} volume={0.32} />
     </AbsoluteFill>
   );
 };
