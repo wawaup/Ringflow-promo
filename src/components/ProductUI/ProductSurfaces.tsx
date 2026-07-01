@@ -235,7 +235,7 @@ export const InterruptedWorkflowWorkspace = ({
     }),
   );
   const pasteKeys = Math.max(
-    interpolate(frame, [choreography.notePasteFrame ?? 0, (choreography.notePasteFrame ?? 0) + 18, (choreography.notePasteFrame ?? 0) + 40], [0, 1, 0], {
+    interpolate(frame, [choreography.notePasteFrame ?? 0, (choreography.notePasteFrame ?? 0) + 18, (choreography.notePasteFrame ?? 0) + 46], [0, 1, 0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     }),
