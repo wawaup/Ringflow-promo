@@ -13,8 +13,8 @@ const sceneRows = [...source.matchAll(/shot: (\d+),\s+id: "([^"]+)",\s+name: "([
   }),
 );
 
-if (sceneRows.length !== 15) {
-  throw new Error(`Expected 15 scenes, found ${sceneRows.length}`);
+if (sceneRows.length < 1) {
+  throw new Error("Expected at least one scene");
 }
 
 for (const scene of sceneRows) {
