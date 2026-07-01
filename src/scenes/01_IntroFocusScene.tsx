@@ -16,7 +16,7 @@ export const IntroFocusScene = () => (
     choreography={introChoreography}
     stageWidth={980}
     stageHeight={680}
-    textLineStagger={24}
+    textLineStagger={12}
   >
     <InterruptedWorkflowWorkspace choreography={scene.choreography} />
   </SceneShell>
