@@ -3,7 +3,7 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 import { PromoBackground } from "../components/Background/PromoBackground";
 import { PromoText } from "../components/Text/PromoText";
 import { LAYOUT } from "../config/layout";
-import { scenePushIn, sceneTransition } from "../config/motion";
+import { scenePushIn, sceneTransition, textExit } from "../config/motion";
 import { theme } from "../config/theme";
 import { sceneCopy } from "../config/copy";
 import type { SceneTiming } from "../config/timeline";
@@ -61,6 +61,7 @@ export const SceneShell = ({
   const totalFrames = scene.durationInFrames + scene.overlapWithNextFrames;
   const transition = sceneTransition(frame, totalFrames);
   const camera = pushIn > 0 ? scenePushIn(frame, totalFrames, pushIn) : 1;
+  const headlineOpacity = textExit(frame, scene.durationInFrames, scene.overlapWithNextFrames);
 
   const childrenReveal = spring({
     frame: Math.max(0, frame - c.visualStartFrame),
@@ -99,6 +100,7 @@ export const SceneShell = ({
               display: "flex",
               justifyContent: isRow ? "flex-start" : "center",
               flex: "none",
+              opacity: headlineOpacity,
             }}
           >
             <PromoText

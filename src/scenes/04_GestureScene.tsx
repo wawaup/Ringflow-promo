@@ -7,7 +7,7 @@ import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sectorMidAngle } from "../components/Wheel/wheelGeometry";
 import { sceneCopy } from "../config/copy";
 import { LAYOUT, getWheelWrapperStyle } from "../config/layout";
-import { EASE_TRAVEL, ease01 } from "../config/motion";
+import { EASE_TRAVEL, ease01, textExit } from "../config/motion";
 import { theme } from "../config/theme";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
@@ -84,6 +84,10 @@ export const GestureScene = () => {
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
 
+  // Words must clear the frame before the crossfade into umbrella's headline —
+  // two headlines mid-dissolve in the same slot read as garbled glyphs.
+  const wordsOpacity = textExit(frame, scene.durationInFrames, scene.overlapWithNextFrames);
+
   const trackpadStart = c.trackpadHintFrame ?? 330;
   // Toast lands after release, then clears the stage before the trackpad hint.
   const toastIn = ease01(frame, release + 8, 22);
@@ -112,7 +116,14 @@ export const GestureScene = () => {
             return (
               <div key={word} style={{ display: "flex", alignItems: "baseline", gap: 34 }}>
                 {index > 0 ? (
-                  <span style={{ fontSize: 56, fontWeight: 500, color: theme.colors.muted, opacity: baseIn * 0.4 }}>
+                  <span
+                    style={{
+                      fontSize: 56,
+                      fontWeight: 500,
+                      color: theme.colors.muted,
+                      opacity: baseIn * 0.4 * wordsOpacity,
+                    }}
+                  >
                     ·
                   </span>
                 ) : null}
@@ -122,7 +133,7 @@ export const GestureScene = () => {
                     fontWeight: 760,
                     letterSpacing: "-0.01em",
                     color: lit > 0.5 ? theme.colors.ink : theme.colors.muted,
-                    opacity: baseIn * (0.34 + lit * 0.66),
+                    opacity: baseIn * (0.34 + lit * 0.66) * wordsOpacity,
                     display: "inline-block",
                     transform: `translateY(${(1 - baseIn) * 24}px) scale(${0.985 + lit * 0.015})`,
                   }}

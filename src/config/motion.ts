@@ -69,6 +69,27 @@ export const scenePushIn = (frame: number, durationInFrames: number, amount = 0.
   });
 
 /**
+ * Headline text must fully clear the frame before the scene-level crossfade
+ * begins — two different headlines mid-dissolve in the same slot read as
+ * garbled overlapping glyphs, not a clean dissolve. Fades text to 0 over
+ * `dur` frames, timed to land exactly as the crossfade overlap window opens
+ * (no fade when there is no next-scene overlap, e.g. the outro).
+ */
+export const textExit = (
+  frame: number,
+  durationInFrames: number,
+  overlap: number,
+  dur: number = 16,
+): number =>
+  overlap <= 0
+    ? 1
+    : interpolate(frame, [durationInFrames - overlap - dur, durationInFrames - overlap], [1, 0], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: EASE_EXIT,
+      });
+
+/**
  * Scene-level cross-dissolve. Returns opacity/scale for the whole scene while
  * it enters over the previous one and exits under the next one.
  */
