@@ -42,19 +42,12 @@ const sceneWindowVisibility = (frame: number, start: number, end: number, fade =
 const KeyCombo = ({
   combo,
   visible,
-  x,
-  y,
 }: {
   combo: string[];
   visible: number;
-  x: number;
-  y: number;
 }) => (
   <div
     style={{
-      position: "absolute",
-      left: x,
-      top: y,
       display: "flex",
       gap: 10,
       alignItems: "center",
@@ -371,7 +364,27 @@ export const InterruptedWorkflowWorkspace = ({
               好的，你需要处理三种情况：loading、error 和 expired…
             </div>
             {/* Input area */}
-            <div style={{ marginTop: "auto", height: 58, borderRadius: 12, background: "rgba(241,245,249,0.92)", border: "1.5px solid rgba(47,127,211,0.20)", padding: "8px 10px", boxSizing: "border-box", fontSize: 12, color: "#233044", fontWeight: 620, lineHeight: 1.35, whiteSpace: "pre-wrap", overflow: "hidden" }}>
+            <div
+              style={{
+                marginTop: "auto",
+                height: 58,
+                borderRadius: 12,
+                background: "rgba(241,245,249,0.92)",
+                border: "1.5px solid rgba(47,127,211,0.20)",
+                padding: "8px 10px",
+                boxSizing: "border-box",
+                fontSize: 12,
+                color: "#233044",
+                fontWeight: 620,
+                lineHeight: 1.35,
+                whiteSpace: "pre-wrap",
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 3,
+                textOverflow: "ellipsis",
+              }}
+            >
               {notePaste > 0.1 ? "会议纪要：下次同步前确认三件事：订阅状态刷新点、设备解绑入口、预设导入后的默认轮盘。" : ""}
               {promptPaste > 0.1 ? "\n" + selectedPrompt.content : ""}
               <span style={{ display: "inline-block", width: 6, height: 12, marginLeft: 2, background: "#2f7fd3", opacity: Math.floor(frame / 18) % 2 ? 0.22 : 0.78, verticalAlign: -2 }} />
@@ -443,25 +456,25 @@ export const InterruptedWorkflowWorkspace = ({
       {/* Note action: 复制 + CTRL+C (stays visible during its paste) */}
       <div style={{ position: "absolute", left: 580, top: 235, opacity: noteCopyLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>复制</div>
-        <KeyCombo combo={["Control", "C"]} visible={noteCopyKeys} x={625} y={235} />
+        <KeyCombo combo={["Control", "C"]} visible={noteCopyKeys} />
       </div>
 
       {/* Note action: 粘贴 + CTRL+V (appears while 复制+CTRL+C stays) */}
       <div style={{ position: "absolute", left: 580, top: 290, opacity: notePasteLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>粘贴</div>
-        <KeyCombo combo={["Control", "V"]} visible={notePasteKeys} x={625} y={290} />
+        <KeyCombo combo={["Control", "V"]} visible={notePasteKeys} />
       </div>
 
       {/* Prompt action: 复制 + CTRL+C (same pattern) */}
       <div style={{ position: "absolute", left: 580, top: 235, opacity: promptCopyLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>复制</div>
-        <KeyCombo combo={["Control", "C"]} visible={promptCopyKeys} x={625} y={235} />
+        <KeyCombo combo={["Control", "C"]} visible={promptCopyKeys} />
       </div>
 
       {/* Prompt action: 粘贴 + CTRL+V */}
       <div style={{ position: "absolute", left: 580, top: 290, opacity: promptPasteLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>粘贴</div>
-        <KeyCombo combo={["Control", "V"]} visible={promptPasteKeys} x={625} y={290} />
+        <KeyCombo combo={["Control", "V"]} visible={promptPasteKeys} />
       </div>
     </div>
   );
