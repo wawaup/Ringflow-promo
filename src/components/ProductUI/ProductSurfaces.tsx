@@ -1,12 +1,17 @@
-import { interpolate, useCurrentFrame } from "remotion";
+import { Easing, interpolate, useCurrentFrame } from "remotion";
 import { MacContextMenu } from "../MacUI/MacContextMenu";
 import { MacMenuBar } from "../MacUI/MacMenuBar";
 import { MacWindow } from "../MacUI/MacWindow";
 
+/** Sharper close than the open — menus snap shut once a real choice is made. */
+const EASE_CLOSE = Easing.bezier(0.4, 0, 0.68, 0.06);
+
 /**
  * FrictionWorkflow — the film's opening friction montage.
- * Real macOS chrome only: menu bar → dropdown → cascading submenu → a second
- * window appears (app switching). Three stages timed via choreography.
+ * Real macOS chrome only: menu bar → dropdown → cascading submenu, both close
+ * together once "打开方式" is chosen, THEN the window switch happens. The menu
+ * group and the switched-to window are never visible at meaningful opacity at
+ * the same time — mirrors how a real app-switch would dismiss any open menu.
  */
 export const FrictionWorkflow = ({
   choreography,
@@ -18,16 +23,40 @@ export const FrictionWorkflow = ({
   const visual = c.visualStartFrame ?? 42;
   const action = c.actionStartFrame ?? 76;
 
-  // Three stages of friction: menu → submenu → window switch
-  const menuStage = interpolate(frame, [visual, visual + 26, action + 10], [0, 1, 1], {
+  // Stage 1: open — dropdown, then cascading submenu.
+  const menuOpenStart = visual;
+  const subOpenStart = action - 6;
+  // Stage 2: chosen — both menus close together (no more "menu forever open").
+  const exitStart = action + 32;
+  const exitDur = 26;
+  const exitEnd = exitStart + exitDur;
+  // Stage 3: switch — only begins after the menu group has fully closed.
+  const switchStart = exitEnd + 4;
+
+  const menuIn = interpolate(frame, [menuOpenStart, menuOpenStart + 26], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const subStage = interpolate(frame, [action - 6, action + 18, action + 44], [0, 1, 1], {
+  const subIn = interpolate(frame, [subOpenStart, subOpenStart + 24], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const switchStage = interpolate(frame, [action + 38, action + 62], [0, 1], {
+  const groupExit = interpolate(frame, [exitStart, exitEnd], [1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: EASE_CLOSE,
+  });
+  const menuStage = menuIn * groupExit;
+  const subStage = subIn * groupExit;
+
+  // Main window loses focus once the menu closes — makes room for the switch
+  // instead of staying at full opacity and fighting the new window visually.
+  const focusOpacity = interpolate(frame, [0, exitStart, exitStart + 18], [1, 1, 0.35], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const switchStage = interpolate(frame, [switchStart, switchStart + 26], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -46,8 +75,8 @@ export const FrictionWorkflow = ({
         />
       </div>
 
-      {/* Main document window — real usage context, sits right under its menu bar */}
-      <div style={{ position: "absolute", left: 60, top: 28 }}>
+      {/* Main document window — loses focus once the menu closes, making room for the switch */}
+      <div style={{ position: "absolute", left: 60, top: 28, opacity: focusOpacity }}>
         <MacWindow title="迭代计划.md" width={520} height={200}>
           <div style={{ fontSize: 15, color: "#334155", lineHeight: 1.65 }}>
             需要把会议纪要里的三件事同步到代码注释里…<br />
@@ -56,14 +85,14 @@ export const FrictionWorkflow = ({
         </MacWindow>
       </div>
 
-      {/* Dropdown opened from "编辑" in the menu bar — real menu-bar friction */}
+      {/* Dropdown opened from "编辑" in the menu bar — closes together with the submenu once chosen */}
       <div
         style={{
           position: "absolute",
           left: 152,
           top: 66,
           opacity: menuStage,
-          transform: `translateY(${(1 - menuStage) * 10}px)`,
+          transform: `translateY(${(1 - menuIn) * 10 - (1 - groupExit) * 8}px) scale(${0.97 + groupExit * 0.03})`,
         }}
       >
         <MacContextMenu
@@ -78,14 +107,14 @@ export const FrictionWorkflow = ({
         />
       </div>
 
-      {/* Submenu cascading further from "替换…" — the extra hop that costs time */}
+      {/* Submenu cascading further from "替换…" — closes together with the dropdown above it */}
       <div
         style={{
           position: "absolute",
           left: 336,
           top: 150,
           opacity: subStage,
-          transform: `translateY(${(1 - subStage) * 8}px)`,
+          transform: `translateY(${(1 - subIn) * 8 - (1 - groupExit) * 8}px) scale(${0.97 + groupExit * 0.03})`,
         }}
       >
         <MacContextMenu
@@ -98,7 +127,7 @@ export const FrictionWorkflow = ({
         />
       </div>
 
-      {/* App/window switching cost — another real window appears, clear of the submenu above it */}
+      {/* App/window switching cost — only appears after the menu group has fully closed */}
       <div
         style={{
           position: "absolute",
