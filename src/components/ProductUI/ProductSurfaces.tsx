@@ -3,6 +3,8 @@ import { Img, staticFile } from "remotion";
 import { assets } from "../../config/assets";
 import { theme } from "../../config/theme";
 import { MacWindow } from "../MacUI/MacWindow";
+import { MacMenuBar } from "../MacUI/MacMenuBar";
+import { MacContextMenu } from "../MacUI/MacContextMenu";
 import { RingflowWheel } from "../Wheel/RingflowWheel";
 import { REAL_TEXT_PROMPTS } from "../../config/productSemantics";
 import { LAYOUT, getWheelPlacementStyle, getWheelWrapperStyle, WHEEL_SIZE } from "../../config/layout";
@@ -708,10 +710,22 @@ export const FrictionWorkflow = ({
   const subStage = interpolate(frame, [action - 6, action + 18, action + 44], [0, 1, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const switchStage = interpolate(frame, [action + 38, action + 62], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
+  const editMenuActive = menuStage > 0.4;
+
   return (
     <div style={{ position: "relative", width: 780, height: 460 }}>
-      {/* Main document window — real usage context */}
-      <div style={{ position: "absolute", left: 60, top: 30 }}>
+      {/* Real macOS menu bar for the focused app — sets the real-app context */}
+      <div style={{ position: "absolute", left: 60, top: 0, borderRadius: "10px 10px 0 0", overflow: "hidden" }}>
+        <MacMenuBar
+          appName="文本编辑"
+          menus={["文件", "编辑", "格式", "窗口"]}
+          activeMenu={editMenuActive ? "编辑" : undefined}
+          width={520}
+        />
+      </div>
+
+      {/* Main document window — real usage context, sits right under its menu bar */}
+      <div style={{ position: "absolute", left: 60, top: 28 }}>
         <MacWindow title="迭代计划.md" width={520} height={200}>
           <div style={{ fontSize: 15, color: "#334155", lineHeight: 1.65 }}>
             需要把会议纪要里的三件事同步到代码注释里…<br />
@@ -720,42 +734,50 @@ export const FrictionWorkflow = ({
         </MacWindow>
       </div>
 
-      {/* Real menu bar friction (appears as overlay from the window top) */}
+      {/* Dropdown opened from "编辑" in the menu bar — real menu-bar friction */}
       <div
         style={{
           position: "absolute",
-          left: 140,
-          top: 82,
+          left: 152,
+          top: 66,
           opacity: menuStage,
           transform: `translateY(${(1 - menuStage) * 10}px)`,
         }}
       >
-        <div style={{ ...panel("light"), width: 210, borderRadius: 10, padding: "6px 4px", fontSize: 14, boxShadow: "0 8px 24px rgba(0,0,0,0.18)" }}>
-          <div style={{ padding: "2px 10px" }}>编辑</div>
-          <div style={{ padding: "2px 10px" }}>服务</div>
-          <div style={{ padding: "2px 10px", background: "rgba(232,244,255,0.85)", borderRadius: 6, color: "#1f5f9f" }}>替换…</div>
-        </div>
+        <MacContextMenu
+          width={190}
+          items={[
+            { label: "剪切", shortcut: "⌘X" },
+            { label: "拷贝", shortcut: "⌘C" },
+            { label: "粘贴", shortcut: "⌘V" },
+            { label: "服务", hasSubmenu: true, separatorBefore: true },
+            { label: "替换…", hasSubmenu: true, selected: true },
+          ]}
+        />
       </div>
 
-      {/* Submenu deeper path */}
+      {/* Submenu cascading further from "替换…" — the extra hop that costs time */}
       <div
         style={{
           position: "absolute",
-          left: 280,
-          top: 130,
+          left: 336,
+          top: 150,
           opacity: subStage,
           transform: `translateY(${(1 - subStage) * 8}px)`,
         }}
       >
-        <div style={{ ...panel("light"), width: 170, borderRadius: 10, padding: "6px 4px", fontSize: 13, boxShadow: "0 8px 24px rgba(0,0,0,0.18)" }}>
-          <div style={{ padding: "2px 10px" }}>转换文本</div>
-          <div style={{ padding: "2px 10px" }}>朗读</div>
-          <div style={{ padding: "2px 10px", background: "rgba(232,244,255,0.85)", borderRadius: 6 }}>打开方式</div>
-        </div>
+        <MacContextMenu
+          width={170}
+          items={[
+            { label: "转换文本" },
+            { label: "朗读" },
+            { label: "打开方式", hasSubmenu: true, selected: true },
+          ]}
+        />
       </div>
 
-      {/* App/window switching cost — another real window appears */}
-      <div style={{ position: "absolute", left: 420, top: 160, opacity: switchStage, transform: `translateY(${(1 - switchStage) * 12}px)` }}>
+      {/* App/window switching cost — another real window appears, clear of the submenu above it */}
+      <div style={{ position: "absolute", left: 480, top: 270, opacity: switchStage, transform: `translateY(${(1 - switchStage) * 12}px)` }}>
         <MacWindow title="备忘录" width={210} height={130} mode="light">
           <div style={{ fontSize: 13, color: "#475569" }}>
             Notes · Finder · Terminal<br />
