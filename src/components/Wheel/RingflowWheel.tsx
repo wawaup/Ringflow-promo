@@ -86,7 +86,7 @@ const splitCenterLabel = (label: string): { presetName: string; appName: string 
   if (!trimmed) return { presetName: "默认", appName: "全局" };
   if (trimmed === "Ringflow") return { presetName: "默认", appName: "全局" };
   if (trimmed === "App") return { presetName: "应用", appName: "专属" };
-  if (trimmed.length <= 4) return { presetName: trimmed, appName: "Ringflow" };
+  if (trimmed.length <= 6) return { presetName: trimmed, appName: "Ringflow" };
   return { presetName: trimmed.slice(0, 4), appName: trimmed.slice(4, 10) || "Ringflow" };
 };
 

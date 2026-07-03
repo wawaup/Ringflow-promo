@@ -145,7 +145,7 @@
 - Final full render if needed.
 **Success Criteria**: Viewer immediately understands Ringflow is the wheel that controls everything using real app actions. Layout is disciplined. All principles followed.
 **Block Owner**: Current session
-**Status**: Completed 2026-07-02 (all scenes updated with conductor pattern and layout; dead code cleaned; full typecheck/timeline/stills validation; principles updated; committed)
+**Status**: Completed 2026-07-02 (full application of all prior blocks to 14 scenes; conductor + highlight leading + real sectors + consistent layout + dark fidelity; dead code removed; comprehensive stills board + typecheck + timeline + principles checklist passed; committed)
 
 ---
 
@@ -156,10 +156,16 @@
 - **Real data priority**: Always prefer exact strings/behavior from mac app over promo inventions.
 - After all blocks: final review against full list in plan.
 
-**Current Block**: All Completed
+**Current Block**: Re-audit + strict one-by-one fixes completed (2026-07-02 follow-up) - conductor, layout, sizing, deadcode, highlightIndex all re-verified with gates.
 
 **Progress Log**:
 - 2026-07-02: Created this prioritized blocks doc. Identified real app data sources. Starting Block 1.
+- 2026-07-02: Block 1 completed (real data sync from mac app) + commit.
+- 2026-07-02: Block 2 completed (wheel as protagonist + conductor + highlight leading + slide) + commit.
+- 2026-07-02: Block 3 completed (layout constants + consistent positioning/sizing) + commit.
+- 2026-07-02: Block 4 completed (dark styling fidelity to real app) + commit.
+- 2026-07-02: Block 5 completed (full scene application, validation, stills review, principles checklist) + commit.
+- All blocks done. Video now has real wheel content, wheel leading every action with sector highlight, consistent layouts, matching dark theme.
 
 ---
 

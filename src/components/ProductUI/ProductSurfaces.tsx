@@ -5,7 +5,7 @@ import { theme } from "../../config/theme";
 import { MacWindow } from "../MacUI/MacWindow";
 import { RingflowWheel } from "../Wheel/RingflowWheel";
 import { REAL_TEXT_PROMPTS } from "../../config/productSemantics";
-import { LAYOUT } from "../../config/layout";
+import { LAYOUT, getWheelPlacementStyle, getWheelWrapperStyle, WHEEL_SIZE } from "../../config/layout";
 
 type Mode = "light" | "dark";
 
@@ -191,19 +191,19 @@ export const InterruptedWorkflowWorkspace = ({
   const codeWindow = sceneWindowVisibility(
     frame,
     choreography.documentStartFrame ?? 0,
-    (choreography.noteStartFrame ?? 0) - 5,  // continuous: code window stays until note appears
+    (choreography.promptPasteFrame ?? 197) + 30,  // stay visible through both copy/paste actions
     20,
   );
   const noteWindow = sceneWindowVisibility(
     frame,
     choreography.noteStartFrame ?? 0,
-    (choreography.promptOpenFrame ?? 0) - 10,
+    (choreography.promptPasteFrame ?? 197) + 25,
     18,
   );
   const promptOpen = sceneWindowVisibility(
     frame,
     choreography.promptOpenFrame ?? 0,
-    (choreography.holdStartFrame ?? 626) + 44,
+    (choreography.promptPasteFrame ?? 197) + 35,
     18,
   );
   const noteSelection = interpolate(frame, [
@@ -227,26 +227,39 @@ export const InterruptedWorkflowWorkspace = ({
   const promptCopyVal = choreography.promptCopyFrame ?? 0;
   const promptPasteVal = choreography.promptPasteFrame ?? 0;
 
-  const copyKeys = Math.max(
-    interpolate(frame, [noteCopyVal, noteCopyVal + 10, Math.max(noteCopyVal + 11, notePasteVal - 2)], [0, 1, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }),
-    interpolate(frame, [promptCopyVal, promptCopyVal + 10, Math.max(promptCopyVal + 11, promptPasteVal - 2)], [0, 1, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }),
-  );
-  const pasteKeys = Math.max(
-    interpolate(frame, [choreography.notePasteFrame ?? 0, (choreography.notePasteFrame ?? 0) + 18, (choreography.notePasteFrame ?? 0) + 46], [0, 1, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }),
-    interpolate(frame, [choreography.promptPasteFrame ?? 0, (choreography.promptPasteFrame ?? 0) + 18, (choreography.promptPasteFrame ?? 0) + 46], [0, 1, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }),
-  );
+  // Note: No wheel on first screen (pre-introduction of Ringflow). Direct code + note + prompt copy/paste flow.
+
+  // Redesigned copy/paste per spec:
+  // - First action (note): "复制" + CTRL+C appear and STAY
+  // - Then "粘贴" + CTRL+V appear BELOW (previous copy+C do not disappear)
+  // - Pasted text lands in input
+  // - Same pattern for prompt action
+  // - After prompt paste result, the keys + labels + editing windows can fade
+
+  // Note copy/paste pair: "复制"+C stay while "粘贴"+V appears for this action
+  const noteCopyKeys = interpolate(frame, [noteCopyVal, noteCopyVal + 10, notePasteVal + 25], [0, 1, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const notePasteKeys = interpolate(frame, [notePasteVal, notePasteVal + 10, notePasteVal + 35], [0, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  // Prompt copy/paste pair: same pattern
+  const promptCopyKeys = interpolate(frame, [promptCopyVal, promptCopyVal + 10, promptPasteVal + 25], [0, 1, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const promptPasteKeys = interpolate(frame, [promptPasteVal, promptPasteVal + 10, promptPasteVal + 40], [0, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+  const noteCopyLabel = noteCopyKeys;
+  const notePasteLabel = notePasteKeys;
+  const promptCopyLabel = promptCopyKeys;
+  const promptPasteLabel = promptPasteKeys;
 
   return (
     <div
@@ -420,8 +433,36 @@ export const InterruptedWorkflowWorkspace = ({
         </div>
       </div>
 
-      <KeyCombo combo={["Control", "C"]} visible={copyKeys} x={642} y={278} />
-      <KeyCombo combo={["Control", "V"]} visible={pasteKeys} x={642} y={278} />
+      {/* Redesigned copy/paste visuals for first screen:
+          - "复制" label + CTRL+C appear and stay visible
+          - Then "粘贴" label + CTRL+V appear (previous do not disappear)
+          - Same pattern for prompt selection + copy/paste
+          - After final paste result, these + editing windows fade for clean transition
+      */}
+
+      {/* Note action: 复制 + CTRL+C (stays visible during its paste) */}
+      <div style={{ position: "absolute", left: 580, top: 235, opacity: noteCopyLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>复制</div>
+        <KeyCombo combo={["Control", "C"]} visible={noteCopyKeys} x={625} y={235} />
+      </div>
+
+      {/* Note action: 粘贴 + CTRL+V (appears while 复制+CTRL+C stays) */}
+      <div style={{ position: "absolute", left: 580, top: 290, opacity: notePasteLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>粘贴</div>
+        <KeyCombo combo={["Control", "V"]} visible={notePasteKeys} x={625} y={290} />
+      </div>
+
+      {/* Prompt action: 复制 + CTRL+C (same pattern) */}
+      <div style={{ position: "absolute", left: 580, top: 235, opacity: promptCopyLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>复制</div>
+        <KeyCombo combo={["Control", "C"]} visible={promptCopyKeys} x={625} y={235} />
+      </div>
+
+      {/* Prompt action: 粘贴 + CTRL+V */}
+      <div style={{ position: "absolute", left: 580, top: 290, opacity: promptPasteLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+        <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>粘贴</div>
+        <KeyCombo combo={["Control", "V"]} visible={promptPasteKeys} x={625} y={290} />
+      </div>
     </div>
   );
 };
@@ -437,138 +478,6 @@ const useItemReveal = (index: number, staggerFrames = 8, durationFrames = 18) =>
   });
 };
 
-// ─── WritingWorkspace ──────────────────────────────────────────────────────────
-export const WritingWorkspace = () => {
-  const frame = useCurrentFrame();
-
-  const windowReveal = interpolate(frame, [0, 20], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-
-  const listItems = [
-    "目标用户反馈需要收敛为三类。",
-    "上线前检查订阅、设备和预设导入。",
-    "把开发任务拆成可验证的小步骤。",
-  ];
-
-  return (
-    <div style={{ position: "relative", width: 850, opacity: windowReveal, transform: `translateY(${(1 - windowReveal) * 24}px)` }}>
-      <div
-        style={{
-          ...panel("light"),
-          width: 780,
-          minHeight: 500,
-          borderRadius: 26,
-          overflow: "hidden",
-        }}
-      >
-        {/* Title bar */}
-        <div
-          style={{
-            height: 58,
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "0 24px",
-            borderBottom: "1px solid rgba(148,163,184,0.18)",
-            color: "#64748b",
-            fontSize: 18,
-            fontWeight: 650,
-          }}
-        >
-          <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ff5f57" }} />
-          <span style={{ width: 12, height: 12, borderRadius: 999, background: "#ffbd2e" }} />
-          <span style={{ width: 12, height: 12, borderRadius: 999, background: "#28c840" }} />
-          <span style={{ marginLeft: 14 }}>会议记录.md</span>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 250px", height: 442 }}>
-          {/* Main content */}
-          <div style={{ padding: "34px 38px", display: "grid", alignContent: "start", gap: 22 }}>
-            <AnimatedItem index={0} stagger={6}>
-              <div style={{ fontSize: 30, lineHeight: 1.42, fontWeight: 720, color: "#263244" }}>
-                下次同步前确认三件事，并把讨论结论整理成可执行列表。
-              </div>
-            </AnimatedItem>
-            {listItems.map((line, i) => (
-              <AnimatedItem key={line} index={i + 1} stagger={7}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 14,
-                    fontSize: 22,
-                    color: "#475569",
-                    lineHeight: 1.35,
-                  }}
-                >
-                  <span style={{ width: 7, height: 7, borderRadius: 999, background: "#2f7fd3", flexShrink: 0 }} />
-                  {line}
-                </div>
-              </AnimatedItem>
-            ))}
-            <AnimatedItem index={5} stagger={7}>
-              <div
-                style={{
-                  marginTop: 10,
-                  height: 68,
-                  borderRadius: 16,
-                  background: "linear-gradient(135deg, rgba(234,245,255,0.96), rgba(248,251,255,0.94))",
-                  border: "1px solid rgba(47,127,211,0.16)",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 20px",
-                  color: "#2563a9",
-                  fontSize: 21,
-                  fontWeight: 690,
-                }}
-              >
-                Ringflow 已插入：总结提炼 Prompt
-              </div>
-            </AnimatedItem>
-          </div>
-
-          {/* Sidebar */}
-          <div
-            style={{
-              borderLeft: "1px solid rgba(148,163,184,0.14)",
-              padding: 24,
-              background: "rgba(248, 251, 255, 0.72)",
-            }}
-          >
-            <div style={{ fontSize: 18, fontWeight: 760, color: "#64748b", marginBottom: 16 }}>常用提示词</div>
-            {["总结提炼", "润色改写", "分步说明", "对比分析"].map((item, index) => (
-              <AnimatedItem key={item} index={index} stagger={5}>
-                <div
-                  style={{
-                    height: 54,
-                    borderRadius: 14,
-                    marginBottom: 12,
-                    padding: "0 16px",
-                    display: "flex",
-                    alignItems: "center",
-                    background: index === 0 ? "rgba(223, 239, 255, 0.96)" : "rgba(255,255,255,0.78)",
-                    color: index === 0 ? "#1f5f9f" : "#475569",
-                    fontSize: 20,
-                    fontWeight: 700,
-                    border: index === 0 ? "1px solid rgba(47,127,211,0.18)" : "1px solid rgba(226,232,240,0.78)",
-                  }}
-                >
-                  {item}
-                </div>
-              </AnimatedItem>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div style={{ position: "absolute", right: -4, bottom: -34 }}>
-        <RingflowWheel mini activeSegment="quick-input" centerLabel="文本" revealFrame={8} />
-      </div>
-    </div>
-  );
-};
 
 // ─── AnimatedItem helper ───────────────────────────────────────────────────────
 const AnimatedItem = ({
@@ -765,9 +674,7 @@ export const QuickInputWorkspace = ({
       {/* Ringflow wheel - protagonist first, highlight leads result, larger for presence */}
       <div
         style={{
-          position: "absolute",
-          right: 12,
-          bottom: -22,
+          ...getWheelPlacementStyle('top-stage', 'standard'),
           opacity: wheelReveal,
           transform: `scale(${1.05 + wheelReveal * 0.1})`,
         }}
@@ -957,8 +864,8 @@ export const QuickOpenTargets = ({ choreography }: { choreography?: { wheelStart
         })}
       </div>
 
-      {/* Wheel first with highlight leading the open result */}
-      <div style={{ position: "absolute", right: -10, bottom: -18, opacity: wheelReveal }}>
+      {/* Wheel first with highlight leading the open result - standardized placement */}
+      <div style={{ ...getWheelPlacementStyle('top-stage', 'standard'), opacity: wheelReveal }}>
         <RingflowWheel 
           activeSegment="quick-open" 
           centerLabel="打开" 
@@ -986,24 +893,27 @@ export const MacroExecution = ({
 
   const wheelReveal = interpolate(frame, [wheelStart, wheelStart + 15], [0, 1], { extrapolateLeft: "clamp" });
 
-  // Smooth slide highlight across 4 real macro steps (conductor)
+  // Smooth slide highlight across 4 real macro steps (conductor) using highlightIndex
   const stepCount = 4;
   const slide = interpolate(frame, [hlStart, hlEnd], [0, stepCount - 0.1], { extrapolateLeft: "clamp" });
   const currentHighlightStep = Math.floor(slide);
+  // Safe monotonic per-step highlight ramp (protect against equal inputs)
+  const stepLen = Math.max(1, (hlEnd - hlStart) / stepCount);
+  const stepHlStart = Math.max(hlStart + (currentHighlightStep * stepLen), hlStart + 1);
+  const wheelHighlight = interpolate(frame, [stepHlStart, Math.max(stepHlStart + 1, hlEnd - 2)], [0, 1], { extrapolateLeft: "clamp" });
 
   const steps = ["复制", "切换应用", "粘贴", "保存"];
 
   return (
     <div style={{ width: 640, display: "flex", flexDirection: "column", gap: 16, alignItems: "center" }}>
-      {/* Wheel first with sliding highlight across real macro steps */}
+      {/* Wheel first with real highlightIndex slide across macro steps (conductor) */}
       <div style={{ opacity: wheelReveal, marginBottom: 8 }}>
         <RingflowWheel 
-          mini 
           mode="dark" 
           activeSegment="macro" 
           centerLabel="宏序列" 
           revealProgress={wheelReveal}
-          glowProgress={Math.min(1, (slide % 1) + 0.2)} 
+          highlightIndex={currentHighlightStep}
         />
       </div>
 
@@ -1014,7 +924,8 @@ export const MacroExecution = ({
           extrapolateRight: "clamp",
           easing: Easing.bezier(0.16, 1, 0.3, 1),
         });
-        const isDone = index <= currentHighlightStep;
+        // Strict: result only after this step's highlight peak (use highlightIndex driven)
+        const isDone = index < currentHighlightStep || (index === currentHighlightStep && wheelHighlight > 0.85);
 
         return (
           <div
@@ -1075,9 +986,9 @@ export const MonitorDashboard = ({ choreography }: { choreography?: { wheelStart
   const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 55, c.wheelHighlightEndFrame ?? 85], [0, 1], { extrapolateLeft: "clamp" });
 
   return (
-    <div style={{ position: "relative", width: 620 }}>
+    <div style={{ position: "relative", display: "flex", flexDirection: "row", alignItems: "center", gap: 40 }}>
       {/* Realistic system monitor context window */}
-      <div style={{ ...panel("dark"), padding: 18, borderRadius: 18, marginBottom: 12 }}>
+      <div style={{ ...panel("dark"), width: 620, padding: 18, borderRadius: 18 }}>
         <div style={{ fontSize: 14, color: "#9aa7bd", marginBottom: 10, display: "flex", justifyContent: "space-between" }}>
           <span>活动监视器</span>
           <span style={{ color: "#2f7fd3", fontSize: 12 }}>Ringflow 状态</span>
@@ -1128,9 +1039,9 @@ export const MonitorDashboard = ({ choreography }: { choreography?: { wheelStart
         </div>
       </div>
 
-      {/* Wheel first, highlight on monitor sector leads metrics */}
-      <div style={{ position: "absolute", right: -5, bottom: -25, opacity: wheelReveal, transform: "scale(1.15)" }}>
-        <RingflowWheel mini mode="dark" activeSegment="monitor" centerLabel="状态" revealProgress={wheelReveal} glowProgress={highlight} />
+      {/* Wheel beside the panel (not overlaid) - highlight on monitor sector leads metrics */}
+      <div style={{ opacity: wheelReveal, flexShrink: 0 }}>
+        <RingflowWheel mode="dark" activeSegment="monitor" centerLabel="状态" revealProgress={wheelReveal} glowProgress={highlight} />
       </div>
     </div>
   );
@@ -1185,110 +1096,122 @@ export const AppConfigurationScreenshot = ({ choreography }: { choreography?: { 
   });
 
   return (
-    <div
-      style={{
-        width: 860,
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 18,
-        opacity: panelReveal,
-        transform: `translateY(${(1 - panelReveal) * 22}px)`,
-      }}
-    >
-      {PROFILES.map((profile, pi) => {
-        const cardReveal = interpolate(frame, [pi * 10, pi * 10 + 22], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
-        return (
-          <div
-            key={profile.role}
-            style={{
-              ...panel("light"),
-              borderRadius: 22,
-              overflow: "hidden",
-              opacity: cardReveal,
-              transform: `translateY(${(1 - cardReveal) * 16}px)`,
-              outline: pi === 1 ? "2px solid rgba(124,58,237,0.28)" : "none",
-              boxShadow: pi === 1 ? "0 0 0 5px rgba(124,58,237,0.07), 0 24px 64px rgba(30,45,70,0.14)" : theme.shadow.panel,
-            }}
-          >
-            {/* Profile header */}
+    <div style={{ position: "relative", width: 860, display: "flex", flexDirection: "column", alignItems: "center", gap: 26 }}>
+      <div
+        style={{
+          width: 860,
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 18,
+          opacity: panelReveal,
+          transform: `translateY(${(1 - panelReveal) * 22}px)`,
+        }}
+      >
+        {PROFILES.map((profile, pi) => {
+          const cardReveal = interpolate(frame, [pi * 10, pi * 10 + 22], [0, 1], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+            easing: Easing.bezier(0.16, 1, 0.3, 1),
+          });
+          return (
             <div
+              key={profile.role}
               style={{
-                padding: "16px 18px 14px",
-                borderBottom: "1px solid rgba(148,163,184,0.13)",
-                background: profile.bg,
+                ...panel("light"),
+                borderRadius: 22,
+                overflow: "hidden",
+                opacity: cardReveal,
+                transform: `translateY(${(1 - cardReveal) * 16}px)`,
+                outline: pi === 1 ? "2px solid rgba(124,58,237,0.28)" : "none",
+                boxShadow: pi === 1 ? "0 0 0 5px rgba(124,58,237,0.07), 0 24px 64px rgba(30,45,70,0.14)" : theme.shadow.panel,
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: profile.color,
-                    display: "grid",
-                    placeItems: "center",
-                    boxShadow: `0 2px 8px ${profile.color}44`,
-                  }}
-                >
-                  <span style={{ color: "white", fontSize: 13, fontWeight: 860 }}>
-                    {profile.app[0]}
-                  </span>
-                </div>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>{profile.role}</div>
-                  <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 580 }}>{profile.app}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Action list */}
-            <div style={{ padding: "12px 14px", display: "grid", gap: 7 }}>
-              {profile.actions.map((action, ai) => {
-                const itemReveal = interpolate(frame, [pi * 10 + ai * 5 + 14, pi * 10 + ai * 5 + 28], [0, 1], {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                  easing: Easing.bezier(0.16, 1, 0.3, 1),
-                });
-                return (
+              {/* Profile header */}
+              <div
+                style={{
+                  padding: "16px 18px 14px",
+                  borderBottom: "1px solid rgba(148,163,184,0.13)",
+                  background: profile.bg,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
                   <div
-                    key={action}
                     style={{
-                      height: 34,
-                      borderRadius: 10,
-                      padding: "0 12px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      background: ai === 0 ? `${profile.accent}14` : "rgba(248,250,252,0.88)",
-                      border: ai === 0 ? `1px solid ${profile.accent}28` : "1px solid rgba(226,232,240,0.70)",
-                      color: ai === 0 ? profile.accent : "#475569",
-                      fontSize: 13,
-                      fontWeight: ai === 0 ? 760 : 560,
-                      opacity: itemReveal,
-                      transform: `translateX(${(1 - itemReveal) * -8}px)`,
+                      width: 28,
+                      height: 28,
+                      borderRadius: 8,
+                      background: profile.color,
+                      display: "grid",
+                      placeItems: "center",
+                      boxShadow: `0 2px 8px ${profile.color}44`,
                     }}
                   >
-                    <span>{action}</span>
-                    <span
-                      style={{
-                        width: 14,
-                        height: 14,
-                        borderRadius: 4,
-                        background: ai === 0 ? profile.accent : "rgba(148,163,184,0.30)",
-                        flexShrink: 0,
-                      }}
-                    />
+                    <span style={{ color: "white", fontSize: 13, fontWeight: 860 }}>
+                      {profile.app[0]}
+                    </span>
                   </div>
-                );
-              })}
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>{profile.role}</div>
+                    <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 580 }}>{profile.app}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action list */}
+              <div style={{ padding: "12px 14px", display: "grid", gap: 7 }}>
+                {profile.actions.map((action, ai) => {
+                  const itemReveal = interpolate(frame, [pi * 10 + ai * 5 + 14, pi * 10 + ai * 5 + 28], [0, 1], {
+                    extrapolateLeft: "clamp",
+                    extrapolateRight: "clamp",
+                    easing: Easing.bezier(0.16, 1, 0.3, 1),
+                  });
+                  return (
+                    <div
+                      key={action}
+                      style={{
+                        height: 34,
+                        borderRadius: 10,
+                        padding: "0 12px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: ai === 0 ? `${profile.accent}14` : "rgba(248,250,252,0.88)",
+                        border: ai === 0 ? `1px solid ${profile.accent}28` : "1px solid rgba(226,232,240,0.70)",
+                        color: ai === 0 ? profile.accent : "#475569",
+                        fontSize: 13,
+                        fontWeight: ai === 0 ? 760 : 560,
+                        opacity: itemReveal,
+                        transform: `translateX(${(1 - itemReveal) * -8}px)`,
+                      }}
+                    >
+                      <span>{action}</span>
+                      <span
+                        style={{
+                          width: 14,
+                          height: 14,
+                          borderRadius: 4,
+                          background: ai === 0 ? profile.accent : "rgba(148,163,184,0.30)",
+                          flexShrink: 0,
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* Wheel conductor for app profiles scene - placed below the cards so it never overlaps them */}
+      <div style={{ opacity: wheelReveal }}>
+        <RingflowWheel
+          activeSegment="prompt-folder"
+          centerLabel="App"
+          revealProgress={wheelReveal}
+          glowProgress={highlight}
+        />
+      </div>
     </div>
   );
 };
@@ -1322,12 +1245,11 @@ export const PresetLibraryShowcase = ({ choreography }: { choreography?: { wheel
   ];
 
   return (
-    <div style={{ position: "relative", width: 760, height: 430 }}>
+    <div style={{ position: "relative", width: 760, display: "flex", flexDirection: "column", alignItems: "center", gap: 26 }}>
       <div
         style={{
           ...panel("light"),
-          position: "absolute",
-          inset: "20px 70px 0 0",
+          width: 760,
           borderRadius: 28,
           padding: 28,
           opacity: panelReveal,
@@ -1369,8 +1291,8 @@ export const PresetLibraryShowcase = ({ choreography }: { choreography?: { wheel
           );
         })}
       </div>
-      <div style={{ position: "absolute", right: 0, bottom: 4, width: 260, opacity: wheelReveal }}>
-        <RingflowWheel mini activeSegment="prompt-folder" centerLabel="默认" revealProgress={wheelReveal} glowProgress={highlight} />
+      <div style={{ opacity: wheelReveal }}>
+        <RingflowWheel activeSegment="prompt-folder" centerLabel="默认" revealProgress={wheelReveal} glowProgress={highlight} />
       </div>
     </div>
   );

@@ -71,3 +71,45 @@ export const LAYOUT = {
 
 export type LayoutRole = 'hero' | 'standard' | 'mini';
 export type SceneLayout = 'left-stage' | 'top-stage' | 'center-stage';
+
+/**
+ * LAYOUT DISCIPLINE RULES (per Block 3):
+ * - hero: NearerConcept + CoreGesture (prominent, ~300px visual, near cursor in context)
+ * - standard: Most feature scenes (Quick*, Sticky, Macro, Shell, Monitor, etc.) — non-mini
+ * - mini: ONLY for side indicators or when space extremely tight (never default for feature demos)
+ *
+ * Always prefer importing LAYOUT and using wheel sizes + placement rules.
+ * Avoid magic left/top/right numbers. Use relative positioning or these constants.
+ */
+export const WHEEL_SIZE = {
+  hero: 300,
+  standard: 220,
+  mini: 130,
+} as const;
+
+export function getWheelPlacementStyle(sceneLayout: SceneLayout, role: LayoutRole = 'standard') {
+  const base = { position: 'absolute' as const };
+  if (sceneLayout === 'left-stage') {
+    return { ...base, right: 40, top: '28%' };
+  }
+  if (sceneLayout === 'center-stage') {
+    return { ...base, bottom: 50, left: '52%', transform: 'translateX(-50%)' };
+  }
+  // top-stage default
+  return { ...base, bottom: -18, right: 18 };
+}
+
+/**
+ * Recommended container width/scale for RingflowWheel by role.
+ * Use with <RingflowWheel ... /> wrapped in div with this style.
+ */
+export function getWheelWrapperStyle(role: LayoutRole) {
+  const diameter = role === 'hero' ? 300 : role === 'standard' ? 220 : 130;
+  const scale = role === 'hero' ? 1.05 : role === 'standard' ? 1.0 : 0.72;
+  return {
+    width: diameter,
+    height: diameter,
+    transform: `scale(${scale})`,
+    transformOrigin: 'center',
+  } as const;
+}

@@ -4,7 +4,7 @@ import { Cursor } from "../components/Cursor/Cursor";
 import { MacWindow } from "../components/MacUI/MacWindow";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
-import { LAYOUT } from "../config/layout";
+import { LAYOUT, getWheelWrapperStyle } from "../config/layout";
 import { scenes } from "../config/timeline";
 
 const scene = scenes.find((item) => item.id === "nearer-concept")!;
@@ -102,7 +102,7 @@ export const NearerConceptScene = () => {
             height: 800,
           }}
         >
-          {/* 第三屏文字：理念 */}
+          {/* 第三屏文字：理念 + reveal caption — flow-stacked so caption never overlaps headline */}
           <div
             style={{
               position: "absolute",
@@ -110,8 +110,6 @@ export const NearerConceptScene = () => {
               left: 0,
               width: "100%",
               textAlign: "center",
-              opacity: ideaText,
-              transform: `translateY(${(1 - ideaText) * 20}px)`,
             }}
           >
             <div
@@ -121,33 +119,25 @@ export const NearerConceptScene = () => {
                 fontWeight: 850,
                 letterSpacing: 0,
                 color: "#111827",
+                opacity: ideaText,
+                transform: `translateY(${(1 - ideaText) * 20}px)`,
               }}
             >
               {sceneCopy["nearer-concept"].headline.map((line) => (
                 <div key={line}>{line}</div>
               ))}
             </div>
-          </div>
 
-          {/* Reveal text - sourced */}
-          <div
-            style={{
-              position: "absolute",
-              top: 200,
-              left: 0,
-              width: "100%",
-              textAlign: "center",
-              opacity: revealText,
-              transform: `translateY(${(1 - revealText) * 16}px)`,
-            }}
-          >
             <div
               style={{
+                marginTop: 28,
                 fontSize: 42,
                 lineHeight: 1.25,
                 fontWeight: 720,
                 letterSpacing: 0,
                 color: "#334155",
+                opacity: revealText,
+                transform: `translateY(${(1 - revealText) * 16}px)`,
               }}
             >
               {sceneCopy["nearer-concept"].caption || "Ringflow 出现在光标旁边。"}
@@ -158,10 +148,10 @@ export const NearerConceptScene = () => {
           <div
             style={{
               position: "absolute",
-              left: LAYOUT.width / 2 - 200,
-              top: LAYOUT.height / 2 - 100,
-              width: LAYOUT.stage.center.width * 0.6,
-              height: LAYOUT.stage.center.height * 0.7,
+              left: LAYOUT.width / 2 - 220,
+              top: LAYOUT.height / 2 - 120,
+              width: LAYOUT.stage.center.width * 0.58,
+              height: LAYOUT.stage.center.height * 0.68,
               pointerEvents: "none",
             }}
           >
@@ -175,13 +165,14 @@ export const NearerConceptScene = () => {
               </MacWindow>
             </div>
 
-            {/* Wheel — hero size, fixed placement relative to context (right of window) */}
+            {/* Wheel — hero size via helper, placed right of document using more predictable offset */}
             <div
               style={{
                 position: "absolute",
-                left: 340,
-                top: 40,
+                left: 360,
+                top: 35,
                 opacity: wheelOpacity * finalHold,
+                ...getWheelWrapperStyle('hero'),
                 transform: `scale(${wheelScale})`,
                 transformOrigin: "center",
               }}
@@ -196,7 +187,7 @@ export const NearerConceptScene = () => {
             </div>
 
             {/* Cursor inside the document */}
-            <div style={{ position: "absolute", left: 150, top: 120, opacity: cursorReveal * finalHold }}>
+            <div style={{ position: "absolute", left: 160, top: 115, opacity: cursorReveal * finalHold }}>
               <Cursor x={cursorX - 100} y={cursorY - 80} scale={0.95} trail={trail} />
             </div>
           </div>

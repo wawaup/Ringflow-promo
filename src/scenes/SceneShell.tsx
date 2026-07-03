@@ -3,7 +3,7 @@ import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoCon
 import { PromoBackground } from "../components/Background/PromoBackground";
 import { PromoText } from "../components/Text/PromoText";
 import { theme } from "../config/theme";
-import { LAYOUT } from "../config/layout";
+import { LAYOUT, getWheelPlacementStyle, WHEEL_SIZE } from "../config/layout";
 import type { SceneChoreography, SceneLayout } from "../config/timeline";
 
 type SceneShellProps = {

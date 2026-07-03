@@ -115,7 +115,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 5,
+    shot: 4,
     id: "core-gesture",
     name: "核心交互：按住、划动、完成",
     durationSeconds: 4.2,
@@ -133,7 +133,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 6,
+    shot: 5,
     id: "quick-input",
     name: "快捷输入",
     durationSeconds: 3.2,
@@ -149,7 +149,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 7,
+    shot: 6,
     id: "quick-open",
     name: "快捷打开",
     durationSeconds: 3.2,
@@ -165,7 +165,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 8,
+    shot: 7,
     id: "sticky-note",
     name: "便签",
     durationSeconds: 3.2,
@@ -181,7 +181,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 9,
+    shot: 8,
     id: "macro-sequence",
     name: "快捷键 / 宏序列",
     durationSeconds: 3.3,
@@ -197,7 +197,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 10,
+    shot: 9,
     id: "shell-script",
     name: "Shell 脚本",
     durationSeconds: 3.0,
@@ -213,7 +213,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 11,
+    shot: 10,
     id: "shortcuts",
     name: "macOS 快捷指令",
     durationSeconds: 2.8,
@@ -229,7 +229,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 12,
+    shot: 11,
     id: "monitor",
     name: "系统监视器",
     durationSeconds: 2.7,
@@ -245,7 +245,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 13,
+    shot: 12,
     id: "app-profiles",
     name: "应用独立配置",
     durationSeconds: 3.0,
@@ -261,7 +261,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 14,
+    shot: 13,
     id: "preset-library",
     name: "预设库",
     durationSeconds: 3.6,
@@ -277,7 +277,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 15,
+    shot: 14,
     id: "outro",
     name: "品牌收尾",
     durationSeconds: 2.8,

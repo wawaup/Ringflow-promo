@@ -2,6 +2,7 @@ import { Easing, interpolate, useCurrentFrame } from "remotion";
 import { MacWindow } from "../components/MacUI/MacWindow";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { LAYOUT, getWheelPlacementStyle } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 
@@ -127,15 +128,16 @@ export const ShellScriptScene = () => {
             </div>
           </MacWindow>
         </div>
-        {/* Wheel first, highlight leads shell result */}
-        <RingflowWheel 
-          mini 
-          mode="dark" 
-          runningSegment="shell" 
-          centerLabel="Shell" 
-          revealProgress={wheelReveal} 
-          glowProgress={highlight} 
-        />
+        {/* Wheel first, highlight leads shell result - standardized */}
+        <div style={{ ...getWheelPlacementStyle('top-stage', 'standard') }}>
+          <RingflowWheel 
+            mode="dark" 
+            runningSegment="shell" 
+            centerLabel="Shell" 
+            revealProgress={wheelReveal} 
+            glowProgress={highlight} 
+          />
+        </div>
       </div>
     </SceneShell>
   );

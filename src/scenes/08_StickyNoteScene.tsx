@@ -3,7 +3,7 @@ import { MacWindow } from "../components/MacUI/MacWindow";
 import { Cursor } from "../components/Cursor/Cursor";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
-import { LAYOUT } from "../config/layout";
+import { LAYOUT, getWheelPlacementStyle, getWheelWrapperStyle } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 import { theme } from "../config/theme";
@@ -59,8 +59,8 @@ export const StickyNoteScene = () => {
           </MacWindow>
         </div>
 
-        {/* Wheel — standard size, consistent right placement */}
-        <div style={{ position: "absolute", left: 420, top: 40, transform: "scale(1.0)", opacity: wheelReveal }}>
+        {/* Wheel — standard size, use layout helper for consistent right placement */}
+        <div style={{ ...getWheelPlacementStyle('top-stage', 'standard'), opacity: wheelReveal, ...getWheelWrapperStyle('standard') }}>
           <RingflowWheel
             activeSegment="sticky-note"
             centerLabel="便签"
@@ -69,17 +69,17 @@ export const StickyNoteScene = () => {
           />
         </div>
 
-        {/* Cursor near wheel */}
-        <div style={{ position: "absolute", left: 390, top: 120, opacity: previewReveal * 0.85 }}>
+        {/* Cursor near wheel - relative to wheel area */}
+        <div style={{ position: "absolute", left: 410, top: 110, opacity: previewReveal * 0.85 }}>
           <Cursor x={20} y={10} scale={0.85} />
         </div>
 
-        {/* Result sticky — fixed offset, no overlap */}
+        {/* Result sticky — use consistent offset from layout guidelines */}
         <div
           style={{
             position: "absolute",
-            left: 620,
-            top: 0,
+            left: 640,
+            top: 10,
             opacity: noteExpand,
             transform: `scale(${0.92 + noteExpand * 0.08})`,
           }}

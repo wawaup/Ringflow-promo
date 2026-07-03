@@ -2,6 +2,7 @@ import { Easing, interpolate, useCurrentFrame } from "remotion";
 import { FeatureCard } from "../components/MacUI/FeatureCards";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
+import { getWheelPlacementStyle } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 
@@ -37,14 +38,15 @@ export const ShortcutsScene = () => {
   return (
     <SceneShell lines={sceneCopy.shortcuts.headline} layout={scene.layout} choreography={scene.choreography}>
       <div style={{ display: "grid", gap: 20, justifyItems: "center" }}>
-        {/* Wheel first with highlight on shortcuts sector */}
-        <RingflowWheel 
-          mini 
-          activeSegment="shortcuts" 
-          centerLabel="快捷指令" 
-          revealProgress={wheelReveal} 
-          glowProgress={highlight} 
-        />
+        {/* Wheel first with highlight on shortcuts sector - standardized */}
+        <div style={getWheelPlacementStyle('top-stage', 'standard') as any}>
+          <RingflowWheel 
+            activeSegment="shortcuts" 
+            centerLabel="快捷指令" 
+            revealProgress={wheelReveal} 
+            glowProgress={highlight} 
+          />
+        </div>
         <div
           style={{
             opacity: card1Reveal,

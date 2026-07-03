@@ -2,7 +2,7 @@ import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "re
 import { MiddleClickCursor } from "../components/Cursor/Cursor";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
-import { LAYOUT } from "../config/layout";
+import { LAYOUT, getWheelWrapperStyle } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 
@@ -145,8 +145,8 @@ export const CoreGestureScene = () => {
       stageHeight={620}
     >
       <div style={{ position: "relative", width: LAYOUT.stage.center.width * 0.9, height: LAYOUT.stage.center.height * 0.9, display: "grid", placeItems: "center" }}>
-        {/* The gesture wheel - fixed hero size, consistent center placement */}
-        <div style={{ position: "absolute", left: -80, top: -60 }}>
+        {/* The gesture wheel - hero role, use wrapper helper, reduced magic offset for centering in gesture area */}
+        <div style={{ position: "absolute", left: -60, top: -40, ...getWheelWrapperStyle('hero') }}>
           <RingflowWheel
             activeSegment="quick-input"
             centerLabel={centerLabel}
