@@ -2,7 +2,7 @@ import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "re
 import { MiddleClickCursor } from "../components/Cursor/Cursor";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
-import { LAYOUT, getWheelWrapperStyle } from "../config/layout";
+import { LAYOUT, getHeroGestureLayout, getWheelWrapperStyle } from "../config/layout";
 import { scenes } from "../config/timeline";
 import { SceneShell } from "./SceneShell";
 
@@ -75,15 +75,13 @@ export const CoreGestureScene = () => {
     easing: Easing.bezier(0.4, 0, 0.6, 1),
   });
 
-  // Centered gesture area in middle of the 1180x620 scene container
-  const cx = 590; // 1180 / 2
-  const cy = 310; // 620 / 2
-  const startX = cx - 80;
-  const startY = cy + 40;
-  const endX = cx + 140;
-  const endY = cy - 80;
-  const cursorX = interpolate(swipeT, [0, 1], [startX, endX]);
-  const cursorY = interpolate(swipeT, [0, 1], [startY, endY]);
+  // Canonical hero-gesture layout: cursor starts left, wheel anchors right,
+  // whole group centered on both axes within the local stage box (Block 6).
+  const localStageWidth = LAYOUT.stage.center.width * 0.9;
+  const localStageHeight = LAYOUT.stage.center.height * 0.9;
+  const gestureLayout = getHeroGestureLayout(localStageWidth, localStageHeight);
+  const cursorX = interpolate(swipeT, [0, 1], [gestureLayout.cursorStart.x, gestureLayout.cursorEnd.x]);
+  const cursorY = interpolate(swipeT, [0, 1], [gestureLayout.cursorStart.y, gestureLayout.cursorEnd.y]);
 
   // Folder ring (double layer) only appears during the swipe gesture
   const wheelRevealStart = c.wheelStartFrame ?? c.actionStartFrame + 20;
@@ -144,9 +142,16 @@ export const CoreGestureScene = () => {
       stageWidth={1180}
       stageHeight={620}
     >
-      <div style={{ position: "relative", width: LAYOUT.stage.center.width * 0.9, height: LAYOUT.stage.center.height * 0.9, display: "grid", placeItems: "center" }}>
-        {/* The gesture wheel - hero role, use wrapper helper, reduced magic offset for centering in gesture area */}
-        <div style={{ position: "absolute", left: -60, top: -40, ...getWheelWrapperStyle('hero') }}>
+      <div style={{ position: "relative", width: localStageWidth, height: localStageHeight, display: "grid", placeItems: "center" }}>
+        {/* The gesture wheel - anchored right of center per getHeroGestureLayout, so mouse-left/wheel-right/group-centered stays disciplined */}
+        <div
+          style={{
+            position: "absolute",
+            left: gestureLayout.wheelCenter.x - gestureLayout.wheelSize / 2,
+            top: gestureLayout.wheelCenter.y - gestureLayout.wheelSize / 2,
+            ...getWheelWrapperStyle('hero'),
+          }}
+        >
           <RingflowWheel
             activeSegment="quick-input"
             centerLabel={centerLabel}
@@ -173,12 +178,12 @@ export const CoreGestureScene = () => {
           scale={3.0 - swipeT * 0.8}
         />
 
-        {/* Clear completion feedback - fixed position */}
+        {/* Clear completion feedback - centered under the wheel */}
         <div
           style={{
             position: "absolute",
-            left: 200,
-            top: 280,
+            left: gestureLayout.centerX - 170,
+            top: gestureLayout.wheelCenter.y + gestureLayout.wheelVisual / 2 + 30,
             width: 340,
             textAlign: "center",
             opacity: resultOpacity,

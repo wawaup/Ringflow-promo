@@ -113,3 +113,35 @@ export function getWheelWrapperStyle(role: LayoutRole) {
     transformOrigin: 'center',
   } as const;
 }
+
+/**
+ * Canonical layout for the "hold + drag right, wheel emerges" hero gesture
+ * (Block 6). Guarantees, by construction:
+ * - The wheel is anchored to the right of the stage's horizontal center.
+ * - The cursor starts to the left and travels rightward toward the wheel.
+ * - The combined bounding box of (cursor start -> wheel) is centered on
+ *   both axes within the given stage box, so callers never need magic
+ *   left/top offsets to "eyeball" centering.
+ */
+export function getHeroGestureLayout(
+  stageWidth: number,
+  stageHeight: number,
+  opts?: { wheelOffsetX?: number; approachMargin?: number; verticalDrift?: number }
+) {
+  const wheelSize = WHEEL_SIZE.hero;
+  const wheelVisual = wheelSize * 1.05; // matches getWheelWrapperStyle('hero') scale
+  const wheelOffsetX = opts?.wheelOffsetX ?? 140;
+  const approachMargin = opts?.approachMargin ?? 40;
+  const verticalDrift = opts?.verticalDrift ?? 15;
+
+  const centerX = stageWidth / 2;
+  const centerY = stageHeight / 2;
+
+  const wheelCenter = { x: centerX + wheelOffsetX, y: centerY };
+  // Mirrors wheelCenter across centerX so the full (cursorStart..wheel-edge)
+  // span is centered on centerX.
+  const cursorStart = { x: stageWidth - wheelCenter.x - wheelVisual / 2, y: centerY + verticalDrift };
+  const cursorEnd = { x: wheelCenter.x - wheelVisual / 2 - approachMargin, y: centerY - verticalDrift };
+
+  return { wheelCenter, cursorStart, cursorEnd, wheelSize, wheelVisual, centerX, centerY };
+}

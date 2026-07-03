@@ -98,13 +98,16 @@ Before committing to numbers:
 7. Verify all interpolate ranges are monotonic.
 8. Generate stills and judge with the viewer eye.
 
-## Wheel Conductor Rules (Added for Block 2)
+## Wheel Conductor Rules (Added for Block 2, clarified in Block 6)
 - Wheel always appears first in the visual sequence for feature demos.
 - Configure wheel sectors to match the current scene's real app actions (from synced productSemantics).
 - For each result/component: relevant real sector on wheel **highlights/glows first** (use glowProgress or highlightIndex driven by choreography).
 - In sequences: smoothly slide the highlight across sectors (interpolate index) in sync with result order.
 - Result UI only fully reveals after the highlight peak.
 - This makes the wheel the protagonist that "conducts" every action. Use real labels/sectors only. Verify with stills at wheel-enter, highlight-ramp, result-after.
+- **"Result" vs. "context" distinction (Block 6)**: A "result" is any panel/content whose purpose is to *demonstrate what the highlighted wheel sector does* (a filled-in dashboard, a created note, terminal command output, a selected preset, a toggled config). A "context" element is pre-existing scene-setting that represents the user's ongoing work *before* they summon the wheel (an already-open document/terminal). Only "result" content is bound by this rule — context elements may appear earlier.
+- **Concretely**: a result's reveal must not *start* before `wheelHighlightStartFrame`. A small overlap of up to ~8-10 frames past `wheelHighlightStartFrame` is fine (consistent with the Zero-Gap Continuous Chaining offset convention), but the result must not be mid-reveal or fully visible while the highlight is still ramping up from zero. When in doubt, gate the result's start frame off `wheelHighlightEndFrame` (or `Math.max(wheelHighlightEndFrame, holdStartFrame)` per the `StickyNoteScene` reference pattern) rather than off `actionStartFrame`/`visualStartFrame`, which are not tied to the highlight at all.
+- **Screen 1 exemption**: `01_IntroFocusScene` (`InterruptedWorkflowWorkspace`) is exempt from this entire rule — it runs before the wheel has been introduced in the video's narrative, so there is no wheel/highlight to lead with. Do not re-litigate this scene against the Wheel Conductor rule.
 
 ## References
 

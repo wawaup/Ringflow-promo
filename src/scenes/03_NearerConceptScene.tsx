@@ -5,6 +5,7 @@ import { MacWindow } from "../components/MacUI/MacWindow";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
 import { sceneCopy } from "../config/copy";
 import { LAYOUT, getWheelWrapperStyle } from "../config/layout";
+import { theme } from "../config/theme";
 import { scenes } from "../config/timeline";
 
 const scene = scenes.find((item) => item.id === "nearer-concept")!;
@@ -16,9 +17,12 @@ const reveal = (frame: number, start: number, duration = 28) =>
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
+const GROUP_WIDTH = LAYOUT.stage.center.width * 0.58;
+const GROUP_HEIGHT = LAYOUT.stage.center.height * 0.68;
+
 export const NearerConceptScene = () => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { fps } = useVideoConfig();
   const c = scene.choreography;
 
   const ideaText = reveal(frame, c.textStartFrame, 30);
@@ -49,18 +53,13 @@ export const NearerConceptScene = () => {
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  const cx = width / 2;
-  const cy = height / 2;
-
-  // Center the gesture area (wheel + cursor movement) in the middle of screen
-  const wheelCenterX = cx - 80;
-  const wheelCenterY = cy + 80;
-
-  // Cursor starts inside the document window area, ends near where wheel is summoned
-  const cursorStartX = cx - 60;
-  const cursorStartY = cy + 50;
-  const cursorEndX = cx + 110;   // near the summoned wheel (inside/edge of document)
-  const cursorEndY = cy + 20;
+  // Cursor moves in the SAME local coordinate space as the document window
+  // (0,0) and the wheel wrapper (360,35) below — not full-canvas coordinates,
+  // so it stays visible and lands next to the wheel it summons (Block 6 fix).
+  const cursorStartX = 170;
+  const cursorStartY = 150;
+  const cursorEndX = 345; // just left of the wheel's edge
+  const cursorEndY = 165;
 
   const cursorX = interpolate(cursorT, [0, 1], [cursorStartX, cursorEndX]);
   const cursorY = interpolate(cursorT, [0, 1], [cursorStartY, cursorEndY]);
@@ -88,108 +87,100 @@ export const NearerConceptScene = () => {
   return (
     <AbsoluteFill>
       <PromoBackground mode="light" />
+      {/* Same flex-column, centered-on-both-axes pattern as SceneShell's center-stage
+          layout (text block, then visual stage, both centered) — no more hand-measured
+          absolute offsets that silently drift off the true frame center (Block 6). */}
       <AbsoluteFill
         style={{
-          display: "grid",
-          placeItems: "center",
-          padding: "60px 120px",
+          padding: `${theme.safeArea.y}px ${theme.safeArea.x}px`,
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          gap: 68,
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
+        {/* 第三屏文字：理念 + reveal caption */}
+        <div style={{ width: "100%", maxWidth: LAYOUT.textMaxWidth.topCenter, textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: 92,
+              lineHeight: 1.1,
+              fontWeight: 850,
+              letterSpacing: 0,
+              color: "#111827",
+              opacity: ideaText,
+              transform: `translateY(${(1 - ideaText) * 20}px)`,
+            }}
+          >
+            {sceneCopy["nearer-concept"].headline.map((line) => (
+              <div key={line}>{line}</div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              marginTop: 28,
+              fontSize: 42,
+              lineHeight: 1.25,
+              fontWeight: 720,
+              letterSpacing: 0,
+              color: "#334155",
+              opacity: revealText,
+              transform: `translateY(${(1 - revealText) * 16}px)`,
+            }}
+          >
+            {sceneCopy["nearer-concept"].caption || "Ringflow 出现在光标旁边。"}
+          </div>
+        </div>
+
+        {/* 桌面上下文 + 真实使用场景中的召唤：文档在左，轮盘在右，整组居中 */}
         <div
           style={{
             position: "relative",
-            width: 1400,
-            height: 800,
+            width: GROUP_WIDTH,
+            height: GROUP_HEIGHT,
+            pointerEvents: "none",
           }}
         >
-          {/* 第三屏文字：理念 + reveal caption — flow-stacked so caption never overlaps headline */}
-          <div
-            style={{
-              position: "absolute",
-              top: 40,
-              left: 0,
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 92,
-                lineHeight: 1.1,
-                fontWeight: 850,
-                letterSpacing: 0,
-                color: "#111827",
-                opacity: ideaText,
-                transform: `translateY(${(1 - ideaText) * 20}px)`,
-              }}
-            >
-              {sceneCopy["nearer-concept"].headline.map((line) => (
-                <div key={line}>{line}</div>
-              ))}
-            </div>
-
-            <div
-              style={{
-                marginTop: 28,
-                fontSize: 42,
-                lineHeight: 1.25,
-                fontWeight: 720,
-                letterSpacing: 0,
-                color: "#334155",
-                opacity: revealText,
-                transform: `translateY(${(1 - revealText) * 16}px)`,
-              }}
-            >
-              {sceneCopy["nearer-concept"].caption || "Ringflow 出现在光标旁边。"}
-            </div>
+          {/* Active document window — fixed size, consistent with layout rules */}
+          <div style={{ position: "absolute", left: 0, top: 0 }}>
+            <MacWindow title="项目计划.md" width={420} height={280}>
+              <div style={{ fontSize: 16, lineHeight: 1.65, color: "#334155" }}>
+                订阅状态刷新需要处理 loading、error、过期三种情况。<br />
+                <span style={{ background: "rgba(47,127,211,0.18)", padding: "1px 5px", borderRadius: 3 }}>下次同步前确认三件事</span> 已记录在会议纪要中。
+              </div>
+            </MacWindow>
           </div>
 
-          {/* 桌面上下文 + 真实使用场景中的召唤：使用固定布局常量 (hero) */}
+          {/* Wheel — hero size via helper, placed right of document using more predictable offset */}
           <div
             style={{
               position: "absolute",
-              left: LAYOUT.width / 2 - 220,
-              top: LAYOUT.height / 2 - 120,
-              width: LAYOUT.stage.center.width * 0.58,
-              height: LAYOUT.stage.center.height * 0.68,
-              pointerEvents: "none",
+              left: 360,
+              top: 35,
+              opacity: wheelOpacity * finalHold,
+              ...getWheelWrapperStyle('hero'),
+              transform: `scale(${wheelScale})`,
+              transformOrigin: "center",
             }}
           >
-            {/* Active document window — fixed size, consistent with layout rules */}
-            <div style={{ position: "absolute", left: 0, top: 0 }}>
-              <MacWindow title="项目计划.md" width={420} height={280}>
-                <div style={{ fontSize: 16, lineHeight: 1.65, color: "#334155" }}>
-                  订阅状态刷新需要处理 loading、error、过期三种情况。<br />
-                  <span style={{ background: "rgba(47,127,211,0.18)", padding: "1px 5px", borderRadius: 3 }}>下次同步前确认三件事</span> 已记录在会议纪要中。
-                </div>
-              </MacWindow>
-            </div>
+            <RingflowWheel
+              activeSegment="quick-input"
+              centerLabel="Ringflow"
+              showCursorReveal={false}
+              revealProgress={wheelReveal}
+              glowProgress={highlight}
+            />
+          </div>
 
-            {/* Wheel — hero size via helper, placed right of document using more predictable offset */}
-            <div
-              style={{
-                position: "absolute",
-                left: 360,
-                top: 35,
-                opacity: wheelOpacity * finalHold,
-                ...getWheelWrapperStyle('hero'),
-                transform: `scale(${wheelScale})`,
-                transformOrigin: "center",
-              }}
-            >
-              <RingflowWheel
-                activeSegment="quick-input"
-                centerLabel="Ringflow"
-                showCursorReveal={false}
-                revealProgress={wheelReveal}
-                glowProgress={highlight}
-              />
-            </div>
-
-            {/* Cursor inside the document */}
-            <div style={{ position: "absolute", left: 160, top: 115, opacity: cursorReveal * finalHold }}>
-              <Cursor x={cursorX - 100} y={cursorY - 80} scale={0.95} trail={trail} />
-            </div>
+          {/* Cursor inside the document, in the SAME local coordinate space as the
+              document (0,0) and wheel (360,35) above — was previously computed from
+              full-canvas center coordinates, which pushed it off to the frame edge
+              and made it effectively invisible (Block 6 fix). */}
+          <div style={{ position: "absolute", left: 0, top: 0, opacity: cursorReveal * finalHold }}>
+            <Cursor x={cursorX} y={cursorY} scale={0.95} trail={trail} />
           </div>
         </div>
       </AbsoluteFill>
