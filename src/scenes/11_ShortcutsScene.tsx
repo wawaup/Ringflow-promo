@@ -23,13 +23,17 @@ export const ShortcutsScene = () => {
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  const card1Reveal = interpolate(frame, [c.actionStartFrame, c.actionStartFrame + 20], [0, 1], {
+  // Feature cards are the "result" proving what the highlighted shortcut does —
+  // must not fill in before the highlight leads (Wheel Conductor rule, Block 6).
+  const resultStart = (c.wheelHighlightEndFrame ?? 95) - 8;
+
+  const card1Reveal = interpolate(frame, [resultStart, resultStart + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
 
-  const card2Reveal = interpolate(frame, [c.actionStartFrame + 18, c.actionStartFrame + 42], [0, 1], {
+  const card2Reveal = interpolate(frame, [resultStart + 18, resultStart + 42], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),

@@ -985,6 +985,9 @@ export const MonitorDashboard = ({ choreography }: { choreography?: { wheelStart
 
   const wheelReveal = interpolate(frame, [c.wheelStartFrame ?? 40, (c.wheelStartFrame ?? 40) + 25], [0, 1], { extrapolateLeft: "clamp" });
   const highlight = interpolate(frame, [c.wheelHighlightStartFrame ?? 55, c.wheelHighlightEndFrame ?? 85], [0, 1], { extrapolateLeft: "clamp" });
+  // Metric cards are the "result" that proves what the highlighted sector does —
+  // must not fill in before the highlight leads (Wheel Conductor rule, Block 6).
+  const resultStart = (c.wheelHighlightEndFrame ?? 85) - 8;
 
   return (
     <div style={{ position: "relative", display: "flex", flexDirection: "row", alignItems: "center", gap: 40 }}>
@@ -997,13 +1000,13 @@ export const MonitorDashboard = ({ choreography }: { choreography?: { wheelStart
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
           {metrics.map(({ label, value, raw, color }, index) => {
-            const tCard = interpolate(frame, [index * 7, index * 7 + 20], [0, 1], {
+            const tCard = interpolate(frame, [resultStart + index * 6, resultStart + index * 6 + 16], [0, 1], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
               easing: Easing.bezier(0.16, 1, 0.3, 1),
             });
-            const barStart = index * 7 + 14;
-            const barFill = interpolate(frame, [barStart, barStart + 24], [0, raw], {
+            const barStart = resultStart + index * 6 + 10;
+            const barFill = interpolate(frame, [barStart, barStart + 20], [0, raw], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
               easing: Easing.bezier(0.4, 0, 0.2, 1),
@@ -1079,7 +1082,10 @@ const PROFILES = [
 export const AppConfigurationScreenshot = ({ choreography }: { choreography?: { wheelStartFrame?: number; wheelHighlightStartFrame?: number; wheelHighlightEndFrame?: number } } = {}) => {
   const frame = useCurrentFrame();
   const c = choreography || {};
-  const panelReveal = interpolate(frame, [0, 20], [0, 1], {
+  // The profile cards are the "result" proving what app-profile switching does —
+  // must not fill in before the wheel's highlight leads (Wheel Conductor rule, Block 6).
+  const resultStart = (c.wheelHighlightStartFrame ?? 90) - 8;
+  const panelReveal = interpolate(frame, [resultStart, resultStart + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -1109,7 +1115,7 @@ export const AppConfigurationScreenshot = ({ choreography }: { choreography?: { 
         }}
       >
         {PROFILES.map((profile, pi) => {
-          const cardReveal = interpolate(frame, [pi * 10, pi * 10 + 22], [0, 1], {
+          const cardReveal = interpolate(frame, [resultStart + pi * 10, resultStart + pi * 10 + 22], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
             easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -1161,7 +1167,7 @@ export const AppConfigurationScreenshot = ({ choreography }: { choreography?: { 
               {/* Action list */}
               <div style={{ padding: "12px 14px", display: "grid", gap: 7 }}>
                 {profile.actions.map((action, ai) => {
-                  const itemReveal = interpolate(frame, [pi * 10 + ai * 5 + 14, pi * 10 + ai * 5 + 28], [0, 1], {
+                  const itemReveal = interpolate(frame, [resultStart + pi * 10 + ai * 5 + 14, resultStart + pi * 10 + ai * 5 + 28], [0, 1], {
                     extrapolateLeft: "clamp",
                     extrapolateRight: "clamp",
                     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -1222,7 +1228,10 @@ export const PresetLibraryShowcase = ({ choreography }: { choreography?: { wheel
   const frame = useCurrentFrame();
   const c = choreography || {};
 
-  const panelReveal = interpolate(frame, [0, 20], [0, 1], {
+  // Preset rows are the "result" proving what the highlighted sector applies —
+  // must not fill in before the wheel's highlight leads (Wheel Conductor rule, Block 6).
+  const resultStart = (c.wheelHighlightStartFrame ?? 90) - 8;
+  const panelReveal = interpolate(frame, [resultStart, resultStart + 20], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.16, 1, 0.3, 1),
@@ -1259,7 +1268,7 @@ export const PresetLibraryShowcase = ({ choreography }: { choreography?: { wheel
       >
         <div style={{ fontSize: 24, color: "#64748b", fontWeight: 720, marginBottom: 22 }}>预设库</div>
         {presets.map((preset, index) => {
-          const t = interpolate(frame, [10 + index * 10, 10 + index * 10 + 20], [0, 1], {
+          const t = interpolate(frame, [resultStart + 10 + index * 10, resultStart + 10 + index * 10 + 20], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
             easing: Easing.bezier(0.16, 1, 0.3, 1),
