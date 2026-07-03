@@ -1,144 +1,136 @@
 import type { ReactNode } from "react";
-import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { PromoBackground } from "../components/Background/PromoBackground";
 import { PromoText } from "../components/Text/PromoText";
+import { LAYOUT } from "../config/layout";
+import { scenePushIn, sceneTransition } from "../config/motion";
 import { theme } from "../config/theme";
-import { LAYOUT, getWheelPlacementStyle, WHEEL_SIZE } from "../config/layout";
-import type { SceneChoreography, SceneLayout } from "../config/timeline";
+import { sceneCopy } from "../config/copy";
+import type { SceneTiming } from "../config/timeline";
 
 type SceneShellProps = {
-  lines: string[];
+  /** Timing entry from config/timeline — drives transition, layout and choreography. */
+  scene: SceneTiming;
+  /** Override headline lines (defaults to sceneCopy[scene.id]). */
+  lines?: string[];
   caption?: string;
   mode?: "light" | "dark";
-  align?: "left" | "center";
-  layout?: SceneLayout;
-  choreography?: SceneChoreography;
-  children?: ReactNode;
-  /** Delay in frames before children when choreography is not provided. */
-  childrenDelay?: number;
+  /** Brand gradient headline (reveal / outro). */
+  gradient?: boolean;
+  /** Extra blue ambience 0..1 for hero moments. */
+  ambience?: number;
+  /** Render no headline block at all (scene draws its own text). */
+  hideText?: boolean;
+  headlineSize?: number;
+  captionSize?: number;
   stageWidth?: number;
   stageHeight?: number;
-  textLineStagger?: number;
+  /** Camera push-in amount across the scene (0 disables). */
+  pushIn?: number;
+  children?: ReactNode;
 };
 
+/**
+ * SceneShell v2 — one visual grammar for the whole film:
+ * cross-dissolve in/out (SCENE_OVERLAP), slow camera push-in, flex-flow text
+ * (headline and caption can never overlap), and a centered visual stage.
+ */
 export const SceneShell = ({
+  scene,
   lines,
   caption,
   mode = "light",
-  align = "left",
-  layout,
-  choreography,
-  children,
-  childrenDelay = 8,
+  gradient = false,
+  ambience = 0,
+  hideText = false,
+  headlineSize,
+  captionSize,
   stageWidth,
   stageHeight,
-  textLineStagger = 6,
+  pushIn = 0.03,
+  children,
 }: SceneShellProps) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const resolvedLayout: SceneLayout = layout ?? (align === "center" ? "center-stage" : "left-stage");
-  const textAlign = resolvedLayout === "center-stage" || resolvedLayout === "top-stage" ? "center" : align;
-  const textStartFrame = choreography?.textStartFrame ?? 0;
-  const visualStartFrame = choreography?.visualStartFrame ?? childrenDelay;
+  const layout = scene.layout;
+  const c = scene.choreography;
+  const copy = sceneCopy[scene.id];
+  const resolvedLines = lines ?? copy.headline;
+  const resolvedCaption = caption ?? copy.caption;
 
-  // Background subtle fade
-  const bgOpacity = interpolate(frame, [0, 12], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
+  const totalFrames = scene.durationInFrames + scene.overlapWithNextFrames;
+  const transition = sceneTransition(frame, totalFrames);
+  const camera = pushIn > 0 ? scenePushIn(frame, totalFrames, pushIn) : 1;
 
-  // Right-side children: spring in slightly after text
   const childrenReveal = spring({
-    frame: Math.max(0, frame - visualStartFrame),
+    frame: Math.max(0, frame - c.visualStartFrame),
     fps,
-    config: { damping: 24, stiffness: 170, mass: 0.95 },
-    durationInFrames: 30,
+    config: { damping: 26, stiffness: 160, mass: 0.9 },
+    durationInFrames: 32,
   });
+  const childrenLift = interpolate(childrenReveal, [0, 1], [40, 0]);
 
-  const childrenLift = interpolate(childrenReveal, [0, 1], [36, 0]);
-
-  // Use fixed layout constants for consistency (no arbitrary sizes)
-  const visualStageWidth = stageWidth ?? (resolvedLayout === "left-stage" 
-    ? LAYOUT.stage.left.width 
-    : LAYOUT.stage.top.width);
-  const visualStageHeight = stageHeight ?? (resolvedLayout === "left-stage" 
-    ? LAYOUT.stage.left.height 
-    : LAYOUT.stage.top.height);
+  const isRow = layout === "left-stage";
+  const resolvedStageWidth = stageWidth ?? (isRow ? LAYOUT.stage.left.width : LAYOUT.stage.top.width);
+  const resolvedStageHeight = stageHeight ?? (isRow ? LAYOUT.stage.left.height : LAYOUT.stage.top.height);
+  const textAlign = isRow ? "left" : "center";
 
   return (
-    <AbsoluteFill>
-      <PromoBackground mode={mode} />
-      <div style={{ opacity: bgOpacity, position: "absolute", inset: 0 }}>
-        <AbsoluteFill
-          style={{
-            padding: `${theme.safeArea.y}px ${theme.safeArea.x}px`,
-            boxSizing: "border-box",
-            display: "flex",
-            flexDirection:
-              resolvedLayout === "left-stage" ? "row" : "column",
-            gap:
-              resolvedLayout === "center-stage" ? 68 : resolvedLayout === "top-stage" ? 58 : 80,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+    <AbsoluteFill style={{ opacity: transition.opacity }}>
+      <PromoBackground mode={mode} ambience={ambience} />
+      <AbsoluteFill
+        style={{
+          padding: `${theme.safeArea.y}px ${theme.safeArea.x}px`,
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: isRow ? "row" : "column",
+          gap: isRow ? 72 : 56,
+          alignItems: "center",
+          justifyContent: "center",
+          scale: String(transition.scale * camera),
+          transformOrigin: "center 46%",
+        }}
+      >
+        {!hideText ? (
           <div
             style={{
-              width:
-                resolvedLayout === "left-stage"
-                  ? 700
-                  : resolvedLayout === "top-stage"
-                    ? "100%"
-                    : "100%",
-              maxWidth:
-                resolvedLayout === "left-stage"
-                  ? 700
-                  : resolvedLayout === "top-stage"
-                    ? 1320
-                    : 1320,
+              width: isRow ? LAYOUT.textMaxWidth.left : "100%",
+              maxWidth: isRow ? LAYOUT.textMaxWidth.left : LAYOUT.textMaxWidth.topCenter,
               display: "flex",
-              alignItems: "center",
-              justifyContent: resolvedLayout === "left-stage" ? "flex-start" : "center",
-              minHeight: resolvedLayout === "left-stage" ? visualStageHeight : "auto",
+              justifyContent: isRow ? "flex-start" : "center",
+              flex: "none",
             }}
           >
             <PromoText
-              lines={lines}
-              caption={caption}
+              lines={resolvedLines}
+              caption={resolvedCaption}
               mode={mode}
               align={textAlign}
-              // Enforce fixed text sizes and max widths from layout constants
-              size={resolvedLayout === "top-stage" ? LAYOUT.text.headlineTop : LAYOUT.text.headline}
-              captionSize={resolvedLayout === "top-stage" ? LAYOUT.text.captionTop : LAYOUT.text.caption}
-              maxWidth={resolvedLayout === "left-stage" ? LAYOUT.textMaxWidth.left : LAYOUT.textMaxWidth.topCenter}
-              startFrame={textStartFrame}
-              lineStagger={textLineStagger}
-              scale={1} // Scale controlled centrally now
+              gradient={gradient}
+              size={headlineSize ?? (layout === "top-stage" ? LAYOUT.text.headlineBeat : LAYOUT.text.headline)}
+              captionSize={captionSize ?? (layout === "top-stage" ? LAYOUT.text.captionBeat : LAYOUT.text.caption)}
+              maxWidth={isRow ? LAYOUT.textMaxWidth.left : LAYOUT.textMaxWidth.topCenter}
+              startFrame={c.textStartFrame}
             />
           </div>
+        ) : null}
 
-          {children ? (
-            <div
-              style={{
-                width: visualStageWidth,
-                height: visualStageHeight,
-                maxWidth: "calc(100vw - 240px)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: childrenReveal,
-                transform:
-                  resolvedLayout === "left-stage"
-                    ? `translateX(${childrenLift}px)`
-                    : `translateY(${childrenLift}px)`,
-              }}
-            >
-              {children}
-            </div>
-          ) : null}
-        </AbsoluteFill>
-      </div>
+        {children ? (
+          <div
+            style={{
+              width: resolvedStageWidth,
+              height: resolvedStageHeight,
+              display: "grid",
+              placeItems: "center",
+              opacity: childrenReveal,
+              transform: isRow ? `translateX(${childrenLift}px)` : `translateY(${childrenLift}px)`,
+              flex: "none",
+            }}
+          >
+            {children}
+          </div>
+        ) : null}
+      </AbsoluteFill>
     </AbsoluteFill>
   );
 };

@@ -72,13 +72,10 @@ export const QUICK_OPEN_TARGETS = [
   { label: "Project Folder", desc: "项目目录" },
 ];
 
+// Matches ActionItem.defaultGlobalStickyNotes() in the mac app
 export const STICKY_NOTE_EXAMPLE = {
   title: "会议要点",
-  items: [
-    "订阅状态刷新点",
-    "设备解绑入口",
-    "预设导入后的默认轮盘",
-  ],
+  items: ["讨论主题", "关键结论", "待办事项"],
 };
 
 export const MACRO_STEPS = [
@@ -118,23 +115,42 @@ export const APP_PROFILES = [
   },
 ];
 
+// Preset library cards — categories match the official website (/presets)
 export const PRESETS = [
   {
-    name: "AI 写作助手",
-    desc: "提示词 + 便签 + 总结",
-    status: "应用中",
-  },
-  {
-    name: "开发者工作流",
-    desc: "Shell + 宏序列 + 监视器",
+    name: "开发环境",
+    desc: "脚本 · 终端 · Git 流程",
     status: "导入",
   },
   {
-    name: "会议记录整理",
-    desc: "便签 + 总结 + 快捷指令",
+    name: "写作助手",
+    desc: "提示词 · 润色 · 便签",
+    status: "导入",
+  },
+  {
+    name: "终端效率",
+    desc: "常用命令 · 监视器",
     status: "导入",
   },
 ];
+
+/** Preset-library shot: three-step flow shown as chips. */
+export const PRESET_FLOW_STEPS = ["下载 JSON", "一键导入", "开始使用"] as const;
+
+/**
+ * Group-ring shot: the real "常用提示词" folder holding the app's five default
+ * text actions (ActionItem.defaultLibrary text items).
+ */
+export const GROUP_RING_EXAMPLE = {
+  folderLabel: "提示词",
+  items: REAL_TEXT_PROMPTS,
+};
+
+/** Outro CTA copy. */
+export const OUTRO_CTA = {
+  primary: "免费下载",
+  secondary: "浏览轮盘预设",
+};
 
 export const SHORTCUTS_EXAMPLE = {
   action: "发送到手机",

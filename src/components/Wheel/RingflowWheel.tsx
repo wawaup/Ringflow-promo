@@ -37,6 +37,10 @@ type RingflowWheelProps = {
   folderHighlightIndex?: number | null;
   folderProgress?: number;
   folderRotation?: number;
+  /** Override the 8 main sectors (defaults to the app's real default wheel). */
+  mainSlots?: readonly SiteWheelSlot[];
+  /** Override the outer folder ring sectors. */
+  folderSlots?: readonly (SiteWheelSlot | null)[];
 };
 
 const clamp01 = (value: number): number => Math.min(Math.max(value, 0), 1);
@@ -266,6 +270,8 @@ export const RingflowWheel = ({
   folderHighlightIndex,
   folderProgress,
   folderRotation = 0,
+  mainSlots = MAIN_SLOTS,
+  folderSlots = FOLDER_SLOTS,
 }: RingflowWheelProps) => {
   const rawId = useId();
   const idPrefix = `ringflow-wheel-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -402,7 +408,7 @@ export const RingflowWheel = ({
                 strokeWidth={0.8}
                 opacity={dark ? 0.75 : palette.folderGlassOpacity}
               />
-              {FOLDER_SLOTS.map((slot, index) => {
+              {folderSlots.map((slot, index) => {
                 if (!slot) return null;
                 const itemReveal = showSegmentStagger
                   ? interpolate(outerRingProgress, [0, Math.min(1, 0.48 + index * 0.065), 1], [0, 0.35, reveal], {
@@ -459,7 +465,7 @@ export const RingflowWheel = ({
             />
           </g>
 
-          {MAIN_SLOTS.map((slot, index) => {
+          {mainSlots.map((slot, index) => {
             const itemReveal = showSegmentStagger
               ? interpolate(frame, [revealFrame + index * stagger, revealFrame + index * stagger + 12], [0, reveal], {
                   extrapolateLeft: "clamp",
@@ -509,7 +515,7 @@ export const RingflowWheel = ({
           <g opacity={reveal}>
             <circle cx={center.x} cy={center.y} r={outer} fill="none" stroke={palette.ringOutline} strokeWidth={1} />
             <circle cx={center.x} cy={center.y} r={inner} fill="none" stroke={palette.ringOutline} strokeWidth={1} />
-            {MAIN_SLOTS.map((slot, index) => {
+            {mainSlots.map((slot, index) => {
               const angle = -Math.PI / 2 + ((2 * Math.PI) / wheelConfig.sectorCount) * index;
               const innerPoint = polarPoint(center, inner, angle);
               const outerPoint = polarPoint(center, outer, angle);

@@ -23,7 +23,15 @@ export type SiteWheelIconName =
   | "arrow.left.arrow.right"
   | "text.append"
   | "text.bubble.fill"
-  | "gauge.with.dots.needle.67percent";
+  | "gauge.with.dots.needle.67percent"
+  | "keyboard"
+  | "square.grid.2x2"
+  | "bolt.fill"
+  | "globe"
+  | "play.fill"
+  | "camera.fill"
+  | "mic.slash"
+  | "arrow.up.circle";
 
 export const MAIN_SLOTS = [
   { label: "复制", icon: "doc.on.doc" },
@@ -80,7 +88,96 @@ export const SITE_WHEEL_ICON_PATHS: Record<SiteWheelIconName, string> = {
     '<path d="M5 6.6a2.6 2.6 0 0 1 2.6-2.6h8.8A2.6 2.6 0 0 1 19 6.6v5.2a2.6 2.6 0 0 1-2.6 2.6h-4.7L8 17.6v-3.2h-.4A2.6 2.6 0 0 1 5 11.8z" fill="currentColor"/><path d="M8.2 8h7.6M8.2 10.8h4.8" stroke="white" stroke-width="1.25" stroke-linecap="round" opacity="0.85"/>',
   "gauge.with.dots.needle.67percent":
     '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 5.5v6.5l4 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+  keyboard:
+    '<rect x="3.2" y="6.4" width="17.6" height="11.2" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.2 9.6h.02M9.4 9.6h.02M12.6 9.6h.02M15.8 9.6h.02M6.2 12.4h.02M9.4 12.4h.02M12.6 12.4h.02M15.8 12.4h.02M17.8 9.6h.02M17.8 12.4h.02" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M7.4 15.1h9.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+  "square.grid.2x2":
+    '<rect x="4" y="4" width="7" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.8" fill="currentColor"/>',
+  "bolt.fill":
+    '<path d="M13.4 3.2 5.8 13.1h4.5l-1.7 7.7 7.6-9.9h-4.5z" fill="currentColor" stroke="currentColor" stroke-width="0.8" stroke-linejoin="round"/>',
+  globe:
+    '<circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="3.9" ry="8.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M3.6 12h16.8M4.7 8h14.6M4.7 16h14.6" stroke="currentColor" stroke-width="1.3"/>',
+  "play.fill":
+    '<path d="M8 5.4c0-1 1.1-1.6 2-1.1l9.2 6.6c.8.5.8 1.7 0 2.2L10 19.7c-.9.5-2-.1-2-1.1z" fill="currentColor"/>',
+  "camera.fill":
+    '<path d="M4.6 7.6h3l1.3-1.9c.3-.4.7-.6 1.2-.6h3.8c.5 0 .9.2 1.2.6l1.3 1.9h3a1.6 1.6 0 0 1 1.6 1.6v8.2a1.6 1.6 0 0 1-1.6 1.6H4.6A1.6 1.6 0 0 1 3 17.4V9.2a1.6 1.6 0 0 1 1.6-1.6z" fill="currentColor"/><circle cx="12" cy="13" r="3.2" fill="white" opacity="0.9"/>',
+  "mic.slash":
+    '<rect x="9.4" y="3.6" width="5.2" height="9.4" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.4 11.4a5.6 5.6 0 0 0 11.2 0M12 17v3.4M9.4 20.4h5.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.8 4.8 19.2 19.2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>',
+  "arrow.up.circle":
+    '<circle cx="12" cy="12" r="8.6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 16.2V8.4M8.6 11.4 12 8l3.4 3.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
 };
+
+/**
+ * Showcase wheel for the feature-run + group-ring scenes: one sector per
+ * action type (product vocabulary, matching the website's feature cards),
+ * plus the group folder at index 7. Highlight sweeps clockwise, one beat per
+ * sector, and the folder sector hands over to the group-ring scene.
+ */
+export const SHOWCASE_SLOTS = [
+  { label: "快捷键", icon: "keyboard" },
+  { label: "快捷输入", icon: "pencil.line" },
+  { label: "快捷打开", icon: "square.grid.2x2" },
+  { label: "便签", icon: "note.text" },
+  { label: "脚本", icon: "terminal.fill" },
+  { label: "指令", icon: "bolt.fill" },
+  { label: "监视器", icon: "gauge.with.dots.needle.67percent" },
+  { label: "提示词", icon: "folder.fill", isFolder: true },
+] as const satisfies readonly SiteWheelSlot[];
+
+/** App-profile wheels for the "不同应用，自动换轮盘" scene. */
+export type ProfileWheel = {
+  app: string;
+  role: string;
+  presetName: string;
+  slots: readonly SiteWheelSlot[];
+};
+
+export const PROFILE_WHEELS: readonly ProfileWheel[] = [
+  {
+    app: "Notion",
+    role: "写作",
+    presetName: "写作",
+    slots: [
+      { label: "润色改写", icon: "pencil.line" },
+      { label: "总结提炼", icon: "text.alignleft" },
+      { label: "翻译", icon: "globe" },
+      { label: "粘贴", icon: "doc.on.clipboard" },
+      { label: "便签", icon: "note.text" },
+      { label: "保存", icon: "square.and.arrow.down" },
+      { label: "全选", icon: "selection.pin.in.out" },
+      { label: "提示词", icon: "folder.fill", isFolder: true },
+    ],
+  },
+  {
+    app: "Cursor",
+    role: "开发",
+    presetName: "开发",
+    slots: [
+      { label: "运行测试", icon: "play.fill" },
+      { label: "脚本", icon: "terminal.fill" },
+      { label: "Git Push", icon: "arrow.up.circle" },
+      { label: "复制", icon: "doc.on.doc" },
+      { label: "粘贴", icon: "doc.on.clipboard" },
+      { label: "保存", icon: "square.and.arrow.down" },
+      { label: "监视器", icon: "gauge.with.dots.needle.67percent" },
+      { label: "指令", icon: "bolt.fill" },
+    ],
+  },
+  {
+    app: "Zoom",
+    role: "会议",
+    presetName: "会议",
+    slots: [
+      { label: "新便签", icon: "note.text" },
+      { label: "截图", icon: "camera.fill" },
+      { label: "静音", icon: "mic.slash" },
+      { label: "复制", icon: "doc.on.doc" },
+      { label: "粘贴", icon: "doc.on.clipboard" },
+      { label: "指令", icon: "bolt.fill" },
+      { label: "监视器", icon: "gauge.with.dots.needle.67percent" },
+      { label: "要点", icon: "folder.fill", isFolder: true },
+    ],
+  },
+] as const;
 
 const LEGACY_SEGMENT_TO_SITE_INDEX: Record<WheelSegmentId, number> = {
   "copy": 0,

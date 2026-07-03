@@ -7,7 +7,7 @@
     "start": "remotion studio src/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-transform-types --test",
-    "check:timeline": "node scripts/check-timeline.mjs",
+    "check:timeline": "node --experimental-transform-types scripts/check-timeline.mjs",
     "build": "pnpm run typecheck && pnpm run test && pnpm run check:timeline",
     "still": "remotion still src/index.ts RingflowPromo out/stills/frame-900.png --frame=900 --scale=0.5",
     "stills": "node scripts/render-stills.mjs",

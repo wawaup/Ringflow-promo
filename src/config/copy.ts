@@ -1,5 +1,13 @@
 import type { SceneId } from "./timeline";
 
+/**
+ * Ringflow Promo — Film copy deck.
+ *
+ * All wording aligns with the official website (Ringflow-web):
+ * 「围绕光标的快捷操作轮盘」「按住拖动，移向目标，松手执行」「唤出 · 选择 · 执行」.
+ * One idea per shot; short lines; feature names use the product's own vocabulary.
+ */
+
 export type SceneCopy = {
   headline: string[];
   caption?: string;
@@ -7,58 +15,63 @@ export type SceneCopy = {
 };
 
 export const sceneCopy: Record<SceneId, SceneCopy> = {
-  "intro-focus": {
-    headline: ["正在做的事，", "应该保持连贯。"],
-    uiLabels: ["Prompt 模板", "正文草稿", "灵感片段"],
-  },
   friction: {
-    headline: ["找来找去。", "来回切换。", "一遍又一遍。"],
-    uiLabels: ["菜单", "二级菜单", "窗口切换"],
+    headline: ["找菜单。", "切窗口。", "一遍又一遍。"],
   },
-  "nearer-concept": {
-    headline: ["常用的，", "应该更近一点。"],
-    caption: "Ringflow 出现在光标旁边。",
+  turn: {
+    headline: ["常用的操作，", "应该就在手边。"],
   },
-  "core-gesture": {
-    headline: ["按住中键，", "向右一划。"],
+  reveal: {
+    headline: ["Ringflow"],
+    caption: "围绕光标的快捷操作轮盘",
   },
-  "quick-input": {
-    headline: ["常用文字，一划输入。"],
-    uiLabels: ["润色改写", "总结提炼", "Prompt inserted · 剪贴板已恢复"],
+  gesture: {
+    // Three beats, lit word by word (choreography.wordFrames)
+    headline: ["按住拖动", "移向目标", "松手执行"],
+    caption: "触控板同样可以：按住 ⇧⌃ 移动光标",
   },
-  "quick-open": {
-    headline: ["常用应用、文件、文件夹，一划打开。"],
-    uiLabels: ["新应用", "新文件", "新文件夹"],
+  umbrella: {
+    headline: ["把常用操作，放进轮盘。"],
   },
-  "sticky-note": {
-    headline: ["灵感，不必打断。"],
-    uiLabels: ["会议要点", "下次同步前确认三件事"],
+  "feature-run": {
+    // Per-beat copy lives in FEATURE_BEATS below
+    headline: [],
   },
-  "macro-sequence": {
-    headline: ["复杂流程，", "一次划动。"],
-    uiLabels: ["复制", "切换应用", "粘贴", "保存"],
-  },
-  "shell-script": {
-    headline: ["脚本，也可以一划运行。"],
-    uiLabels: ["pnpm run build", "Done in 2.4s"],
-  },
-  shortcuts: {
-    headline: ["已有的自动化，也能更近一点。"],
-    uiLabels: ["发送到手机", "快捷指令完成"],
-  },
-  monitor: {
-    headline: ["状态，一眼看到。"],
-    uiLabels: ["CPU", "内存", "网速", "电池"],
+  "group-ring": {
+    headline: ["分组外环，装下更多。"],
+    caption: "悬停展开，离开收起",
   },
   "app-profiles": {
-    headline: ["不同 App，", "不同轮盘。"],
-    uiLabels: ["写作", "开发", "会议"],
+    headline: ["不同应用，自动换轮盘。"],
+    caption: "按前台应用，匹配最合适的布局",
   },
   "preset-library": {
-    headline: ["下载。导入。开始使用。"],
-    uiLabels: ["AI 写作助手", "开发者工作流", "会议记录整理"],
+    headline: ["不想从零编排？"],
+    caption: "预设库，一键导入",
   },
   outro: {
-    headline: ["让 Mac 操作，", "更接近直觉。", "Ringflow"],
+    headline: ["唤出 · 选择 · 执行"],
+    caption: "免费下载，开始使用",
   },
 };
+
+/** One beat of the feature run: headline + sub line + which showcase sector lights up. */
+export type FeatureBeat = {
+  id: string;
+  /** Big word (feature name, product vocabulary) */
+  headline: string;
+  /** One-line value statement (from website feature cards) */
+  sub: string;
+  /** Index into SHOWCASE_SLOTS (siteWheelModel) — highlight sweeps clockwise */
+  wheelIndex: number;
+};
+
+export const FEATURE_BEATS: readonly FeatureBeat[] = [
+  { id: "hotkey", headline: "快捷键", sub: "复制、粘贴、保存，一划即达", wheelIndex: 0 },
+  { id: "quick-input", headline: "快捷输入", sub: "固定回复与提示词，一划贴入", wheelIndex: 1 },
+  { id: "quick-open", headline: "快捷打开", sub: "应用、文件、文件夹，无需切换窗口", wheelIndex: 2 },
+  { id: "sticky-note", headline: "便签", sub: "灵感随取随记", wheelIndex: 3 },
+  { id: "shell", headline: "Shell 脚本", sub: "自动化命令，一划运行", wheelIndex: 4 },
+  { id: "shortcuts", headline: "快捷指令", sub: "系统里的自动化，直接调用", wheelIndex: 5 },
+  { id: "monitor", headline: "监视器", sub: "CPU、内存、网络，一眼看到", wheelIndex: 6 },
+] as const;

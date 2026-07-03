@@ -1,36 +1,28 @@
 import { Audio } from "@remotion/media";
-import { AbsoluteFill, Sequence, staticFile } from "remotion";
+import { AbsoluteFill, Sequence, interpolate, staticFile } from "remotion";
 import { assets } from "./config/assets";
-import { scenes, type SceneId } from "./config/timeline";
+import { composition, scenes, type SceneId } from "./config/timeline";
 import {
   AppProfilesScene,
-  CoreGestureScene,
+  FeatureRunScene,
   FrictionScene,
-  IntroFocusScene,
-  MacroSequenceScene,
-  MonitorScene,
-  NearerConceptScene,
+  GestureScene,
+  GroupRingScene,
   OutroScene,
   PresetLibraryScene,
-  QuickInputScene,
-  QuickOpenScene,
-  ShellScriptScene,
-  ShortcutsScene,
-  StickyNoteScene,
+  RevealScene,
+  TurnScene,
+  UmbrellaScene,
 } from "./scenes";
 
 const SCENE_MAP: Record<SceneId, React.ComponentType> = {
-  "intro-focus": IntroFocusScene,
   friction: FrictionScene,
-  "nearer-concept": NearerConceptScene,
-  "core-gesture": CoreGestureScene,
-  "quick-input": QuickInputScene,
-  "quick-open": QuickOpenScene,
-  "sticky-note": StickyNoteScene,
-  "macro-sequence": MacroSequenceScene,
-  "shell-script": ShellScriptScene,
-  shortcuts: ShortcutsScene,
-  monitor: MonitorScene,
+  turn: TurnScene,
+  reveal: RevealScene,
+  gesture: GestureScene,
+  umbrella: UmbrellaScene,
+  "feature-run": FeatureRunScene,
+  "group-ring": GroupRingScene,
   "app-profiles": AppProfilesScene,
   "preset-library": PresetLibraryScene,
   outro: OutroScene,
@@ -46,12 +38,28 @@ export const PromoFilm = () => {
           return null;
         }
         return (
-          <Sequence key={scene.id} from={scene.startFrame} durationInFrames={scene.durationInFrames}>
+          <Sequence
+            key={scene.id}
+            from={scene.startFrame}
+            // Extended past the nominal end so the next scene cross-dissolves in
+            durationInFrames={scene.durationInFrames + scene.overlapWithNextFrames}
+          >
             <Scene />
           </Sequence>
         );
       })}
-      <Audio src={staticFile(assets.audio.music)} trimBefore={120} volume={0.32} />
+      <Audio
+        src={staticFile(assets.audio.music)}
+        trimBefore={120}
+        volume={(f) =>
+          interpolate(
+            f,
+            [0, 70, composition.durationInFrames - 110, composition.durationInFrames - 10],
+            [0, 0.3, 0.3, 0],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          )
+        }
+      />
     </AbsoluteFill>
   );
 };

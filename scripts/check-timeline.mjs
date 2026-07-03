@@ -1,31 +1,25 @@
-import fs from "node:fs";
-import path from "node:path";
+import { composition, scenes } from "../src/config/timeline.ts";
 
-const timelinePath = path.join(process.cwd(), "src/config/timeline.ts");
-const source = fs.readFileSync(timelinePath, "utf8");
-
-const sceneRows = [...source.matchAll(/shot: (\d+),\s+id: "([^"]+)",\s+name: "([^"]+)",\s+durationSeconds: ([0-9.]+)/g)].map(
-  (match) => ({
-    shot: Number(match[1]),
-    id: match[2],
-    name: match[3],
-    duration: Number(match[4]),
-  }),
-);
-
-if (sceneRows.length < 1) {
+if (scenes.length < 1) {
   throw new Error("Expected at least one scene");
 }
 
-for (const scene of sceneRows) {
-  if (scene.duration <= 0) {
-    throw new Error(`Scene ${scene.shot} has invalid duration`);
+for (const scene of scenes) {
+  if (scene.durationInFrames <= 0) {
+    throw new Error(`Scene ${scene.shot} (${scene.id}) has invalid duration`);
   }
 }
 
-let totalSeconds = 0;
-for (const scene of sceneRows) {
-  totalSeconds += scene.duration;
+for (let i = 0; i < scenes.length - 1; i += 1) {
+  if (scenes[i].endFrame !== scenes[i + 1].startFrame) {
+    throw new Error(`Gap between ${scenes[i].id} and ${scenes[i + 1].id}`);
+  }
 }
 
-console.log(`Timeline OK: ${sceneRows.length} scenes, ${totalSeconds.toFixed(2)}s total.`);
+if (composition.durationSeconds >= 60) {
+  throw new Error(`Film too long: ${composition.durationSeconds}s (must stay under 60s)`);
+}
+
+console.log(
+  `Timeline OK: ${scenes.length} scenes, ${composition.durationSeconds.toFixed(2)}s total (${composition.durationInFrames} frames @ ${composition.fps}fps).`,
+);

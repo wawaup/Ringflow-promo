@@ -1,13 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { composition, scenes } from "./timeline.ts";
-
-const assertNumber = (value: number | undefined): number => {
-  if (typeof value !== "number") {
-    throw new TypeError("Expected choreography frame to be a number");
-  }
-  return value;
-};
+import {
+  FEATURE_BEAT_COUNT,
+  FEATURE_BEAT_FRAMES,
+  SCENE_OVERLAP,
+  composition,
+  scenes,
+} from "./timeline.ts";
 
 test("composition duration is derived from the final scene", () => {
   const lastScene = scenes.at(-1);
@@ -17,70 +16,57 @@ test("composition duration is derived from the final scene", () => {
   assert.equal(composition.durationSeconds, lastScene.endSeconds);
 });
 
-test("storyline timing gives demonstration scenes enough reading room", () => {
-  const coreGesture = scenes.find((scene) => scene.id === "core-gesture");
-  const quickInput = scenes.find((scene) => scene.id === "quick-input");
-  const presetLibrary = scenes.find((scene) => scene.id === "preset-library");
-
-  assert.ok(coreGesture);
-  assert.ok(quickInput);
-  assert.ok(presetLibrary);
-  assert.ok(coreGesture.durationInFrames >= 180);
-  assert.ok(quickInput.durationInFrames >= 132);
-  assert.ok(presetLibrary.durationInFrames >= 240);
+test("film stays under 60 seconds", () => {
+  assert.ok(composition.durationSeconds < 60, `film is ${composition.durationSeconds}s`);
 });
 
-test("each scene has ordered choreography phases", () => {
+test("scenes chain with no gaps and valid overlaps", () => {
+  for (let i = 0; i < scenes.length - 1; i += 1) {
+    assert.equal(scenes[i].endFrame, scenes[i + 1].startFrame, scenes[i].id);
+    assert.equal(scenes[i].overlapWithNextFrames, SCENE_OVERLAP, scenes[i].id);
+  }
+  assert.equal(scenes.at(-1)?.overlapWithNextFrames, 0);
+});
+
+test("scene ids are unique", () => {
+  const ids = scenes.map((scene) => scene.id);
+  assert.equal(new Set(ids).size, ids.length);
+});
+
+test("each scene has ordered core choreography phases", () => {
   for (const scene of scenes) {
-    assert.ok(scene.choreography.textStartFrame <= scene.choreography.visualStartFrame, scene.id);
-    assert.ok(scene.choreography.visualStartFrame <= scene.choreography.actionStartFrame, scene.id);
-    assert.ok(scene.choreography.actionStartFrame <= scene.choreography.holdStartFrame, scene.id);
-    assert.ok(scene.choreography.holdStartFrame < scene.durationInFrames, scene.id);
+    const c = scene.choreography;
+    // Brand moments may land text after the visual, but the physical
+    // visual → action → hold order always holds and fits the scene.
+    assert.ok(c.visualStartFrame <= c.actionStartFrame, scene.id);
+    assert.ok(c.actionStartFrame <= c.holdStartFrame, scene.id);
+    assert.ok(c.holdStartFrame < scene.durationInFrames, scene.id);
+    assert.ok(c.textStartFrame >= 0 && c.textStartFrame < scene.durationInFrames, scene.id);
   }
 });
 
-test("core gesture teaches mouse before showing the wheel", () => {
-  const coreGesture = scenes.find((scene) => scene.id === "core-gesture");
-
-  assert.ok(coreGesture);
-  assert.equal(coreGesture.layout, "center-stage");
-  const mouseStartFrame = assertNumber(coreGesture.choreography.mouseStartFrame);
-  const swipeStartFrame = assertNumber(coreGesture.choreography.swipeStartFrame);
-  const wheelStartFrame = assertNumber(coreGesture.choreography.wheelStartFrame);
-
-  assert.ok(mouseStartFrame < wheelStartFrame);
-  assert.ok(swipeStartFrame < wheelStartFrame);
-  assert.ok(wheelStartFrame < coreGesture.choreography.holdStartFrame);
+test("gesture scene word beats are ordered and inside the scene", () => {
+  const gesture = scenes.find((scene) => scene.id === "gesture");
+  assert.ok(gesture);
+  const words = gesture.choreography.wordFrames ?? [];
+  assert.equal(words.length, 3);
+  for (let i = 1; i < words.length; i += 1) {
+    assert.ok(words[i] > words[i - 1]);
+  }
+  assert.ok(words.at(-1)! < gesture.durationInFrames);
 });
 
-test("intro focus stages the interrupted workflow before text and clipboard actions", () => {
-  const intro = scenes.find((scene) => scene.id === "intro-focus");
+test("feature run holds seven uniform beats that fill the scene", () => {
+  const featureRun = scenes.find((scene) => scene.id === "feature-run");
+  assert.ok(featureRun);
+  assert.equal(featureRun.choreography.beatDurationFrames, FEATURE_BEAT_FRAMES);
+  assert.equal(featureRun.durationInFrames, FEATURE_BEAT_FRAMES * FEATURE_BEAT_COUNT);
+});
 
-  assert.ok(intro);
-  const pageStartFrame = assertNumber(intro.choreography.pageStartFrame);
-  const pageReadyFrame = assertNumber(intro.choreography.pageReadyFrame);
-  const destinationInputStartFrame = assertNumber(intro.choreography.destinationInputStartFrame);
-  const documentStartFrame = assertNumber(intro.choreography.documentStartFrame);
-  const noteStartFrame = assertNumber(intro.choreography.noteStartFrame);
-  const stickyOpenFrame = assertNumber(intro.choreography.stickyOpenFrame);
-  const noteCopyFrame = assertNumber(intro.choreography.noteCopyFrame);
-  const notePasteFrame = assertNumber(intro.choreography.notePasteFrame);
-  const promptOpenFrame = assertNumber(intro.choreography.promptOpenFrame);
-  const promptCopyFrame = assertNumber(intro.choreography.promptCopyFrame);
-  const promptPasteFrame = assertNumber(intro.choreography.promptPasteFrame);
-
-  assert.ok(pageStartFrame < pageReadyFrame);
-  assert.ok(pageReadyFrame < intro.choreography.textStartFrame);
-  assert.ok(intro.durationInFrames >= 600);
-  assert.ok(intro.choreography.textStartFrame < intro.choreography.visualStartFrame);
-  assert.ok(intro.choreography.visualStartFrame <= destinationInputStartFrame);
-  assert.ok(destinationInputStartFrame < documentStartFrame);
-  assert.ok(documentStartFrame < noteStartFrame);
-  assert.ok(noteStartFrame < stickyOpenFrame);
-  assert.ok(stickyOpenFrame < noteCopyFrame);
-  assert.ok(noteCopyFrame < notePasteFrame);
-  assert.ok(notePasteFrame < promptOpenFrame);
-  assert.ok(promptOpenFrame < promptCopyFrame);
-  assert.ok(promptCopyFrame < promptPasteFrame);
-  assert.ok(promptPasteFrame < intro.choreography.holdStartFrame);
+test("teaching scenes keep enough reading room", () => {
+  const reveal = scenes.find((scene) => scene.id === "reveal");
+  const gesture = scenes.find((scene) => scene.id === "gesture");
+  assert.ok(reveal && gesture);
+  assert.ok(reveal.durationInFrames >= 360);
+  assert.ok(gesture.durationInFrames >= 390);
 });

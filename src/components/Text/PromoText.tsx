@@ -1,4 +1,5 @@
-import { Easing, interpolate, useCurrentFrame } from "remotion";
+import { interpolate, useCurrentFrame } from "remotion";
+import { EASE, ease01 } from "../../config/motion";
 import { theme } from "../../config/theme";
 
 type PromoTextProps = {
@@ -11,11 +12,16 @@ type PromoTextProps = {
   maxWidth?: number;
   /** Frame offset for when text animation begins (default: 0) */
   startFrame?: number;
-  /** Frames between each line's reveal (default: 6) */
+  /** Frames between each line's reveal (default: 8) */
   lineStagger?: number;
-  /** Reduce headline scale for top stage scenes (default: 1) */
-  scale?: number;
+  /** Brand gradient headline (reveal / outro moments only). */
+  gradient?: boolean;
+  /** Delay of the caption relative to the last line (default 14). */
+  captionDelay?: number;
 };
+
+export const FONT_STACK =
+  '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro SC", "PingFang SC", sans-serif';
 
 export const PromoText = ({
   lines,
@@ -24,64 +30,60 @@ export const PromoText = ({
   align = "left",
   size = theme.type.headline,
   captionSize = theme.type.caption,
-  maxWidth = 1120,
+  maxWidth = 1200,
   startFrame = 0,
-  lineStagger = 6,
-  scale = 1,
+  lineStagger = 8,
+  gradient = false,
+  captionDelay = 14,
 }: PromoTextProps) => {
   const frame = useCurrentFrame();
   const dark = mode === "dark";
+
+  const gradientStyle = gradient
+    ? {
+        backgroundImage: dark ? theme.gradients.headlineDark : theme.gradients.headlineLight,
+        backgroundClip: "text" as const,
+        WebkitBackgroundClip: "text" as const,
+        color: "transparent",
+      }
+    : { color: dark ? theme.colors.darkInk : theme.colors.ink };
+
+  const captionStart = startFrame + (lines.length - 1) * lineStagger + captionDelay;
 
   return (
     <div
       style={{
         maxWidth,
         textAlign: align,
-        color: dark ? theme.colors.darkInk : theme.colors.ink,
-        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif',
+        fontFamily: FONT_STACK,
       }}
     >
       {lines.map((line, index) => {
         const lineStart = startFrame + index * lineStagger;
-        const lineEnd = lineStart + 22;
-
-        const opacity = interpolate(frame, [lineStart, lineEnd], [0, 1], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
-
-        const lift = interpolate(frame, [lineStart, lineEnd + 4], [28, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
-
-        // clip-path mask reveal: top of line opens downward
-        const clipY = interpolate(frame, [lineStart, lineEnd], [100, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-          easing: Easing.bezier(0.16, 1, 0.3, 1),
-        });
+        const t = ease01(frame, lineStart, 26);
+        const lift = interpolate(t, [0, 1], [30, 0]);
+        const clipY = interpolate(t, [0, 1], [100, 0]);
 
         return (
           <div
             key={`${line}-${index}`}
             style={{
               overflow: "hidden",
-              paddingBottom: "0.06em", // prevent descender clipping
+              paddingBottom: "0.08em", // prevent descender clipping
+              marginBottom: "-0.08em",
             }}
           >
             <div
               style={{
-                fontSize: size * scale,
-                lineHeight: 1.08,
-                fontWeight: 820,
-                letterSpacing: 0,
+                fontSize: size,
+                lineHeight: 1.1,
+                fontWeight: 760,
+                letterSpacing: "-0.01em",
                 overflowWrap: "anywhere",
-                opacity,
+                opacity: t,
                 transform: `translateY(${lift}px)`,
                 clipPath: `inset(0 0 ${clipY}% 0)`,
+                ...gradientStyle,
               }}
             >
               {line}
@@ -90,40 +92,17 @@ export const PromoText = ({
         );
       })}
       {caption ? (
-        <div
-          style={{
-            marginTop: 28,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ marginTop: Math.round(size * 0.34), overflow: "hidden" }}>
           <div
             style={{
               fontSize: captionSize,
-              lineHeight: 1.2,
-              fontWeight: 620,
-              letterSpacing: 0,
+              lineHeight: 1.25,
+              fontWeight: 560,
+              letterSpacing: "-0.005em",
               color: dark ? theme.colors.darkMuted : theme.colors.muted,
               overflowWrap: "anywhere",
-              opacity: interpolate(
-                frame,
-                [startFrame + lines.length * lineStagger, startFrame + lines.length * lineStagger + 18],
-                [0, 1],
-                {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                  easing: Easing.bezier(0.16, 1, 0.3, 1),
-                },
-              ),
-              transform: `translateY(${interpolate(
-                frame,
-                [startFrame + lines.length * lineStagger, startFrame + lines.length * lineStagger + 22],
-                [16, 0],
-                {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                  easing: Easing.bezier(0.16, 1, 0.3, 1),
-                },
-              )}px)`,
+              opacity: ease01(frame, captionStart, 24),
+              transform: `translateY(${interpolate(ease01(frame, captionStart, 28), [0, 1], [18, 0])}px)`,
             }}
           >
             {caption}
@@ -133,3 +112,6 @@ export const PromoText = ({
     </div>
   );
 };
+
+/** Re-export the shared ease for callers composing custom text beats. */
+export { EASE };

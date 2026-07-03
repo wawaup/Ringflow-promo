@@ -3,15 +3,18 @@ import { describe, it } from "node:test";
 import {
   MAIN_SLOTS,
   FOLDER_SLOTS,
+  PROFILE_WHEELS,
+  SHOWCASE_SLOTS,
+  SITE_WHEEL_ICON_PATHS,
   wheelSegmentToSiteIndex,
   wheelSegmentToFolderIndex,
 } from "./siteWheelModel.ts";
 
 describe("siteWheelModel", () => {
-  it("uses the official website wheel slot labels and ordering", () => {
+  it("matches the real mac app default wheel (ActionItem.defaultLibrary)", () => {
     assert.deepEqual(
       MAIN_SLOTS.map((slot) => slot.label),
-      ["常用提示词", "复制", "粘贴", "撤销", "全选", "新脚本", "监视器", "新便签"],
+      ["复制", "粘贴", "撤销", "保存", "全选", "新脚本", "监视器", "新便签"],
     );
   });
 
@@ -34,5 +37,24 @@ describe("siteWheelModel", () => {
     assert.equal(wheelSegmentToFolderIndex("quick-open"), 2);
     assert.equal(wheelSegmentToFolderIndex("shortcuts"), 5);
     assert.equal(wheelSegmentToFolderIndex("shell"), null);
+  });
+
+  it("showcase wheel covers the seven action types plus the group folder", () => {
+    assert.equal(SHOWCASE_SLOTS.length, 8);
+    assert.deepEqual(
+      SHOWCASE_SLOTS.map((slot) => slot.label),
+      ["快捷键", "快捷输入", "快捷打开", "便签", "脚本", "指令", "监视器", "提示词"],
+    );
+    assert.equal(SHOWCASE_SLOTS[7].isFolder, true);
+  });
+
+  it("profile wheels always carry a full eight sectors and known icons", () => {
+    assert.equal(PROFILE_WHEELS.length, 3);
+    for (const profile of PROFILE_WHEELS) {
+      assert.equal(profile.slots.length, 8, profile.app);
+      for (const slot of profile.slots) {
+        assert.ok(slot.icon in SITE_WHEEL_ICON_PATHS, `${profile.app}/${slot.label}`);
+      }
+    }
   });
 });
