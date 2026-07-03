@@ -17,6 +17,7 @@ export type SceneChoreography = {
   stickyOpenFrame?: number;
   noteCopyFrame?: number;
   notePasteFrame?: number;
+  noteGroupExitFrame?: number; // when the note window + its copy/paste keys begin fading out together
   promptOpenFrame?: number;
   promptCopyFrame?: number;
   promptPasteFrame?: number;
@@ -77,16 +78,17 @@ const rawScenes = [
       textStartFrame: 18,
       visualStartFrame: 26,
       destinationInputStartFrame: 35,
-      documentStartFrame: 45,
-      noteStartFrame: 95,
-      actionStartFrame: 98,
-      stickyOpenFrame: 98,
-      noteCopyFrame: 105,
-      notePasteFrame: 117,
-      promptOpenFrame: 175,
-      promptCopyFrame: 185,
-      promptPasteFrame: 197,
-      holdStartFrame: 220,
+      documentStartFrame: 45,     // code window enters, holds, then fully exits before note enters
+      noteStartFrame: 101,        // note window only enters after code window has fully faded out
+      actionStartFrame: 124,
+      stickyOpenFrame: 101,
+      noteCopyFrame: 124,
+      notePasteFrame: 150,
+      noteGroupExitFrame: 176,    // note window + its copy/paste keys fade out together
+      promptOpenFrame: 192,       // prompt window only enters after note window + keys are fully gone
+      promptCopyFrame: 215,
+      promptPasteFrame: 241,
+      holdStartFrame: 255,        // final pasted state holds until scene cut at 288
     },
   },
   {

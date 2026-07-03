@@ -138,9 +138,9 @@ export const InterruptedWorkflowWorkspace = ({
     destinationInputStartFrame?: number;
     documentStartFrame?: number;
     noteStartFrame?: number;
-    stickyOpenFrame?: number;
     noteCopyFrame?: number;
     notePasteFrame?: number;
+    noteGroupExitFrame?: number;
     promptOpenFrame?: number;
     promptCopyFrame?: number;
     promptPasteFrame?: number;
@@ -176,29 +176,29 @@ export const InterruptedWorkflowWorkspace = ({
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
   const destinationInput = reveal(frame, choreography.destinationInputStartFrame ?? 0, 22);
-  const stickyOpen = reveal(frame, choreography.stickyOpenFrame ?? 0, 18);
-  const noteCopy = reveal(frame, choreography.noteCopyFrame ?? 0, 10);
   const notePaste = reveal(frame, choreography.notePasteFrame ?? 0, 14);
-  const promptCopy = reveal(frame, choreography.promptCopyFrame ?? 0, 10);
   const promptPaste = reveal(frame, choreography.promptPasteFrame ?? 0, 14);
+
+  const noteGroupExitVal = choreography.noteGroupExitFrame ?? 176;
+
+  // Windows take turns as separate desktop apps: each one must be fully gone
+  // before the next is allowed to enter, so they never visually coexist.
   const codeWindow = sceneWindowVisibility(
     frame,
     choreography.documentStartFrame ?? 0,
-    (choreography.promptPasteFrame ?? 197) + 30,  // stay visible through both copy/paste actions
-    20,
+    choreography.noteStartFrame ?? 0,
+    16,
   );
   const noteWindow = sceneWindowVisibility(
     frame,
     choreography.noteStartFrame ?? 0,
-    (choreography.promptPasteFrame ?? 197) + 25,
-    18,
+    noteGroupExitVal + 16,
+    16,
   );
-  const promptOpen = sceneWindowVisibility(
-    frame,
-    choreography.promptOpenFrame ?? 0,
-    (choreography.promptPasteFrame ?? 197) + 35,
-    18,
-  );
+  // Prompt window is the scene's final state: it enters once the note window
+  // is gone and simply holds (the scene-to-scene crossfade handles its exit).
+  const promptOpen = reveal(frame, choreography.promptOpenFrame ?? 0, 16);
+
   const noteSelection = interpolate(frame, [
     (choreography.noteCopyFrame ?? 0) - 18,
     choreography.noteCopyFrame ?? 0,
@@ -222,32 +222,23 @@ export const InterruptedWorkflowWorkspace = ({
 
   // Note: No wheel on first screen (pre-introduction of Ringflow). Direct code + note + prompt copy/paste flow.
 
-  // Redesigned copy/paste per spec:
-  // - First action (note): "复制" + CTRL+C appear and STAY
-  // - Then "粘贴" + CTRL+V appear BELOW (previous copy+C do not disappear)
-  // - Pasted text lands in input
-  // - Same pattern for prompt action
-  // - After prompt paste result, the keys + labels + editing windows can fade
-
-  // Note copy/paste pair: "复制"+C stay while "粘贴"+V appears for this action
-  const noteCopyKeys = interpolate(frame, [noteCopyVal, noteCopyVal + 10, notePasteVal + 25], [0, 1, 1], {
+  // Copy/paste key-cap choreography:
+  // - "复制"+CTRL+C appears and stays visible.
+  // - "粘贴"+CTRL+V appears next to it once copy has held for a beat (copy does not disappear on its own).
+  // - For the note action, both keys fade out TOGETHER with the note window (at noteGroupExitVal) only
+  //   after the paste has landed and held — never independently, never left stacked under the prompt action's keys.
+  // - The prompt action's keys have no explicit exit: they hold until the scene cuts to the next shot.
+  const noteCopyKeys = interpolate(frame, [noteCopyVal, noteCopyVal + 10, noteGroupExitVal, noteGroupExitVal + 16], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const notePasteKeys = interpolate(frame, [notePasteVal, notePasteVal + 10, notePasteVal + 35], [0, 1, 0], {
+  const notePasteKeys = interpolate(frame, [notePasteVal, notePasteVal + 10, noteGroupExitVal, noteGroupExitVal + 16], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Prompt copy/paste pair: same pattern
-  const promptCopyKeys = interpolate(frame, [promptCopyVal, promptCopyVal + 10, promptPasteVal + 25], [0, 1, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const promptPasteKeys = interpolate(frame, [promptPasteVal, promptPasteVal + 10, promptPasteVal + 40], [0, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const promptCopyKeys = reveal(frame, promptCopyVal, 10);
+  const promptPasteKeys = reveal(frame, promptPasteVal, 10);
 
   const noteCopyLabel = noteCopyKeys;
   const notePasteLabel = notePasteKeys;
@@ -446,33 +437,30 @@ export const InterruptedWorkflowWorkspace = ({
         </div>
       </div>
 
-      {/* Redesigned copy/paste visuals for first screen:
-          - "复制" label + CTRL+C appear and stay visible
-          - Then "粘贴" label + CTRL+V appear (previous do not disappear)
-          - Same pattern for prompt selection + copy/paste
-          - After final paste result, these + editing windows fade for clean transition
-      */}
+      {/* Copy/paste key-cap indicators live in the blank strip right of the source windows
+          (x >= 780, clear of code/note/prompt/destination-input bounding boxes) so they never
+          sit on top of any window. Stacked vertically (label above keys) to fit the strip. */}
 
-      {/* Note action: 复制 + CTRL+C (stays visible during its paste) */}
-      <div style={{ position: "absolute", left: 580, top: 235, opacity: noteCopyLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+      {/* Note action: 复制 + CTRL+C (stays visible until paste lands, then fades with the note window) */}
+      <div style={{ position: "absolute", left: 780, top: 120, opacity: noteCopyLabel, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>复制</div>
         <KeyCombo combo={["Control", "C"]} visible={noteCopyKeys} />
       </div>
 
-      {/* Note action: 粘贴 + CTRL+V (appears while 复制+CTRL+C stays) */}
-      <div style={{ position: "absolute", left: 580, top: 290, opacity: notePasteLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+      {/* Note action: 粘贴 + CTRL+V (appears while 复制+CTRL+C stays, fades together at group exit) */}
+      <div style={{ position: "absolute", left: 780, top: 230, opacity: notePasteLabel, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>粘贴</div>
         <KeyCombo combo={["Control", "V"]} visible={notePasteKeys} />
       </div>
 
-      {/* Prompt action: 复制 + CTRL+C (same pattern) */}
-      <div style={{ position: "absolute", left: 580, top: 235, opacity: promptCopyLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+      {/* Prompt action: 复制 + CTRL+C (same pattern, holds until scene cut) */}
+      <div style={{ position: "absolute", left: 780, top: 120, opacity: promptCopyLabel, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>复制</div>
         <KeyCombo combo={["Control", "C"]} visible={promptCopyKeys} />
       </div>
 
       {/* Prompt action: 粘贴 + CTRL+V */}
-      <div style={{ position: "absolute", left: 580, top: 290, opacity: promptPasteLabel, display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}>
+      <div style={{ position: "absolute", left: 780, top: 230, opacity: promptPasteLabel, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8, zIndex: 10 }}>
         <div style={{ fontSize: 14, fontWeight: 620, color: "#1f2937", background: "rgba(255,255,255,0.85)", padding: "2px 8px", borderRadius: 4, border: "1px solid rgba(148,163,184,0.3)" }}>粘贴</div>
         <KeyCombo combo={["Control", "V"]} visible={promptPasteKeys} />
       </div>
