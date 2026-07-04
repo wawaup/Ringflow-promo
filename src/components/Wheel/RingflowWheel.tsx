@@ -37,8 +37,10 @@ type RingflowWheelProps = {
   folderHighlightIndex?: number | null;
   folderProgress?: number;
   folderRotation?: number;
-  /** Override the 8 main sectors (defaults to the app's real default wheel). */
-  mainSlots?: readonly SiteWheelSlot[];
+  /** Override the 8 main sectors (defaults to the app's real default wheel).
+   * A `null` entry renders that sector as an EMPTY wedge (no icon/label) —
+   * used by the umbrella scene to show a slot waiting for its action. */
+  mainSlots?: readonly (SiteWheelSlot | null)[];
   /** Override the outer folder ring sectors. */
   folderSlots?: readonly (SiteWheelSlot | null)[];
 };
@@ -478,7 +480,7 @@ export const RingflowWheel = ({
             const path = annulusSectorPath(index, wheelConfig.sectorCount, center, outer, inner);
             return (
               <g
-                key={slot.label}
+                key={slot ? slot.label : `empty-${index}`}
                 opacity={itemReveal}
                 style={{
                   rotate: `${fanCollapseRotation(index, wheelConfig.sectorCount) * (1 - itemReveal)}rad`,
@@ -497,17 +499,19 @@ export const RingflowWheel = ({
                     style={{ filter: "blur(0.7px)" }}
                   />
                 ) : null}
-                {renderForeignLabel({
-                  slot,
-                  index,
-                  center,
-                  outerRadius: outer,
-                  innerRatio: wheelConfig.overlayInnerDeadZoneRatio,
-                  highlighted: highlighted || running,
-                  compact: false,
-                  palette,
-                  showText,
-                })}
+                {slot
+                  ? renderForeignLabel({
+                      slot,
+                      index,
+                      center,
+                      outerRadius: outer,
+                      innerRatio: wheelConfig.overlayInnerDeadZoneRatio,
+                      highlighted: highlighted || running,
+                      compact: false,
+                      palette,
+                      showText,
+                    })
+                  : null}
               </g>
             );
           })}
@@ -521,7 +525,7 @@ export const RingflowWheel = ({
               const outerPoint = polarPoint(center, outer, angle);
               return (
                 <line
-                  key={`${slot.label}-divider`}
+                  key={`${slot ? slot.label : "empty"}-${index}-divider`}
                   x1={innerPoint.x}
                   y1={innerPoint.y}
                   x2={outerPoint.x}
