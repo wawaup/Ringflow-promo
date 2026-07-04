@@ -67,8 +67,9 @@ test("teaching scenes keep enough reading room", () => {
   const reveal = scenes.find((scene) => scene.id === "reveal");
   const gesture = scenes.find((scene) => scene.id === "gesture");
   assert.ok(reveal && gesture);
-  // Thresholds tightened with the film-wide pacing pass (2026-07): scenes keep
-  // just enough reading room without dragging between shots.
-  assert.ok(reveal.durationInFrames >= 260);
+  // Thresholds tightened with the transition-pacing pass (2026-07): every
+  // scene now cuts to the next shortly after its last visible action settles
+  // (~0.4-0.5s), instead of holding on a finished animation.
+  assert.ok(reveal.durationInFrames >= 220);
   assert.ok(gesture.durationInFrames >= 390);
 });

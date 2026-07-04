@@ -51,13 +51,24 @@ export const GestureScene = () => {
   const trackpadStart = c.trackpadHintFrame ?? 320;
   /** Mouse demo clears the stage before the trackpad takes the slot. */
   const mouseExitStart = trackpadStart - 34;
+  /**
+   * When the mouse cursor itself starts fading in — deliberately a LOCAL
+   * beat (not c.visualStartFrame). SceneShell's outer children-wrapper spring
+   * is keyed to c.visualStartFrame too, and if this cursor read off the same
+   * value, pushing that value later (to let the title/words read first) would
+   * also delay the wrapper's own reveal — masking every element's carefully
+   * staggered entrance behind one late "everything pops in at once" spring.
+   * Keeping this independent means the demo can start only once the text is
+   * done, without touching when the scene's content container itself appears.
+   */
+  const demoStart = press - 22;
 
   // Wheel sits far up-right of the mouse — clearly separate positions, so
   // even with the longer slide the mouse never crowds or covers the wheel.
   const wheelCenter = { x: STAGE_WIDTH / 2 + 330, y: DEMO_STAGE_HEIGHT / 2 - 15 };
   const pressPoint = { x: STAGE_WIDTH / 2 - 210, y: DEMO_STAGE_HEIGHT / 2 + 125 };
 
-  const cursorIn = ease01(frame, c.visualStartFrame, 22);
+  const cursorIn = ease01(frame, demoStart, 22);
 
   // Joystick logic: the slide direction IS the selection — cursor nudges along
   // the target sector's mid-angle, and that sector lights up as it moves.
@@ -98,9 +109,7 @@ export const GestureScene = () => {
 
   // One-line callouts, each visible only while its demo plays.
   const mouseCalloutOpacity =
-    interpolate(frame, [c.visualStartFrame, c.visualStartFrame + 20], [0, 1], CLAMP) *
-    mouseDemoOpacity *
-    textOpacity;
+    interpolate(frame, [demoStart, demoStart + 20], [0, 1], CLAMP) * mouseDemoOpacity * textOpacity;
   const trackpadCalloutOpacity = trackpadIn * textOpacity;
 
   const calloutStyle = {

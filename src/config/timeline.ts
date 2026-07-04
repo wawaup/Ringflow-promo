@@ -108,7 +108,7 @@ const rawScenes = [
     shot: 2,
     id: "reveal",
     name: "亮相：文案先行 → 轮盘居中旋入 → 缩入应用预览框 + 截图展开",
-    durationSeconds: 4.6,
+    durationSeconds: 3.9, // 收紧：轮盘对齐落位后只留 ~0.5s 呼吸，立刻切下一镜
     layout: "center-stage",
     choreography: {
       textStartFrame: 6, // 主标题先读一拍（40 帧），Ringflow 与轮盘同帧入场
@@ -117,7 +117,7 @@ const rawScenes = [
       wheelStartFrame: 46, // = textStartFrame + lineStagger(40)，与第二行同帧
       wheelRotateFrame: 46,
       wheelShrinkFrame: 140, // 转完即收：截图快速展开 + 轮盘对齐落位
-      holdStartFrame: 240,
+      holdStartFrame: 200,
     },
   },
   {
@@ -127,23 +127,30 @@ const rawScenes = [
     durationSeconds: 7.6,
     layout: "center-stage",
     choreography: {
+      // NOTE: visualStartFrame here ONLY gates SceneShell's outer children-
+      // wrapper spring (opacity on the whole title+words+demo block). Since
+      // the title itself must read from frame 0, this must be 0 too — any
+      // later value re-creates the "everything pops in together" bug (the
+      // wrapper's own fade would lag behind and mask the text's carefully
+      // staggered internal reveal). The demo's own later start lives in
+      // GestureScene's local `demoStart` constant, fully independent of this.
       textStartFrame: 0, // 标题先读一拍，三个词组每 34 帧逐个入场（~128 帧全部落定）
-      visualStartFrame: 118, // 文字读完后演示才开始，不与文字抢视线
-      actionStartFrame: 126,
-      pressStartFrame: 148, // 中键按下：下陷 + 高亮（鼠标原地不动）
-      swipeStartFrame: 180, // 向斜上方（东北）轻轻一滑
-      wheelStartFrame: 186, // 轮盘在偏右位置旋转出现，摇杆式高亮滑动方向
-      releaseFrame: 268, // 松手执行：中键取消高亮、鼠标上弹，轮盘收起 → 「动作已执行」toast
-      holdStartFrame: 430,
-      wordFrames: [148, 184, 268], // 与按下 / 移向 / 松手三个动作同步点亮
-      trackpadHintFrame: 372, // 鼠标演示隐去后，触控板演示在同一位置放大接力
+      visualStartFrame: 0,
+      actionStartFrame: 140,
+      pressStartFrame: 162, // 中键按下：下陷 + 高亮（鼠标原地不动），文字落定后才开始
+      swipeStartFrame: 194, // 向斜上方（东北）轻轻一滑
+      wheelStartFrame: 200, // 轮盘在偏右位置旋转出现，摇杆式高亮滑动方向
+      releaseFrame: 280, // 松手执行：中键取消高亮、鼠标上弹，轮盘收起 → 「动作已执行」toast
+      holdStartFrame: 448,
+      wordFrames: [162, 200, 280], // 与按下 / 移向 / 松手三个动作同步点亮
+      trackpadHintFrame: 374, // 鼠标演示隐去后，触控板演示在同一位置放大接力
     },
   },
   {
     shot: 4,
     id: "umbrella",
     name: "伞句：把常用操作，放进轮盘（快捷键拖入空扇区）",
-    durationSeconds: 4.0,
+    durationSeconds: 3.6, // 收紧：落位脉冲结束后 ~0.5s 即切，不多等
     layout: "center-stage",
     choreography: {
       textStartFrame: 8,
@@ -172,7 +179,7 @@ const rawScenes = [
     shot: 6,
     id: "group-ring",
     name: "分组外环：一个轮盘装下更多（鼠标向左上，外环展开）",
-    durationSeconds: 3.8,
+    durationSeconds: 3.6, // 收紧：外环展开+高亮settle 后 ~0.4s 即切
     layout: "center-stage",
     choreography: {
       textStartFrame: 0,
