@@ -19,8 +19,9 @@ const DEMO_STAGE_HEIGHT = 470;
 const WHEEL_BOX = 292;
 /** ENE sector (index 1, mid-angle −22.5°) — matches the up-right slide. */
 const TARGET_SECTOR = 1;
-/** Small diagonal (up-right) nudge that summons the wheel (px). */
-const SUMMON_SLIDE = 58;
+/** Diagonal (up-right) slide that summons the wheel (px) — long enough to
+ * read as clearly as the trackpad demo, still far from the wheel itself. */
+const SUMMON_SLIDE = 118;
 
 const CLAMP = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
@@ -51,17 +52,17 @@ export const GestureScene = () => {
   /** Mouse demo clears the stage before the trackpad takes the slot. */
   const mouseExitStart = trackpadStart - 34;
 
-  // Wheel sits well up-right of the mouse — clearly separate positions, so
-  // the cursor never crowds or covers the wheel.
-  const wheelCenter = { x: STAGE_WIDTH / 2 + 270, y: DEMO_STAGE_HEIGHT / 2 - 15 };
-  const pressPoint = { x: STAGE_WIDTH / 2 - 130, y: DEMO_STAGE_HEIGHT / 2 + 110 };
+  // Wheel sits far up-right of the mouse — clearly separate positions, so
+  // even with the longer slide the mouse never crowds or covers the wheel.
+  const wheelCenter = { x: STAGE_WIDTH / 2 + 330, y: DEMO_STAGE_HEIGHT / 2 - 15 };
+  const pressPoint = { x: STAGE_WIDTH / 2 - 210, y: DEMO_STAGE_HEIGHT / 2 + 125 };
 
   const cursorIn = ease01(frame, c.visualStartFrame, 22);
 
   // Joystick logic: the slide direction IS the selection — cursor nudges along
   // the target sector's mid-angle, and that sector lights up as it moves.
   const slideAngle = sectorMidAngle(TARGET_SECTOR, 8);
-  const slide = interpolate(frame, [swipe, swipe + 24], [0, 1], { ...CLAMP, easing: EASE_TRAVEL });
+  const slide = interpolate(frame, [swipe, swipe + 30], [0, 1], { ...CLAMP, easing: EASE_TRAVEL });
   // On release the mouse pops back up: a quick upward bounce that settles.
   const releaseBounce = interpolate(frame, [release, release + 8, release + 22], [0, -8, 0], CLAMP);
   const cursorX = pressPoint.x + Math.cos(slideAngle) * SUMMON_SLIDE * slide;
