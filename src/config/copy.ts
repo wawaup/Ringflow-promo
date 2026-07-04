@@ -12,14 +12,17 @@ export type SceneCopy = {
   headline: string[];
   caption?: string;
   uiLabels?: string[];
+  /** Top-anchored line stating what the scene demonstrates, rendered above the headline row. */
+  title?: string;
+  /** Left-side caption shown alongside the mouse-based demo. */
+  mouseCallout?: string;
+  /** Left-side caption shown alongside the trackpad-based demo. */
+  trackpadCallout?: string;
 };
 
 export const sceneCopy: Record<SceneId, SceneCopy> = {
   friction: {
     headline: ["找菜单。", "切窗口。", "一遍又一遍。"],
-  },
-  turn: {
-    headline: ["常用的操作，", "应该就在手边。"],
   },
   reveal: {
     headline: ["Ringflow"],
@@ -27,8 +30,11 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
   },
   gesture: {
     // Three beats, lit word by word (choreography.wordFrames)
+    title: "如何唤醒？",
     headline: ["按住拖动", "移向目标", "松手执行"],
     caption: "触控板同样可以：按住 ⇧⌃ 移动光标",
+    mouseCallout: "鼠标 · 按下中键，向右上轻滑",
+    trackpadCallout: "触控板 · 按住 ⇧⌃ 移动光标",
   },
   umbrella: {
     headline: ["把常用操作，放进轮盘。"],

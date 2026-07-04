@@ -25,10 +25,16 @@ export type SceneChoreography = {
   wheelStartFrame?: number;
   wheelHighlightStartFrame?: number;
   wheelHighlightEndFrame?: number;
+  // Reveal: rotate-in centered → shrink to corner → app screenshot
+  wheelRotateFrame?: number;
+  wheelShrinkFrame?: number;
+  screenshotFrame?: number;
   // Gesture phases
   pressStartFrame?: number;
   swipeStartFrame?: number;
   releaseFrame?: number;
+  // Gesture: click-select beat before the wheel is summoned
+  clickTargetFrame?: number;
   // Word-by-word headline beats (gesture scene)
   wordFrames?: readonly number[];
   trackpadHintFrame?: number;
@@ -42,6 +48,9 @@ export type SceneChoreography = {
   stepFrames?: readonly number[];
   // Outro
   ctaFrame?: number;
+  // Umbrella: action-list → drag → drop-into-wheel
+  dragStartFrame?: number;
+  dropFrame?: number;
 };
 
 const baseComposition = {
@@ -53,7 +62,6 @@ const baseComposition = {
 
 export type SceneId =
   | "friction"
-  | "turn"
   | "reveal"
   | "gesture"
   | "umbrella"
@@ -78,91 +86,78 @@ export type SceneTiming = {
 };
 
 /** Feature-run rhythm: 7 beats, one per showcase sector, uniform length. */
-export const FEATURE_BEAT_FRAMES = 126;
+export const FEATURE_BEAT_FRAMES = 102;
 export const FEATURE_BEAT_COUNT = 7;
 
 const rawScenes = [
   {
     shot: 1,
     id: "friction",
-    name: "摩擦：找菜单、切窗口",
-    durationSeconds: 4.2,
+    name: "摩擦：找菜单、切窗口 → 常用的操作，应该就在手边",
+    durationSeconds: 11.8,
     layout: "left-stage",
     choreography: {
       textStartFrame: 0,
-      visualStartFrame: 42,
-      actionStartFrame: 76,
-      holdStartFrame: 200,
+      visualStartFrame: 20,
+      actionStartFrame: 50,
+      holdStartFrame: 634,
     },
   },
   {
     shot: 2,
-    id: "turn",
-    name: "转折：常用的操作，应该就在手边",
-    durationSeconds: 3.2,
+    id: "reveal",
+    name: "亮相：文案先行 → 轮盘居中旋入 → 缩入应用预览框 + 截图展开",
+    durationSeconds: 5.5,
     layout: "center-stage",
     choreography: {
-      textStartFrame: 12,
-      visualStartFrame: 90,
-      actionStartFrame: 120,
-      holdStartFrame: 156,
+      textStartFrame: 6, // 「围绕光标的快捷操作轮盘」最先出现
+      visualStartFrame: 24,
+      actionStartFrame: 40,
+      wheelStartFrame: 40, // 轮盘随后在居中位置旋转出现
+      wheelRotateFrame: 40,
+      wheelShrinkFrame: 150, // 缩小的同时截图从一个点展开
+      holdStartFrame: 280,
     },
   },
   {
     shot: 3,
-    id: "reveal",
-    name: "亮相：按住拖动，轮盘绽放 + Ringflow 标题",
-    durationSeconds: 6.5,
-    layout: "center-stage",
-    choreography: {
-      textStartFrame: 210, // brand title lands after the wheel has bloomed
-      visualStartFrame: 12,
-      actionStartFrame: 66,
-      pressStartFrame: 66,
-      swipeStartFrame: 90,
-      wheelStartFrame: 104,
-      holdStartFrame: 330,
-    },
-  },
-  {
-    shot: 4,
     id: "gesture",
-    name: "核心手势：按住拖动 · 移向目标 · 松手执行",
-    durationSeconds: 7.0,
+    name: "核心手势：如何唤醒？· 中键下陷 → 轻滑 → 轮盘旋入 → 松手执行 → 触控板接力",
+    durationSeconds: 7.2,
     layout: "center-stage",
     choreography: {
       textStartFrame: 0,
       visualStartFrame: 20,
-      actionStartFrame: 56,
-      pressStartFrame: 56,
-      swipeStartFrame: 92,
-      wheelStartFrame: 104,
-      wheelHighlightStartFrame: 150,
-      wheelHighlightEndFrame: 216,
-      releaseFrame: 252,
-      holdStartFrame: 320,
-      wordFrames: [24, 140, 258],
-      trackpadHintFrame: 330,
+      actionStartFrame: 36,
+      pressStartFrame: 64, // 中键按下：下陷 + 高亮（鼠标原地不动）
+      swipeStartFrame: 96, // 向斜上方（东北）轻轻一滑
+      wheelStartFrame: 100, // 轮盘在偏右位置旋转出现，摇杆式高亮滑动方向
+      releaseFrame: 190, // 松手执行：中键取消高亮、鼠标上弹，轮盘收起 → 「动作已执行」toast
+      holdStartFrame: 396,
+      wordFrames: [64, 104, 190],
+      trackpadHintFrame: 320, // 鼠标演示隐去后，触控板演示在同一位置放大接力
+    },
+  },
+  {
+    shot: 4,
+    id: "umbrella",
+    name: "伞句：把常用操作，放进轮盘（快捷键拖入空扇区）",
+    durationSeconds: 4.0,
+    layout: "center-stage",
+    choreography: {
+      textStartFrame: 8,
+      visualStartFrame: 24,
+      actionStartFrame: 64,
+      dragStartFrame: 96,
+      dropFrame: 152,
+      holdStartFrame: 200,
     },
   },
   {
     shot: 5,
-    id: "umbrella",
-    name: "伞句：把常用操作，放进轮盘",
-    durationSeconds: 2.4,
-    layout: "center-stage",
-    choreography: {
-      textStartFrame: 8,
-      visualStartFrame: 46,
-      actionStartFrame: 70,
-      holdStartFrame: 110,
-    },
-  },
-  {
-    shot: 6,
     id: "feature-run",
     name: "功能节拍：七种动作，一种手势",
-    durationSeconds: (FEATURE_BEAT_FRAMES * FEATURE_BEAT_COUNT) / FPS, // 14.7s
+    durationSeconds: (FEATURE_BEAT_FRAMES * FEATURE_BEAT_COUNT) / FPS,
     layout: "top-stage",
     choreography: {
       textStartFrame: 0,
@@ -173,27 +168,27 @@ const rawScenes = [
     },
   },
   {
-    shot: 7,
+    shot: 6,
     id: "group-ring",
-    name: "分组外环：一个轮盘装下更多",
-    durationSeconds: 4.5,
+    name: "分组外环：一个轮盘装下更多（鼠标向左上，外环展开）",
+    durationSeconds: 4.0,
     layout: "center-stage",
     choreography: {
       textStartFrame: 0,
       visualStartFrame: 18,
-      actionStartFrame: 84,
-      folderExpandFrame: 96,
+      actionStartFrame: 64, // 鼠标向左上轻移，分组扇区高亮
+      folderExpandFrame: 100, // 外环展开、填满操作区块
       wheelStartFrame: 18,
-      wheelHighlightStartFrame: 168,
-      wheelHighlightEndFrame: 204,
-      holdStartFrame: 232,
+      wheelHighlightStartFrame: 150,
+      wheelHighlightEndFrame: 186,
+      holdStartFrame: 208,
     },
   },
   {
-    shot: 8,
+    shot: 7,
     id: "app-profiles",
     name: "应用配置：不同应用，自动换轮盘",
-    durationSeconds: 4.0,
+    durationSeconds: 3.7,
     layout: "center-stage",
     choreography: {
       textStartFrame: 0,
@@ -204,7 +199,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 9,
+    shot: 8,
     id: "preset-library",
     name: "预设库：不想从零编排？一键导入",
     durationSeconds: 4.0,
@@ -218,7 +213,7 @@ const rawScenes = [
     },
   },
   {
-    shot: 10,
+    shot: 9,
     id: "outro",
     name: "收尾：品牌定版 + CTA",
     durationSeconds: 4.0,
