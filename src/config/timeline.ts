@@ -93,14 +93,14 @@ const rawScenes = [
   {
     shot: 1,
     id: "friction",
-    name: "摩擦：同一件事三遍加速重播 + 计数器 → 常用的操作，应该就在手边",
-    durationSeconds: 10.2,
+    name: "摩擦：三个来源窗口搬进 Terminal，一轮完整演示 + 快速切窗蒙太奇 + 计数器",
+    durationSeconds: 10.8,
     layout: "left-stage",
     choreography: {
       textStartFrame: 0,
       visualStartFrame: 20,
-      actionStartFrame: 40, // 第 1 圈原速看懂，第 2/3 圈 1.7×/2.6× 加速重播
-      holdStartFrame: 556,
+      actionStartFrame: 40, // 阶段1 完整一轮（Markdown bug），阶段2 便签/报错快速接力
+      holdStartFrame: 600,
     },
   },
   {
