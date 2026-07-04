@@ -32,6 +32,36 @@ type MiddleClickCursorProps = {
   scale?: number;
 };
 
+/**
+ * Small macOS-style pointer (black body, white outline) — shown a little
+ * above the physical mouse in teaching shots, moving in lockstep with it, so
+ * viewers see "the on-screen cursor follows the mouse". Tip anchored at (x, y).
+ */
+export const MacPointer = ({ x, y, scale = 1, opacity = 1 }: { x: number; y: number; scale?: number; opacity?: number }) => (
+  <svg
+    width={26 * scale}
+    height={30 * scale}
+    viewBox="-3 -3 26 30"
+    aria-hidden="true"
+    style={{
+      position: "absolute",
+      left: x,
+      top: y,
+      opacity,
+      pointerEvents: "none",
+      filter: "drop-shadow(0 2px 4px rgba(15,23,42,0.30))",
+    }}
+  >
+    <path
+      d="M0 0 L0 19.5 L4.8 15.2 L7.9 22.4 L11.2 21 L8.1 14 L14.5 14 Z"
+      fill="#0a0b0d"
+      stroke="#ffffff"
+      strokeWidth={1.8}
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 /** Standard macOS arrow cursor */
 export const Cursor = ({ x, y, pressed = false, trail = [], scale = 1 }: CursorProps) => {
   const rawId = useId();
@@ -117,8 +147,10 @@ export const MiddleClickCursor = ({
 
   // Scroll wheel button glow intensity
   const wheelGlow = pressProgress;
-  // Cursor body squish on press
-  const bodyScaleY = 1 - pressProgress * 0.06;
+  // Press-down feel: the body squishes AND dips a few px, so the click reads
+  // as a physical "sink" rather than just a color change.
+  const bodyScaleY = 1 - pressProgress * 0.1;
+  const pressDip = pressProgress * 4;
   // Swipe arrow alpha
   const arrowAlpha = swipeProgress;
 
@@ -156,7 +188,7 @@ export const MiddleClickCursor = ({
           left: x - 28 * scale,
           top: y - 20 * scale,
           opacity: revealProgress,
-          transform: `scaleY(${bodyScaleY})`,
+          transform: `translateY(${pressDip}px) scaleY(${bodyScaleY})`,
           transformOrigin: "28px 30px",
         }}
       >
@@ -210,7 +242,7 @@ export const MiddleClickCursor = ({
               width={12}
               height={20}
               rx={6}
-              fill={`rgba(120,180,255,${pressProgress * 0.35})`}
+              fill={`rgba(120,180,255,${pressProgress * 0.55})`}
             />
           ) : null}
 
