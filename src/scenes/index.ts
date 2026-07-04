@@ -6,4 +6,5 @@ export { FeatureRunScene } from "./06_FeatureRunScene";
 export { GroupRingScene } from "./07_GroupRingScene";
 export { AppProfilesScene } from "./08_AppProfilesScene";
 export { PresetLibraryScene } from "./09_PresetLibraryScene";
+export { AppGalleryScene } from "./10_AppGalleryScene";
 export { OutroScene } from "./10_OutroScene";

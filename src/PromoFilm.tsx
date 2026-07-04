@@ -3,6 +3,7 @@ import { AbsoluteFill, Sequence, interpolate, staticFile } from "remotion";
 import { assets } from "./config/assets";
 import { composition, scenes, type SceneId } from "./config/timeline";
 import {
+  AppGalleryScene,
   AppProfilesScene,
   FeatureRunScene,
   FrictionScene,
@@ -23,6 +24,7 @@ const SCENE_MAP: Record<SceneId, React.ComponentType> = {
   "group-ring": GroupRingScene,
   "app-profiles": AppProfilesScene,
   "preset-library": PresetLibraryScene,
+  "app-gallery": AppGalleryScene,
   outro: OutroScene,
 };
 
