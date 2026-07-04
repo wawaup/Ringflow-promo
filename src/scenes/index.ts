@@ -1,5 +1,4 @@
 export { FrictionScene } from "./01_FrictionScene";
-export { TurnScene } from "./02_TurnScene";
 export { RevealScene } from "./03_RevealScene";
 export { GestureScene } from "./04_GestureScene";
 export { UmbrellaScene } from "./05_UmbrellaScene";

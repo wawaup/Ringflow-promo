@@ -10,7 +10,7 @@ const scene = scenes.find((item) => item.id === "friction")!;
  * Sets up the problem in one glance before Ringflow appears.
  */
 export const FrictionScene = () => (
-  <SceneShell scene={scene}>
+  <SceneShell scene={scene} hideText stageWidth={1920} stageHeight={1080}>
     <FrictionWorkflow choreography={scene.choreography} />
   </SceneShell>
 );

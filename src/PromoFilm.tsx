@@ -11,13 +11,11 @@ import {
   OutroScene,
   PresetLibraryScene,
   RevealScene,
-  TurnScene,
   UmbrellaScene,
 } from "./scenes";
 
 const SCENE_MAP: Record<SceneId, React.ComponentType> = {
   friction: FrictionScene,
-  turn: TurnScene,
   reveal: RevealScene,
   gesture: GestureScene,
   umbrella: UmbrellaScene,
