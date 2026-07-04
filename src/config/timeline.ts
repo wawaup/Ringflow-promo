@@ -107,16 +107,16 @@ const rawScenes = [
     shot: 2,
     id: "reveal",
     name: "亮相：文案先行 → 轮盘居中旋入 → 缩入应用预览框 + 截图展开",
-    durationSeconds: 5.1,
+    durationSeconds: 4.6,
     layout: "center-stage",
     choreography: {
-      textStartFrame: 6, // 「围绕光标的快捷操作轮盘」最先出现
+      textStartFrame: 6, // 「Ringflow」先落，副标题隔一拍再出
       visualStartFrame: 24,
       actionStartFrame: 40,
       wheelStartFrame: 40, // 轮盘随后在居中位置旋转出现
       wheelRotateFrame: 40,
-      wheelShrinkFrame: 150, // 缩小的同时截图从一个点展开
-      holdStartFrame: 280,
+      wheelShrinkFrame: 136, // 转完即收：截图快速展开 + 轮盘对齐落位
+      holdStartFrame: 240,
     },
   },
   {
@@ -126,10 +126,10 @@ const rawScenes = [
     durationSeconds: 7.2,
     layout: "center-stage",
     choreography: {
-      textStartFrame: 0,
-      visualStartFrame: 20,
-      actionStartFrame: 36,
-      pressStartFrame: 64, // 中键按下：下陷 + 高亮（鼠标原地不动）
+      textStartFrame: 0, // 标题先出，三个词组随后逐个入场
+      visualStartFrame: 34,
+      actionStartFrame: 44,
+      pressStartFrame: 72, // 中键按下：下陷 + 高亮（鼠标原地不动）
       swipeStartFrame: 96, // 向斜上方（东北）轻轻一滑
       wheelStartFrame: 100, // 轮盘在偏右位置旋转出现，摇杆式高亮滑动方向
       releaseFrame: 190, // 松手执行：中键取消高亮、鼠标上弹，轮盘收起 → 「动作已执行」toast

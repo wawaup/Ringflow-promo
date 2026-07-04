@@ -25,8 +25,8 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
     headline: ["找菜单。", "切窗口。", "一遍又一遍。"],
   },
   reveal: {
-    headline: ["Ringflow"],
-    caption: "围绕光标的快捷操作轮盘",
+    // 主标题先出；第二行 Ringflow 落下的同一帧，轮盘开始旋入（timeline.wheelStartFrame 对齐）
+    headline: ["围绕光标的快捷操作轮盘", "Ringflow"],
   },
   gesture: {
     // Three beats, lit word by word (choreography.wordFrames)

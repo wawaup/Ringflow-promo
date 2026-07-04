@@ -23,6 +23,10 @@ type SceneShellProps = {
   hideText?: boolean;
   headlineSize?: number;
   captionSize?: number;
+  /** Frames between the last headline line and the caption (default 14). */
+  captionDelay?: number;
+  /** Frames between each headline line's reveal (default 8). */
+  lineStagger?: number;
   stageWidth?: number;
   stageHeight?: number;
   /** Camera push-in amount across the scene (0 disables). */
@@ -45,6 +49,8 @@ export const SceneShell = ({
   hideText = false,
   headlineSize,
   captionSize,
+  captionDelay,
+  lineStagger,
   stageWidth,
   stageHeight,
   pushIn = 0.03,
@@ -113,6 +119,8 @@ export const SceneShell = ({
               captionSize={captionSize ?? (layout === "top-stage" ? LAYOUT.text.captionBeat : LAYOUT.text.caption)}
               maxWidth={isRow ? LAYOUT.textMaxWidth.left : LAYOUT.textMaxWidth.topCenter}
               startFrame={c.textStartFrame}
+              captionDelay={captionDelay}
+              lineStagger={lineStagger}
             />
           </div>
         ) : null}

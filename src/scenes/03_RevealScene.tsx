@@ -65,8 +65,8 @@ export const RevealScene = () => {
   const rotateDeg = interpolate(rotateProgress, [0, 1], [-18, 0]);
 
   // One shared progress drives both the wheel docking and the screenshot pop —
-  // they read as a single "hand off to the real app" move.
-  const dock = interpolate(frame, [shrinkStart, shrinkStart + 76], [0, 1], {
+  // they read as a single, brisk "hand off to the real app" move.
+  const dock = interpolate(frame, [shrinkStart, shrinkStart + 54], [0, 1], {
     ...CLAMP,
     easing: EASE_TRAVEL,
   });
@@ -89,7 +89,8 @@ export const RevealScene = () => {
       scene={scene}
       gradient
       ambience={ease01(frame, wheelStart + 40, 60)}
-      headlineSize={128}
+      headlineSize={104}
+      lineStagger={34}
       stageWidth={STAGE_WIDTH}
       stageHeight={STAGE_HEIGHT}
       pushIn={0.024}
