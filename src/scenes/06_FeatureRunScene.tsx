@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { interpolate, useCurrentFrame } from "remotion";
+import { AppIcon, type AppIconName } from "../components/Brand/AppIcons";
 import { GlassCard } from "../components/Promo/GlassCard";
 import { KeyCap } from "../components/Promo/KeyCap";
 import { FONT_STACK } from "../components/Text/PromoText";
@@ -194,6 +195,13 @@ const QuickInputResult = ({ fb }: { fb: number }) => {
   );
 };
 
+/** Real macOS app icons for the quick-open targets. */
+const QUICK_OPEN_ICONS: Record<string, AppIconName> = {
+  Terminal: "terminal",
+  "README.md": "doc",
+  "Project Folder": "folder",
+};
+
 const QuickOpenResult = ({ fb }: { fb: number }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: 16, width: CARD_WIDTH }}>
     {QUICK_OPEN_TARGETS.map((target, index) => {
@@ -211,22 +219,7 @@ const QuickOpenResult = ({ fb }: { fb: number }) => (
             transform: `translateX(${(1 - t) * 34}px)`,
           }}
         >
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 11,
-              background: theme.gradients.accent,
-              color: "#fff",
-              display: "grid",
-              placeItems: "center",
-              fontSize: 19,
-              fontWeight: 700,
-              flex: "none",
-            }}
-          >
-            {target.label.slice(0, 1)}
-          </div>
+          <AppIcon name={QUICK_OPEN_ICONS[target.label] ?? "doc"} size={44} />
           <div style={{ fontSize: 26, fontWeight: 620, color: theme.colors.ink }}>{target.label}</div>
           <div style={{ marginLeft: "auto", fontSize: 20, color: theme.colors.muted }}>{target.desc}</div>
         </GlassCard>

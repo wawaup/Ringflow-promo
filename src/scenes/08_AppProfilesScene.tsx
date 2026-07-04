@@ -1,4 +1,5 @@
 import { interpolate, useCurrentFrame } from "remotion";
+import { AppIcon, type AppIconName } from "../components/Brand/AppIcons";
 import { GlassCard } from "../components/Promo/GlassCard";
 import { FONT_STACK } from "../components/Text/PromoText";
 import { RingflowWheel } from "../components/Wheel/RingflowWheel";
@@ -15,10 +16,10 @@ const STAGE_WIDTH = 1240;
 const STAGE_HEIGHT = 560;
 const WHEEL_BOX = 292;
 
-const APP_BADGES: Record<string, { bg: string; glyph: string }> = {
-  Notion: { bg: "linear-gradient(135deg, #37352f, #191919)", glyph: "N" },
-  Cursor: { bg: "linear-gradient(135deg, #4f7cf7, #1e4fd6)", glyph: "⌘" },
-  Zoom: { bg: "linear-gradient(135deg, #4a8cff, #2d8cff)", glyph: "Z" },
+const APP_ICONS: Record<string, AppIconName> = {
+  Notion: "notion",
+  Cursor: "cursor",
+  Zoom: "zoom",
 };
 
 /**
@@ -50,7 +51,6 @@ export const AppProfilesScene = () => {
         <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
           {PROFILE_WHEELS.map((profile, index) => {
             const active = index === activeIndex;
-            const badge = APP_BADGES[profile.app];
             const activeT = ease01(frame, switches[index], 16);
             const emphasis = active ? activeT : 0;
             return (
@@ -69,22 +69,7 @@ export const AppProfilesScene = () => {
                     : "1px solid rgba(255,255,255,0.9)",
                 }}
               >
-                <div
-                  style={{
-                    width: 54,
-                    height: 54,
-                    borderRadius: 14,
-                    background: badge.bg,
-                    color: "#fff",
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: 25,
-                    fontWeight: 700,
-                    flex: "none",
-                  }}
-                >
-                  {badge.glyph}
-                </div>
+                <AppIcon name={APP_ICONS[profile.app]} size={54} />
                 <div>
                   <div style={{ fontSize: 27, fontWeight: 650, color: theme.colors.ink }}>{profile.app}</div>
                   <div style={{ fontSize: 20, color: theme.colors.muted, marginTop: 2 }}>
