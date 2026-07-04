@@ -80,7 +80,8 @@ const FREEZE_AT = 442;
 const FREEZE_HOLD = 12;
 const OVERLAY_DUR = 16;
 const TEXT_START = FREEZE_AT + FREEZE_HOLD + OVERLAY_DUR; // 470
-const HANDY_START = TEXT_START + 92; // 562
+/** Beat of silence after 「一遍又一遍。」 before the conclusion lands. */
+const HANDY_START = TEXT_START + 126; // 596
 
 /** Reveal a string progressively, character by character. */
 const revealText = (full: string, progress: number) => {

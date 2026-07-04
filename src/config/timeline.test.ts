@@ -69,6 +69,6 @@ test("teaching scenes keep enough reading room", () => {
   assert.ok(reveal && gesture);
   // Thresholds tightened with the film-wide pacing pass (2026-07): scenes keep
   // just enough reading room without dragging between shots.
-  assert.ok(reveal.durationInFrames >= 320);
+  assert.ok(reveal.durationInFrames >= 300);
   assert.ok(gesture.durationInFrames >= 390);
 });

@@ -94,20 +94,20 @@ const rawScenes = [
     shot: 1,
     id: "friction",
     name: "摩擦：三个来源窗口搬进 Terminal，一轮完整演示 + 快速切窗蒙太奇 + 计数器",
-    durationSeconds: 10.8,
+    durationSeconds: 10.9,
     layout: "left-stage",
     choreography: {
       textStartFrame: 0,
       visualStartFrame: 20,
       actionStartFrame: 40, // 阶段1 完整一轮（Markdown bug），阶段2 便签/报错快速接力
-      holdStartFrame: 600,
+      holdStartFrame: 622,
     },
   },
   {
     shot: 2,
     id: "reveal",
     name: "亮相：文案先行 → 轮盘居中旋入 → 缩入应用预览框 + 截图展开",
-    durationSeconds: 5.5,
+    durationSeconds: 5.1,
     layout: "center-stage",
     choreography: {
       textStartFrame: 6, // 「围绕光标的快捷操作轮盘」最先出现
