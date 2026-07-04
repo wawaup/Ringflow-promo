@@ -90,7 +90,7 @@ export const RevealScene = () => {
       gradient
       ambience={ease01(frame, wheelStart + 40, 60)}
       headlineSize={104}
-      lineStagger={34}
+      lineStagger={40}
       stageWidth={STAGE_WIDTH}
       stageHeight={STAGE_HEIGHT}
       pushIn={0.024}

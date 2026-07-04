@@ -55,6 +55,9 @@ export const sceneCopy: Record<SceneId, SceneCopy> = {
     headline: ["不想从零编排？"],
     caption: "预设库，一键导入",
   },
+  "app-gallery": {
+    headline: ["支持 Mac 上的所有应用"],
+  },
   outro: {
     headline: ["唤出 · 选择 · 执行"],
     caption: "免费下载，开始使用",

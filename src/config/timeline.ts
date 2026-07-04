@@ -69,6 +69,7 @@ export type SceneId =
   | "group-ring"
   | "app-profiles"
   | "preset-library"
+  | "app-gallery"
   | "outro";
 
 export type SceneTiming = {
@@ -94,13 +95,13 @@ const rawScenes = [
     shot: 1,
     id: "friction",
     name: "摩擦：三个来源窗口搬进 Terminal，一轮完整演示 + 快速切窗蒙太奇 + 计数器",
-    durationSeconds: 10.9,
+    durationSeconds: 11.7,
     layout: "left-stage",
     choreography: {
       textStartFrame: 0,
       visualStartFrame: 20,
       actionStartFrame: 40, // 阶段1 完整一轮（Markdown bug），阶段2 便签/报错快速接力
-      holdStartFrame: 622,
+      holdStartFrame: 660,
     },
   },
   {
@@ -110,12 +111,12 @@ const rawScenes = [
     durationSeconds: 4.6,
     layout: "center-stage",
     choreography: {
-      textStartFrame: 6, // 「Ringflow」先落，副标题隔一拍再出
+      textStartFrame: 6, // 主标题先读一拍（40 帧），Ringflow 与轮盘同帧入场
       visualStartFrame: 24,
-      actionStartFrame: 40,
-      wheelStartFrame: 40, // 轮盘随后在居中位置旋转出现
-      wheelRotateFrame: 40,
-      wheelShrinkFrame: 136, // 转完即收：截图快速展开 + 轮盘对齐落位
+      actionStartFrame: 46,
+      wheelStartFrame: 46, // = textStartFrame + lineStagger(40)，与第二行同帧
+      wheelRotateFrame: 46,
+      wheelShrinkFrame: 140, // 转完即收：截图快速展开 + 轮盘对齐落位
       holdStartFrame: 240,
     },
   },
@@ -123,19 +124,19 @@ const rawScenes = [
     shot: 3,
     id: "gesture",
     name: "核心手势：如何唤醒？· 中键下陷 → 轻滑 → 轮盘旋入 → 松手执行 → 触控板接力",
-    durationSeconds: 7.2,
+    durationSeconds: 7.6,
     layout: "center-stage",
     choreography: {
-      textStartFrame: 0, // 标题先出，三个词组随后逐个入场
-      visualStartFrame: 34,
-      actionStartFrame: 44,
-      pressStartFrame: 72, // 中键按下：下陷 + 高亮（鼠标原地不动）
-      swipeStartFrame: 96, // 向斜上方（东北）轻轻一滑
-      wheelStartFrame: 100, // 轮盘在偏右位置旋转出现，摇杆式高亮滑动方向
-      releaseFrame: 190, // 松手执行：中键取消高亮、鼠标上弹，轮盘收起 → 「动作已执行」toast
-      holdStartFrame: 396,
-      wordFrames: [64, 104, 190],
-      trackpadHintFrame: 320, // 鼠标演示隐去后，触控板演示在同一位置放大接力
+      textStartFrame: 0, // 标题先读一拍，三个词组每 34 帧逐个入场（~128 帧全部落定）
+      visualStartFrame: 118, // 文字读完后演示才开始，不与文字抢视线
+      actionStartFrame: 126,
+      pressStartFrame: 148, // 中键按下：下陷 + 高亮（鼠标原地不动）
+      swipeStartFrame: 180, // 向斜上方（东北）轻轻一滑
+      wheelStartFrame: 186, // 轮盘在偏右位置旋转出现，摇杆式高亮滑动方向
+      releaseFrame: 268, // 松手执行：中键取消高亮、鼠标上弹，轮盘收起 → 「动作已执行」toast
+      holdStartFrame: 430,
+      wordFrames: [148, 184, 268], // 与按下 / 移向 / 松手三个动作同步点亮
+      trackpadHintFrame: 372, // 鼠标演示隐去后，触控板演示在同一位置放大接力
     },
   },
   {
@@ -171,7 +172,7 @@ const rawScenes = [
     shot: 6,
     id: "group-ring",
     name: "分组外环：一个轮盘装下更多（鼠标向左上，外环展开）",
-    durationSeconds: 4.0,
+    durationSeconds: 3.8,
     layout: "center-stage",
     choreography: {
       textStartFrame: 0,
@@ -202,7 +203,7 @@ const rawScenes = [
     shot: 8,
     id: "preset-library",
     name: "预设库：不想从零编排？一键导入",
-    durationSeconds: 4.0,
+    durationSeconds: 3.7,
     layout: "center-stage",
     choreography: {
       textStartFrame: 0,
@@ -214,6 +215,19 @@ const rawScenes = [
   },
   {
     shot: 9,
+    id: "app-gallery",
+    name: "应用长廊：多行 app 胶卷滚动 → 支持 Mac 上的所有应用 → 向两侧收起",
+    durationSeconds: 4.4,
+    layout: "center-stage",
+    choreography: {
+      textStartFrame: 64, // 滚动铺满后，标题浮出
+      visualStartFrame: 6,
+      actionStartFrame: 196, // 各行加速滚出两侧
+      holdStartFrame: 250,
+    },
+  },
+  {
+    shot: 10,
     id: "outro",
     name: "收尾：品牌定版 + CTA",
     durationSeconds: 4.0,

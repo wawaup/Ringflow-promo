@@ -80,8 +80,12 @@ const FREEZE_AT = 442;
 const FREEZE_HOLD = 12;
 const OVERLAY_DUR = 16;
 const TEXT_START = FREEZE_AT + FREEZE_HOLD + OVERLAY_DUR; // 470
-/** Beat of silence after 「一遍又一遍。」 before the conclusion lands. */
-const HANDY_START = TEXT_START + 126; // 596
+/**
+ * Reading rhythm: each line = 26f entrance + ≥14f dwell (lineStagger 40),
+ * then a LONG beat of silence (44f) after 「一遍又一遍。」 before the
+ * conclusion lands — the pause is what makes the answer land.
+ */
+const HANDY_START = TEXT_START + 150; // line 3 settles at +106, pause, then this
 
 /** Reveal a string progressively, character by character. */
 const revealText = (full: string, progress: number) => {
@@ -548,14 +552,14 @@ export const FrictionWorkflow = ({
           zIndex: 80,
         }}
       >
-        {/* 三行痛点，按时间顺序逐行落地（每行间隔 30 帧） */}
+        {/* 三行痛点，逐行落地：40 帧一拍（入场 26f + 注视 14f），观众读得完 */}
         <PromoText
           lines={sceneCopy.friction.headline}
           mode="dark"
           align="center"
           size={92}
           startFrame={TEXT_START + (action - 40)}
-          lineStagger={30}
+          lineStagger={40}
         />
         {/* 结论句：与上方同字号，单行 + 品牌渐变 */}
         <PromoText

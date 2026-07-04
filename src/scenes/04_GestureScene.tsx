@@ -145,8 +145,9 @@ export const GestureScene = () => {
         {/* Three teaching beats, lit word by word — the "how" */}
         <div style={{ display: "flex", alignItems: "baseline", gap: 34 }}>
           {words.map((word, index) => {
-            // Title lands first, then each phrase enters in order — not all at once.
-            const baseIn = ease01(frame, c.textStartFrame + 26 + index * 24, 24);
+            // Title reads first (a full beat), then each phrase enters in order —
+            // 34f apart so every step registers before the next appears.
+            const baseIn = ease01(frame, c.textStartFrame + 34 + index * 34, 24);
             const lit = ease01(frame, wordFrames[index], 18);
             return (
               <div key={word} style={{ display: "flex", alignItems: "baseline", gap: 34 }}>
